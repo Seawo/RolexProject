@@ -6,10 +6,33 @@ public class RolexProject : ModuleRules
 {
 	public RolexProject(ReadOnlyTargetRules Target) : base(Target)
 	{
-        PublicIncludePaths.AddRange(new string[] { "RolexProject" });
+        // Public 파일 경로 추가
+        PublicIncludePaths.AddRange(new string[] { 
+            "RolexProject", 
+            "RolexProject/LSH" , 
+            "RolexProject/CSW/Public", 
+            "RolexProject/PJE" 
+        });
 
+        // Private 파일 경로 추가
+        PrivateIncludePaths.AddRange(new string[] { 
+            "RolexProject/CSW/Private" 
+        });
+
+        // PCH 사용 설정
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+        // Public 종속성 추가
+		PublicDependencyModuleNames.AddRange(new string[] { 
+            "Core", 
+            "CoreUObject", 
+            "Engine", 
+            "InputCore", 
+            "EnhancedInput",
+            "UMG",
+            "OnlineSubsystem",
+            "OnlineSubsystemSteam",
+            "Niagara"
+        });
 	}
 }
