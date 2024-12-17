@@ -11,12 +11,13 @@ public class RolexProject : ModuleRules
             "RolexProject", 
             "RolexProject/LSH" , 
             "RolexProject/CSW/Public", 
-            "RolexProject/PJE" 
+            "RolexProject/jaeun/Public"
         });
 
         // Private 파일 경로 추가
         PrivateIncludePaths.AddRange(new string[] { 
-            "RolexProject/CSW/Private" 
+            "RolexProject/CSW/Private",
+            "RolexProject/jaeun/Private" 
         });
 
         // PCH 사용 설정
