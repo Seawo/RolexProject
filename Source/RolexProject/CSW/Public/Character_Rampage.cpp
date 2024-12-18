@@ -1,12 +1,12 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "LSH/Character_Phase.h"
+#include "Character_Rampage.h"
+
 #include "EnhancedInputComponent.h"
 
 
-
-ACharacter_Phase::ACharacter_Phase()
+ACharacter_Rampage::ACharacter_Rampage()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -20,31 +20,30 @@ ACharacter_Phase::ACharacter_Phase()
 	Data.Power = 20.0f;
 }
 
-void ACharacter_Phase::BeginPlay()
+void ACharacter_Rampage::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void ACharacter_Phase::Tick(float DeltaTime)
+void ACharacter_Rampage::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
-void ACharacter_Phase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ACharacter_Rampage::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	if (auto characterInput = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		characterInput->BindAction(IA_Q, ETriggerEvent::Started, this, &ACharacter_Phase::InputAttack);
-		characterInput->BindAction(IA_E, ETriggerEvent::Started, this, &ACharacter_Phase::InputAttack);
-		characterInput->BindAction(IA_LBM, ETriggerEvent::Started, this, &ACharacter_Phase::InputAttack);
-		characterInput->BindAction(IA_RBM, ETriggerEvent::Started, this, &ACharacter_Phase::InputAttack);
+		characterInput->BindAction(IA_Q, ETriggerEvent::Started, this, &ACharacter_Rampage::InputAttack);
+		characterInput->BindAction(IA_E, ETriggerEvent::Started, this, &ACharacter_Rampage::InputAttack);
+		characterInput->BindAction(IA_LBM, ETriggerEvent::Started, this, &ACharacter_Rampage::InputAttack);
+		characterInput->BindAction(IA_RBM, ETriggerEvent::Started, this, &ACharacter_Rampage::InputAttack);
 	}
-
 }
 
-void ACharacter_Phase::ChangeState(EAttackState state)
+void ACharacter_Rampage::ChangeState(EAttackState state)
 {
 	switch (state)
 	{
@@ -77,7 +76,7 @@ void ACharacter_Phase::ChangeState(EAttackState state)
 	}
 }
 
-void ACharacter_Phase::InputAttack(const FInputActionValue& inputValue)
+void ACharacter_Rampage::InputAttack(const FInputActionValue& inputValue)
 {
 	int inputVector = inputValue.Get<float>();
 	inputVector--;

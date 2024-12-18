@@ -4,17 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "BaseCharacter.h"
-#include "Character_Phase.generated.h"
+#include "Character_Rampage.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ROLEXPROJECT_API ACharacter_Phase : public ABaseCharacter
+class ROLEXPROJECT_API ACharacter_Rampage : public ABaseCharacter
 {
 	GENERATED_BODY()
-	
-	ACharacter_Phase();
+	ACharacter_Rampage();
 
 	virtual void BeginPlay() override;
 

@@ -64,11 +64,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void ChangeState(EMoveState newState) PURE_VIRTUAL(ABaseCharacter::ChangeState,);
-	virtual void QSkill() PURE_VIRTUAL(ABaseCharacter::QSkill,);
-	virtual void ESkill() PURE_VIRTUAL(ABaseCharacter::ESkill,);
-	virtual void LMB() PURE_VIRTUAL(ABaseCharacter::LMB,);
-	virtual void RMB() PURE_VIRTUAL(ABaseCharacter::RMB,);
+	virtual void ChangeState(EAttackState newState) PURE_VIRTUAL(ABaseCharacter::ChangeState,);
+	virtual void InputAttack(const struct FInputActionValue& inputValue) PURE_VIRTUAL(ABaseCharacter::InputAttack,);
 
 
 public:	
@@ -83,6 +80,8 @@ public:
 	EMoveState MoveState;				// 이동 상태
 	EAttackState AttackState;			// 공격 상태
 
+	UPROPERTY(EditDefaultsOnly, Category = "Montage")
+	TMap<FString, UAnimMontage*> AttackMontages;
 
 /*Input*/
 public:
@@ -101,7 +100,18 @@ public:
 	class UInputAction* IA_VectorMove;
 	UPROPERTY(EditAnywhere, Category = "Input")
 	class UInputAction* IA_Rotation;
-
+	UPROPERTY(EditAnywhere, Category = "Input")
+	class UInputAction* IA_LShift;						// 달리기
+	UPROPERTY(EditAnywhere, Category = "Input")
+	class UInputAction* IA_Spacebar;					// 점프
+	UPROPERTY(EditAnywhere, Category = "Input")
+	class UInputAction* IA_LBM;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	class UInputAction* IA_RBM;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	class UInputAction* IA_Q;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	class UInputAction* IA_E;
 
 
 	void InputMove(const struct FInputActionValue& inputValue);
