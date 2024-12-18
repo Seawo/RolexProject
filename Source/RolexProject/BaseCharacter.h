@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -6,6 +6,51 @@
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
 
+UENUM(BlueprintType)
+enum class EMoveState : uint8
+{
+	Idle,
+	Move,
+	Run,
+	Jump,
+	Crouch
+};
+
+UENUM(BlueprintType)
+enum class EAttackState : uint8
+{
+	QSkill,
+	ESkill,
+	LMB,
+	RMB
+};
+
+UENUM(BlueprintType)
+enum class ERoleTyep : uint8
+{
+	Tanker,
+	Dealer,
+	Healer
+};
+
+USTRUCT(BlueprintType)
+struct FCharacterData
+{
+	GENERATED_BODY()
+
+public:
+	ERoleTyep RoleType;		// 역할
+
+	FString Name;			// 캐릭터 이름
+	bool Team;				// 팀 여부 (true = Red , false = Blue)
+
+	// Stat
+	float MaxHp;			// 최대 체력
+	float Hp;				// 현재 체력
+	float Shield;			// 쉴드
+	float Speed;			// 이동속도
+	float Power;			// 공격력
+};
 
 UCLASS()
 class ROLEXPROJECT_API ABaseCharacter : public ACharacter
@@ -28,6 +73,9 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 
+	FCharacterData Data;				// 캐릭터 데이터를 가지고있을 구조체
+
+/*Input*/
 public:
 	UPROPERTY(EditAnywhere)
 	class UCapsuleComponent* capsuleComp;
