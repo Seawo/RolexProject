@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "BaseCharacter.h"
@@ -21,11 +21,12 @@ ABaseCharacter::ABaseCharacter()
 	capsuleComp->SetCapsuleHalfHeight(100.0f);
 	capsuleComp->SetCapsuleRadius(50.0f);
 
-	// TPS Ä«¸Ş¶ó ºÙÀÌ±â 
+	// TPS ì¹´ë©”ë¼ ë¶™ì´ê¸° 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComp->SetupAttachment(RootComponent);
 	SpringArmComp->SetRelativeLocation(FVector(0, 0, 40));
-	SpringArmComp->TargetArmLength = 25.0f;
+	SpringArmComp->TargetArmLength = 160.0f;
+	SpringArmComp->SocketOffset = FVector(0.0f,25.0f,75.0f);
 	SpringArmComp->bUsePawnControlRotation = true;
 
 	// Camera
