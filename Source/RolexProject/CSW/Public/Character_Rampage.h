@@ -23,4 +23,11 @@ class ROLEXPROJECT_API ACharacter_Rampage : public ABaseCharacter
 
 	virtual void ChangeState(EAttackState state) override;
 	virtual void InputAttack(const struct FInputActionValue& inputValue) override;
+
+public:
+	bool bIsRun = true;
+
+private:
+	void InputJump();
+	void InputRun();
 };
