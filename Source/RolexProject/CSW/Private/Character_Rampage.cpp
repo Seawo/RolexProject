@@ -108,13 +108,14 @@ void ACharacter_Rampage::InputRun()
 		bIsRun = false;
 		
 		GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
-		anim->SlopeForwardAngle = FMath::Lerp(-25.0f, 25.0f, 0.5f);
+		anim->SlopeForwardAngle = 3;
 	}
 	else
 	{
 		bIsRun = true;
 		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
-		anim->SlopeForwardAngle = FMath::Lerp(25.0f, -25.0f, 0.5f);
+		anim->SlopeForwardAngle = 0;
 	}
 
 }
+
