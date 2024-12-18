@@ -28,6 +28,7 @@ class ROLEXPROJECT_API ACharacter_Phase : public ABaseCharacter
 	void InputLShift();
 
 
+	void PlayMontage(FString Key, float InPlayRate = 1.0f, FName StartSectionName = NAME_None);
 
 
 private:

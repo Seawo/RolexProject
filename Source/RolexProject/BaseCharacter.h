@@ -80,7 +80,7 @@ public:
 	EMoveState MoveState;				// 이동 상태
 	EAttackState AttackState;			// 공격 상태
 
-	UPROPERTY(EditDefaultsOnly, Category = "Montage")
+	UPROPERTY(EditAnywhere, Category = "Montage")
 	TMap<FString, UAnimMontage*> AttackMontages;
 
 /*Input*/

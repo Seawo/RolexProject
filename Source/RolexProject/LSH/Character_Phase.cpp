@@ -4,6 +4,8 @@
 #include "LSH/Character_Phase.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "AnimInstance_Phase.h"
+#include "Animation/AnimMontage.h"
 
 ACharacter_Phase::ACharacter_Phase()
 {
@@ -68,7 +70,7 @@ void ACharacter_Phase::ChangeState(EAttackState state)
 	case EAttackState::LMB:
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("LMB"));
 		// Montage
-
+		PlayMontage("LMB",1.0f,"AAttack");
 		// Effect
 		break;
 	case EAttackState::RMB:
@@ -104,4 +106,26 @@ void ACharacter_Phase::InputLShift()
 		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
 		SlopeForwardAngle = 0.0f;
 	}
+}
+
+void ACharacter_Phase::PlayMontage(FString Key, float InPlayRate, FName StartSectionName)
+{
+	if (AttackMontages.Contains(Key))
+	{
+		// 화면에 Key값 출력하기
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, Key);
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, StartSectionName.ToString());
+
+		UAnimMontage* Montage = AttackMontages[Key];
+		PlayAnimMontage(Montage, InPlayRate, StartSectionName);
+	}
+
+	//if (Montage != nullptr)
+	//{
+	//	//몽타주 재생하기
+	//	PlayAnimMontage(Montage, InPlayRate, StartSectionName);
+	//
+	//	//UAnimInstance_Phase* animInstance = Cast<UAnimInstance_Phase>(GetMesh()->GetAnimInstance());
+	//	//animInstance->Montage_Play(Montage, 1);
+	//}
 }
