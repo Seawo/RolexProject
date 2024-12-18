@@ -12,8 +12,7 @@ enum class EMoveState : uint8
 	Idle,
 	Move,
 	Run,
-	Jump,
-	Crouch
+	Jump
 };
 
 UENUM(BlueprintType)
@@ -72,8 +71,11 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-
+	UPROPERTY()
 	FCharacterData Data;				// 캐릭터 데이터를 가지고있을 구조체
+	EMoveState MoveState;				// 이동 상태
+	EAttackState AttackState;			// 공격 상태
+
 
 /*Input*/
 public:
