@@ -24,4 +24,18 @@ class ROLEXPROJECT_API ACharacter_Phase : public ABaseCharacter
 
 	virtual void ChangeState(EAttackState state) override;
 	virtual void InputAttack(const struct FInputActionValue& inputValue) override;
+
+	void InputLShift();
+
+
+
+
+private:
+	bool bLShift = true;
+	float LerpAlpha = 0.0f;
+	float Duration = 5.0f;
+
+
+	public:
+	float SlopeForwardAngle = 0.0f;
 };

@@ -3,8 +3,7 @@
 
 #include "LSH/Character_Phase.h"
 #include "EnhancedInputComponent.h"
-
-
+#include "GameFramework/CharacterMovementComponent.h"
 
 ACharacter_Phase::ACharacter_Phase()
 {
@@ -36,12 +35,18 @@ void ACharacter_Phase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	if (auto characterInput = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
+		characterInput->BindAction(IA_Spacebar, ETriggerEvent::Started, this, &ACharacter_Phase::Jump);
+		characterInput->BindAction(IA_Spacebar, ETriggerEvent::Completed, this, &ACharacter_Phase::StopJumping);
+
+		characterInput->BindAction(IA_LShift, ETriggerEvent::Started, this, &ACharacter_Phase::InputLShift);
+		characterInput->BindAction(IA_LShift, ETriggerEvent::Completed, this, &ACharacter_Phase::InputLShift);
+
 		characterInput->BindAction(IA_Q, ETriggerEvent::Started, this, &ACharacter_Phase::InputAttack);
 		characterInput->BindAction(IA_E, ETriggerEvent::Started, this, &ACharacter_Phase::InputAttack);
 		characterInput->BindAction(IA_LBM, ETriggerEvent::Started, this, &ACharacter_Phase::InputAttack);
 		characterInput->BindAction(IA_RBM, ETriggerEvent::Started, this, &ACharacter_Phase::InputAttack);
-	}
 
+	}
 }
 
 void ACharacter_Phase::ChangeState(EAttackState state)
@@ -64,13 +69,13 @@ void ACharacter_Phase::ChangeState(EAttackState state)
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("LMB"));
 		// Montage
 
-// Effect
+		// Effect
 		break;
 	case EAttackState::RMB:
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("RMB"));
 		// Montage
 
-// Effect
+		// Effect
 		break;
 	default:
 		break;
@@ -83,4 +88,20 @@ void ACharacter_Phase::InputAttack(const FInputActionValue& inputValue)
 	inputVector--;
 	EAttackState state = static_cast<EAttackState>(inputVector);
 	ChangeState(state);
+}
+
+void ACharacter_Phase::InputLShift()
+{
+	if (bLShift)
+	{
+		bLShift = false;
+		GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
+		SlopeForwardAngle = 25.0f;
+	}
+	else
+	{
+		bLShift = true;
+		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+		SlopeForwardAngle = 0.0f;
+	}
 }
