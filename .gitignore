@@ -76,4 +76,6 @@ Plugins/**/Intermediate/*
 # Cache files for the editor to use
 DerivedDataCache/*
 
+# 소스 파일
+Content/ParagonPhase
 
