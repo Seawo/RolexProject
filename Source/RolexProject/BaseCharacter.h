@@ -25,7 +25,7 @@ enum class EAttackState : uint8
 };
 
 UENUM(BlueprintType)
-enum class ERoleTyep : uint8
+enum class ERoleType : uint8
 {
 	Tanker,
 	Dealer,
@@ -38,7 +38,7 @@ struct FCharacterData
 	GENERATED_BODY()
 
 public:
-	ERoleTyep RoleType;		// 역할
+	ERoleType RoleType;		// 역할
 
 	FString Name;			// 캐릭터 이름
 	bool Team;				// 팀 여부 (true = Red , false = Blue)
@@ -63,6 +63,13 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	virtual void ChangeState(EMoveState newState) PURE_VIRTUAL(ABaseCharacter::ChangeState,);
+	virtual void QSkill() PURE_VIRTUAL(ABaseCharacter::QSkill,);
+	virtual void ESkill() PURE_VIRTUAL(ABaseCharacter::ESkill,);
+	virtual void LMB() PURE_VIRTUAL(ABaseCharacter::LMB,);
+	virtual void RMB() PURE_VIRTUAL(ABaseCharacter::RMB,);
+
 
 public:	
 	// Called every frame
