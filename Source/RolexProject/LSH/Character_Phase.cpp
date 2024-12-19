@@ -3,8 +3,10 @@
 
 #include "LSH/Character_Phase.h"
 #include "EnhancedInputComponent.h"
-
-
+#include "GameFramework/CharacterMovementComponent.h"
+#include "AnimInstance_Phase.h"
+#include "Animation/AnimMontage.h"
+#include "DataAsset_PhaseLMB.h"
 
 ACharacter_Phase::ACharacter_Phase()
 {
@@ -23,6 +25,8 @@ ACharacter_Phase::ACharacter_Phase()
 void ACharacter_Phase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	AnimInstance = Cast<UAnimInstance_Phase>(GetMesh()->GetAnimInstance());
 }
 
 void ACharacter_Phase::Tick(float DeltaTime)
@@ -36,12 +40,18 @@ void ACharacter_Phase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	if (auto characterInput = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
+		characterInput->BindAction(IA_Spacebar, ETriggerEvent::Started, this, &ACharacter_Phase::Jump);
+		characterInput->BindAction(IA_Spacebar, ETriggerEvent::Completed, this, &ACharacter_Phase::StopJumping);
+
+		characterInput->BindAction(IA_LShift, ETriggerEvent::Started, this, &ACharacter_Phase::InputLShift);
+		characterInput->BindAction(IA_LShift, ETriggerEvent::Completed, this, &ACharacter_Phase::InputLShift);
+
 		characterInput->BindAction(IA_Q, ETriggerEvent::Started, this, &ACharacter_Phase::InputAttack);
 		characterInput->BindAction(IA_E, ETriggerEvent::Started, this, &ACharacter_Phase::InputAttack);
 		characterInput->BindAction(IA_LBM, ETriggerEvent::Started, this, &ACharacter_Phase::InputAttack);
 		characterInput->BindAction(IA_RBM, ETriggerEvent::Started, this, &ACharacter_Phase::InputAttack);
-	}
 
+	}
 }
 
 void ACharacter_Phase::ChangeState(EAttackState state)
@@ -51,26 +61,40 @@ void ACharacter_Phase::ChangeState(EAttackState state)
 	case EAttackState::QSkill:
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("QSkill"));
 		// Montage
-
+		PlayMontage("Q", 1.0f);
 		// Effect
 		break;
 	case EAttackState::ESkill:
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("ESkill"));
 		// Montage
-
+		PlayMontage("E", 1.0f);
 		// Effect
 		break;
 	case EAttackState::LMB:
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("LMB"));
 		// Montage
-
-// Effect
+		PlayMontage("LMB",1.0f);
+		
+		//if (CurrentLMBCombo == 0)
+		//{
+		//	LMBActionBegin();
+		//}
+		//if(!LMBTimerHandle.IsValid())
+		//{
+		//	bHasNextLMBCommand = false;
+		//}
+		//else
+		//{
+		//	bHasNextLMBCommand = true;
+		//}
+		
+		// Effect
 		break;
 	case EAttackState::RMB:
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("RMB"));
 		// Montage
-
-// Effect
+		PlayMontage("RMB", 1.0f);
+		// Effect
 		break;
 	default:
 		break;
@@ -84,3 +108,112 @@ void ACharacter_Phase::InputAttack(const FInputActionValue& inputValue)
 	EAttackState state = static_cast<EAttackState>(inputVector);
 	ChangeState(state);
 }
+
+void ACharacter_Phase::InputLShift()
+{
+	if (bLShift)
+	{
+		bLShift = false;
+		GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
+		SlopeForwardAngle = 25.0f;
+	}
+	else
+	{
+		bLShift = true;
+		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+		SlopeForwardAngle = 0.0f;
+	}
+}
+
+void ACharacter_Phase::PlayMontage(FString Key, float InPlayRate, FName StartSectionName)
+{
+	if (AttackMontages.Contains(Key))
+	{
+		UAnimMontage* Montage = AttackMontages[Key];
+
+
+		if (AnimInstance->Montage_IsPlaying(Montage))
+		{
+			return;
+		}
+		// 화면에 Key값 출력하기
+		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, Key);
+		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, StartSectionName.ToString());
+
+		PlayAnimMontage(Montage, InPlayRate);
+	}
+}
+
+//void ACharacter_Phase::LMBActionBegin()
+//{
+//	// 콤보 시작
+//	CurrentLMBCombo = 1;
+//	FString key = "LMB";
+//	if (AttackMontages.Contains(key))
+//	{
+//		// 화면에 Key값 출력하기
+//		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, Key);
+//		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, StartSectionName.ToString());
+//		
+//		UAnimMontage* Montage = AttackMontages[key];
+//		//PlayAnimMontage(Montage, InPlayRate, StartSectionName);
+//
+//		// Animation Setting
+//		const float attackSpeedRate = 1.0f;
+//		//PlayMontage("LMB", attackSpeedRate, "Attack1");
+//		
+//
+//		if (AnimInstance)
+//		{
+//			AnimInstance->Montage_Play(Montage, attackSpeedRate);
+//
+//			FOnMontageEnded endDelegate;
+//			endDelegate.BindUObject(this, &ACharacter_Phase::LMBActionEnd);
+//			AnimInstance->Montage_SetEndDelegate(endDelegate, Montage);
+//		}
+//		else
+//		{
+//			UE_LOG(LogTemp, Error, TEXT("AnimInstance is nullptr"));
+//		}
+//
+//		LMBTimerHandle.Invalidate();
+//		SetLMBCheckTimer(Montage);
+//	}
+//}
+//
+//void ACharacter_Phase::LMBActionEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
+//{
+//	ensure(CurrentLMBCombo != 0);	// ensur이라는 Assertion 함수를 사용해서 CurrentLMBCombo가 0이 나오면 출력 로그에 에러 발생
+//
+//	CurrentLMBCombo = 0;
+//
+//}
+//
+//void ACharacter_Phase::SetLMBCheckTimer(UAnimMontage* TargetMontage)
+//{
+//	int32 lmbIndex = CurrentLMBCombo;
+//
+//	ensure(LMBData->EffectiveFrameCount.IsValidIndex(lmbIndex)); // false면 문제가 있다
+//
+//	const float attackSpeedRate = 1.0f;
+//	// 발동할 시간 정도를 계산
+//	float lmbEffectiveTime = (LMBData->EffectiveFrameCount[lmbIndex] / LMBData->FrameRate) / attackSpeedRate;
+//	if (lmbEffectiveTime > 0.0f)
+//	{
+//		GetWorld()->GetTimerManager().SetTimer(LMBTimerHandle, FTimerDelegate::CreateLambda([this, TargetMontage](){LMBCheck(TargetMontage);}), lmbEffectiveTime, false);
+//	}
+//}
+//
+//void ACharacter_Phase::LMBCheck(UAnimMontage* TargetMontage)
+//{
+//	// Handle 초기화
+//	LMBTimerHandle.Invalidate();
+//	if (bHasNextLMBCommand)
+//	{
+//		CurrentLMBCombo = FMath::Clamp(CurrentLMBCombo + 1, 1, LMBData->MaxComboCount);
+//		FName nextSection = FName(*FString::Printf(TEXT("%s%d"), *LMBData->MontageSectionName, CurrentLMBCombo));
+//		AnimInstance->Montage_JumpToSection(nextSection, TargetMontage);
+//		SetLMBCheckTimer(TargetMontage);
+//		bHasNextLMBCommand = false;
+//	}
+//}

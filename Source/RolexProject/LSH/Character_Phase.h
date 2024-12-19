@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BaseCharacter.h"
+#include "Animation/AnimMontage.h"
 #include "Character_Phase.generated.h"
 
 /**
@@ -24,4 +25,40 @@ class ROLEXPROJECT_API ACharacter_Phase : public ABaseCharacter
 
 	virtual void ChangeState(EAttackState state) override;
 	virtual void InputAttack(const struct FInputActionValue& inputValue) override;
+
+	void InputLShift();
+
+
+	void PlayMontage(FString Key, float InPlayRate = 1.0f, FName StartSectionName = NAME_None);
+
+
+
+protected:
+	void LMBActionBegin();
+	void LMBActionEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
+	void SetLMBCheckTimer(class UAnimMontage* TargetMontage);
+	void LMBCheck(class UAnimMontage* TargetMontage);
+
+
+
+
+protected:
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UDataAsset_PhaseLMB> LMBData;
+	int32 CurrentLMBCombo = 0;
+	FTimerHandle LMBTimerHandle;
+	bool bHasNextLMBCommand = false;
+
+private:
+	class UAnimInstance_Phase* AnimInstance;
+
+	bool bLShift = true;
+	float LerpAlpha = 0.0f;
+	float Duration = 5.0f;
+
+
+	public:
+	float SlopeForwardAngle = 0.0f;
+
+	
 };
