@@ -16,8 +16,6 @@ class ROLEXPROJECT_API UBaseAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 	
 
-	virtual void NativeInitializeAnimation() override;
-
 
 	public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterData")
