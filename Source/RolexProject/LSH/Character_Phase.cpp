@@ -110,7 +110,7 @@ void ACharacter_Phase::InputAttack(const FInputActionValue& inputValue)
 	int inputVector = inputValue.Get<float>();
 	inputVector--;
 	EAttackState state = static_cast<EAttackState>(inputVector);
-	ChangeState(state);
+	ChangeAttackState(state);
 }
 
 void ACharacter_Phase::InputLShift()

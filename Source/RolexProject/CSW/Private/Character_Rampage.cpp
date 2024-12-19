@@ -35,6 +35,7 @@ void ACharacter_Rampage::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 
 	
 }
 
@@ -126,16 +127,13 @@ void ACharacter_Rampage::ChangeAttackState(EAttackState state)
 	}
 }
 
-void ACharacter_Rampage::ChangeState(EMoveState state)
-{
-}
 
 void ACharacter_Rampage::InputAttack(const FInputActionValue& inputValue)
 {
 	int inputVector = inputValue.Get<float>();
 	inputVector--;
 	CurrAttackState = static_cast<EAttackState>(inputVector);
-	ChangeState(CurrAttackState);
+	ChangeAttackState(CurrAttackState);
 }
 
 void ACharacter_Rampage::InputJump()
@@ -271,4 +269,3 @@ void ACharacter_Rampage::EAttack()
 		DashDuration, false);
 
 }
-

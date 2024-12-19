@@ -11,6 +11,9 @@
 #include <GameFramework\SpringArmComponent.h>
 #include "Camera\CameraComponent.h"
 
+#include "Animation\AnimMontage.h"
+
+
 // Sets default values
 ABaseCharacter::ABaseCharacter()
 {
@@ -56,6 +59,24 @@ void ABaseCharacter::BeginPlay()
 		}
 	}
 
+}
+
+void ABaseCharacter::ChangeState(EMoveState newState, UAnimMontage* montage)
+{
+	switch (newState)
+	{
+	case EMoveState::Stun:
+		Sturn(montage);
+		break;
+	case EMoveState::Die:
+		Die(montage);
+		break;
+	case EMoveState::Start:
+		Start(montage);
+		break;
+	default:
+		break;
+	}
 }
 
 // Called every frame
@@ -110,5 +131,60 @@ void ABaseCharacter::InputRotation(const FInputActionValue& inputValue)
 		AddControllerPitchInput(InputVector.Y);
 	}
 
+}
+
+void ABaseCharacter::Sturn(UAnimMontage* montage)
+{
+	bIsMove = false;
+	// Test
+	PlayAnimMontage(montage);
+
+	float montageDelay = montage->GetPlayLength() + 1.0f;
+
+	FTimerHandle montageTimer;
+	GetWorld()->GetTimerManager().SetTimer(montageTimer, FTimerDelegate::CreateLambda(
+		[this]() 
+		{
+			bIsMove = true;
+
+		}),
+		montageDelay, false);
+
+}
+
+void ABaseCharacter::Die(UAnimMontage* montage)
+{
+	bIsMove = false;
+	PlayAnimMontage(montage);
+
+	float montageDelay = montage->GetPlayLength() + 1.0f;
+
+	FTimerHandle montageTimer;
+	GetWorld()->GetTimerManager().SetTimer(montageTimer, FTimerDelegate::CreateLambda(
+		[this]()
+		{
+			bIsMove = true;
+
+		}),
+		montageDelay, false);
+	
+}
+
+void ABaseCharacter::Start(UAnimMontage* montage)
+{
+	bIsMove = false;
+	PlayAnimMontage(montage);
+
+	float montageDelay = montage->GetPlayLength() + 1.0f;
+
+	FTimerHandle montageTimer;
+	GetWorld()->GetTimerManager().SetTimer(montageTimer, FTimerDelegate::CreateLambda(
+		[this]()
+		{
+			bIsMove = true;
+
+		}),
+		montageDelay, false);
+	
 }
 
