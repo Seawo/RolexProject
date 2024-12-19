@@ -35,6 +35,7 @@ void ACharacter_Rampage::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 
 	
 }
 
@@ -126,9 +127,6 @@ void ACharacter_Rampage::ChangeAttackState(EAttackState state)
 	}
 }
 
-void ACharacter_Rampage::ChangeState(EMoveState state)
-{
-}
 
 void ACharacter_Rampage::InputAttack(const FInputActionValue& inputValue)
 {
@@ -271,4 +269,3 @@ void ACharacter_Rampage::EAttack()
 		DashDuration, false);
 
 }
-

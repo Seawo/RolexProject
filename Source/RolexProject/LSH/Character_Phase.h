@@ -24,10 +24,10 @@ class ROLEXPROJECT_API ACharacter_Phase : public ABaseCharacter
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void ChangeAttackState(EAttackState state) override;
-	virtual void ChangeState(EMoveState state) override;
 	virtual void InputAttack(const struct FInputActionValue& inputValue) override;
 
 	void InputLShift();
+	void ChangeState(EMoveState state);
 
 
 	void PlayMontage(FString Key, float InPlayRate = 1.0f, FName StartSectionName = NAME_None);

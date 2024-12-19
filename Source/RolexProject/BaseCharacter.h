@@ -68,8 +68,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void ChangeAttackState(EAttackState newState) PURE_VIRTUAL(ABaseCharacter::ChangeState,);
-	virtual void ChangeState(EMoveState newState) PURE_VIRTUAL(ABaseCharacter::ChangeState,);
 	virtual void InputAttack(const struct FInputActionValue& inputValue) PURE_VIRTUAL(ABaseCharacter::InputAttack,);
+	void ChangeState(EMoveState newState, UAnimMontage* montage);
 
 
 public:	
@@ -86,6 +86,8 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	TMap<FString, UAnimMontage*> AttackMontages;
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TMap<FString, UAnimMontage*> stateMontages;
 
 protected:
 	bool bIsMove = true;				// 이동중인지
@@ -124,4 +126,8 @@ public:
 
 	void InputMove(const struct FInputActionValue& inputValue);
 	void InputRotation(const struct FInputActionValue& inputValue);
+
+	void Sturn(UAnimMontage* montage);
+	void Die(UAnimMontage* montage);
+	void Start(UAnimMontage* montage);
 };
