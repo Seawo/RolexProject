@@ -25,9 +25,37 @@ class ROLEXPROJECT_API ACharacter_Rampage : public ABaseCharacter
 	virtual void InputAttack(const struct FInputActionValue& inputValue) override;
 
 public:
-	bool bIsRun = true;
+	/*
+	LBM, RBM, Q, E 
+	*/
+	EAttackState CurrAttackState;
 
 private:
+	bool bIsRun = true;
+
+	// LBM
+	int32 MaxCnt;
+	int32 ComboCnt;
+	float ComboResetDelay;
+
+	// E
+	bool bIsDashing = false;
+	float DashSpeed = 2000.0f;
+	float DashDuration = 1.0f;
+	FVector DashDirection;
+	FVector StartPos;
+	float ElapsedTime = 0.0f;
+	float  DashHeight = 500.0f;
+	
+	// 콤보 리셋을 위한 타이머 핸들
+	FTimerHandle ComboResetTimerHandle;
+	FTimerHandle DashTimerHandle;
+
+
 	void InputJump();
 	void InputRun();
+	void LBMAttack();
+	void RBMAttack();
+	void QAttack();
+	void EAttack();
 };
