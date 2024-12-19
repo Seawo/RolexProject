@@ -10,6 +10,7 @@
 #include "Animation\AnimInstance.h"
 #include "Animation\AnimMontage.h"
 
+
 ACharacter_Rampage::ACharacter_Rampage()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -171,11 +172,7 @@ void ACharacter_Rampage::LBMAttack()
 			return;
 	}
 
-	for (const TPair<FString, UAnimMontage*>& Pair : stateMontages)
-	{
-		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(Pair.Value))
-			return;
-	}
+
 
 
 	if (ComboCnt < MaxCnt)

@@ -89,8 +89,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	TMap<FString, UAnimMontage*> stateMontages;
 
-protected:
-	bool bIsMove = true;				// 이동중인지
 
 
 

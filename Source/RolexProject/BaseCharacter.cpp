@@ -12,6 +12,7 @@
 #include "Camera\CameraComponent.h"
 
 #include "Animation\AnimMontage.h"
+#include "GameFramework\CharacterMovementComponent.h"
 
 
 // Sets default values
@@ -103,22 +104,19 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void ABaseCharacter::InputMove(const FInputActionValue& inputValue)
 {
-	if (bIsMove)
+	FVector2D InputVector = inputValue.Get<FVector2D>();
+
+	if (IsValid(Controller))
 	{
-		FVector2D InputVector = inputValue.Get<FVector2D>();
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRoatation(0, Rotation.Yaw, 0);
 
-		if (IsValid(Controller))
-		{
-			const FRotator Rotation = Controller->GetControlRotation();
-			const FRotator YawRoatation(0, Rotation.Yaw, 0);
+		const FVector ForwardDir = FRotationMatrix(YawRoatation).GetUnitAxis(EAxis::X);
+		const FVector RightDir = FRotationMatrix(YawRoatation).GetUnitAxis(EAxis::Y);
 
-			const FVector ForwardDir = FRotationMatrix(YawRoatation).GetUnitAxis(EAxis::X);
-			const FVector RightDir = FRotationMatrix(YawRoatation).GetUnitAxis(EAxis::Y);
-
-			AddMovementInput(ForwardDir, InputVector.Y);
-			AddMovementInput(RightDir, InputVector.X);
-		}
-	}
+		AddMovementInput(ForwardDir, InputVector.Y);
+		AddMovementInput(RightDir, InputVector.X);
+	}	
 }
 
 void ABaseCharacter::InputRotation(const FInputActionValue& inputValue)
@@ -135,7 +133,7 @@ void ABaseCharacter::InputRotation(const FInputActionValue& inputValue)
 
 void ABaseCharacter::Sturn(UAnimMontage* montage)
 {
-	bIsMove = false;
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	// Test
 	PlayAnimMontage(montage);
 
@@ -145,7 +143,7 @@ void ABaseCharacter::Sturn(UAnimMontage* montage)
 	GetWorld()->GetTimerManager().SetTimer(montageTimer, FTimerDelegate::CreateLambda(
 		[this]() 
 		{
-			bIsMove = true;
+			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 
 		}),
 		montageDelay, false);
@@ -154,7 +152,7 @@ void ABaseCharacter::Sturn(UAnimMontage* montage)
 
 void ABaseCharacter::Die(UAnimMontage* montage)
 {
-	bIsMove = false;
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	PlayAnimMontage(montage);
 
 	float montageDelay = montage->GetPlayLength() + 1.0f;
@@ -163,8 +161,8 @@ void ABaseCharacter::Die(UAnimMontage* montage)
 	GetWorld()->GetTimerManager().SetTimer(montageTimer, FTimerDelegate::CreateLambda(
 		[this]()
 		{
-			bIsMove = true;
-
+			
+			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 		}),
 		montageDelay, false);
 	
@@ -172,7 +170,8 @@ void ABaseCharacter::Die(UAnimMontage* montage)
 
 void ABaseCharacter::Start(UAnimMontage* montage)
 {
-	bIsMove = false;
+	//bIsMove = false;
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	PlayAnimMontage(montage);
 
 	float montageDelay = montage->GetPlayLength() + 1.0f;
@@ -181,7 +180,8 @@ void ABaseCharacter::Start(UAnimMontage* montage)
 	GetWorld()->GetTimerManager().SetTimer(montageTimer, FTimerDelegate::CreateLambda(
 		[this]()
 		{
-			bIsMove = true;
+			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+			//bIsMove = true;
 
 		}),
 		montageDelay, false);
