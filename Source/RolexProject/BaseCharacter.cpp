@@ -12,7 +12,7 @@
 #include "Camera\CameraComponent.h"
 
 #include "Animation\AnimMontage.h"
-
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -172,7 +172,8 @@ void ABaseCharacter::Die(UAnimMontage* montage)
 
 void ABaseCharacter::Start(UAnimMontage* montage)
 {
-	bIsMove = false;
+	//bIsMove = false;
+	GetCharacterMovement()->DisableMovement();
 	PlayAnimMontage(montage);
 
 	float montageDelay = montage->GetPlayLength() + 1.0f;
@@ -181,7 +182,8 @@ void ABaseCharacter::Start(UAnimMontage* montage)
 	GetWorld()->GetTimerManager().SetTimer(montageTimer, FTimerDelegate::CreateLambda(
 		[this]()
 		{
-			bIsMove = true;
+			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+			//bIsMove = true;
 
 		}),
 		montageDelay, false);
