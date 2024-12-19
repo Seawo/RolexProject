@@ -82,18 +82,21 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void ABaseCharacter::InputMove(const FInputActionValue& inputValue)
 {
-	FVector2D InputVector = inputValue.Get<FVector2D>();
-
-	if (IsValid(Controller))
+	if (bIsMove)
 	{
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRoatation(0, Rotation.Yaw, 0);
+		FVector2D InputVector = inputValue.Get<FVector2D>();
 
-		const FVector ForwardDir = FRotationMatrix(YawRoatation).GetUnitAxis(EAxis::X);
-		const FVector RightDir = FRotationMatrix(YawRoatation).GetUnitAxis(EAxis::Y);
+		if (IsValid(Controller))
+		{
+			const FRotator Rotation = Controller->GetControlRotation();
+			const FRotator YawRoatation(0, Rotation.Yaw, 0);
 
-		AddMovementInput(ForwardDir, InputVector.Y);
-		AddMovementInput(RightDir, InputVector.X);
+			const FVector ForwardDir = FRotationMatrix(YawRoatation).GetUnitAxis(EAxis::X);
+			const FVector RightDir = FRotationMatrix(YawRoatation).GetUnitAxis(EAxis::Y);
+
+			AddMovementInput(ForwardDir, InputVector.Y);
+			AddMovementInput(RightDir, InputVector.X);
+		}
 	}
 }
 

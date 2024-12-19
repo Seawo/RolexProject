@@ -54,7 +54,7 @@ void ACharacter_Phase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	}
 }
 
-void ACharacter_Phase::ChangeState(EAttackState state)
+void ACharacter_Phase::ChangeAttackState(EAttackState state)
 {
 	switch (state)
 	{
@@ -99,6 +99,10 @@ void ACharacter_Phase::ChangeState(EAttackState state)
 	default:
 		break;
 	}
+}
+
+void ACharacter_Phase::ChangeState(EMoveState state)
+{
 }
 
 void ACharacter_Phase::InputAttack(const FInputActionValue& inputValue)

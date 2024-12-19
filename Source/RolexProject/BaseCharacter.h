@@ -67,7 +67,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void ChangeState(EAttackState newState) PURE_VIRTUAL(ABaseCharacter::ChangeState,);
+	virtual void ChangeAttackState(EAttackState newState) PURE_VIRTUAL(ABaseCharacter::ChangeState,);
+	virtual void ChangeState(EMoveState newState) PURE_VIRTUAL(ABaseCharacter::ChangeState,);
 	virtual void InputAttack(const struct FInputActionValue& inputValue) PURE_VIRTUAL(ABaseCharacter::InputAttack,);
 
 
@@ -85,6 +86,11 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	TMap<FString, UAnimMontage*> AttackMontages;
+
+protected:
+	bool bIsMove = true;				// 이동중인지
+
+
 
 /*Input*/
 public:
@@ -115,7 +121,6 @@ public:
 	class UInputAction* IA_Q;
 	UPROPERTY(EditAnywhere, Category = "Input")
 	class UInputAction* IA_E;
-
 
 	void InputMove(const struct FInputActionValue& inputValue);
 	void InputRotation(const struct FInputActionValue& inputValue);

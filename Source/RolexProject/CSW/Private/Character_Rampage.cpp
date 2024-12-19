@@ -101,7 +101,7 @@ void ACharacter_Rampage::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	}
 }
 
-void ACharacter_Rampage::ChangeState(EAttackState state)
+void ACharacter_Rampage::ChangeAttackState(EAttackState state)
 {
 	switch (state)
 	{
@@ -124,6 +124,10 @@ void ACharacter_Rampage::ChangeState(EAttackState state)
 	default:
 		break;
 	}
+}
+
+void ACharacter_Rampage::ChangeState(EMoveState state)
+{
 }
 
 void ACharacter_Rampage::InputAttack(const FInputActionValue& inputValue)

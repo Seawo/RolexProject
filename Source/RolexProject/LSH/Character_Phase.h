@@ -23,7 +23,8 @@ class ROLEXPROJECT_API ACharacter_Phase : public ABaseCharacter
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	virtual void ChangeState(EAttackState state) override;
+	virtual void ChangeAttackState(EAttackState state) override;
+	virtual void ChangeState(EMoveState state) override;
 	virtual void InputAttack(const struct FInputActionValue& inputValue) override;
 
 	void InputLShift();
@@ -34,10 +35,10 @@ class ROLEXPROJECT_API ACharacter_Phase : public ABaseCharacter
 
 
 protected:
-	void LMBActionBegin();
-	void LMBActionEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
-	void SetLMBCheckTimer(class UAnimMontage* TargetMontage);
-	void LMBCheck(class UAnimMontage* TargetMontage);
+	//void LMBActionBegin();
+	//void LMBActionEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
+	//void SetLMBCheckTimer(class UAnimMontage* TargetMontage);
+	//void LMBCheck(class UAnimMontage* TargetMontage);
 
 
 

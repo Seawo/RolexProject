@@ -21,7 +21,8 @@ class ROLEXPROJECT_API ACharacter_Rampage : public ABaseCharacter
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	virtual void ChangeState(EAttackState state) override;
+	virtual void ChangeAttackState(EAttackState state) override;
+	virtual void ChangeState(EMoveState state) override;
 	virtual void InputAttack(const struct FInputActionValue& inputValue) override;
 
 public:
