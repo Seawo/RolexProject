@@ -135,7 +135,7 @@ void ACharacter_Rampage::InputAttack(const FInputActionValue& inputValue)
 	int inputVector = inputValue.Get<float>();
 	inputVector--;
 	CurrAttackState = static_cast<EAttackState>(inputVector);
-	ChangeState(CurrAttackState);
+	ChangeAttackState(CurrAttackState);
 }
 
 void ACharacter_Rampage::InputJump()

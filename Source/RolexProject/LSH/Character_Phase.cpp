@@ -103,6 +103,36 @@ void ACharacter_Phase::ChangeAttackState(EAttackState state)
 
 void ACharacter_Phase::ChangeState(EMoveState state)
 {
+	switch (state)
+	{
+	case EMoveState::Idle:
+		bIsMove = true;
+		break;
+	case EMoveState::Move:
+		bIsMove = true;
+		break;
+	case EMoveState::Run:
+		bIsMove = true;
+		break;
+	case EMoveState::Jump:
+		//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+		bIsMove = true;
+		break;
+	case EMoveState::Stun:
+		bIsMove = false;
+		PlayMontage("Stun", 1.0f);
+		break;
+	case EMoveState::Die:
+		bIsMove = false;
+		PlayMontage("Die", 1.0f);
+		break;
+	case EMoveState::Start:
+		bIsMove = false;
+		PlayMontage("Select", 1.0f);
+		break;
+	default:
+		break;
+	}
 }
 
 void ACharacter_Phase::InputAttack(const FInputActionValue& inputValue)
@@ -110,7 +140,7 @@ void ACharacter_Phase::InputAttack(const FInputActionValue& inputValue)
 	int inputVector = inputValue.Get<float>();
 	inputVector--;
 	EAttackState state = static_cast<EAttackState>(inputVector);
-	ChangeState(state);
+	ChangeAttackState(state);
 }
 
 void ACharacter_Phase::InputLShift()
@@ -145,6 +175,13 @@ void ACharacter_Phase::PlayMontage(FString Key, float InPlayRate, FName StartSec
 		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, StartSectionName.ToString());
 
 		PlayAnimMontage(Montage, InPlayRate);
+
+		if (Key == "Stun")
+		{
+			FTimerHandle stunTimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(stunTimerHandle, FTimerDelegate::CreateLambda([this]() {ChangeState(EMoveState::Idle); }), Montage->GetPlayLength(), false);
+		}
+
 	}
 }
 
