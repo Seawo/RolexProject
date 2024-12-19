@@ -36,7 +36,7 @@ void ACharacter_Rampage::BeginPlay()
 	Super::BeginPlay();
 
 	// 
-	
+	ChangeState(EMoveState::Start, stateMontages[TEXT("Start")]);
 }
 
 void ACharacter_Rampage::Tick(float DeltaTime)
@@ -166,6 +166,12 @@ void ACharacter_Rampage::LBMAttack()
 	//UE_LOG(LogTemp, Warning, TEXT("LBM attack"));
 
 	for (const TPair<FString, UAnimMontage*>& Pair : AttackMontages)
+	{
+		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(Pair.Value))
+			return;
+	}
+
+	for (const TPair<FString, UAnimMontage*>& Pair : stateMontages)
 	{
 		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(Pair.Value))
 			return;
