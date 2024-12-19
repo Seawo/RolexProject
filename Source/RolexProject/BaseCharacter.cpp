@@ -14,7 +14,6 @@
 #include "Animation\AnimMontage.h"
 #include "GameFramework\CharacterMovementComponent.h"
 
-
 // Sets default values
 ABaseCharacter::ABaseCharacter()
 {

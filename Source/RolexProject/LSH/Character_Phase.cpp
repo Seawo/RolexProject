@@ -27,6 +27,9 @@ void ACharacter_Phase::BeginPlay()
 	Super::BeginPlay();
 
 	AnimInstance = Cast<UAnimInstance_Phase>(GetMesh()->GetAnimInstance());
+
+	//PlayMontage("Select", 1.0f);
+	ChangeState(EMoveState::Stun);
 }
 
 void ACharacter_Phase::Tick(float DeltaTime)
@@ -103,14 +106,53 @@ void ACharacter_Phase::ChangeAttackState(EAttackState state)
 
 void ACharacter_Phase::ChangeState(EMoveState state)
 {
+	APlayerController* playerController = Cast<APlayerController>(GetController());
+
+	switch (state)
+	{
+	case EMoveState::Idle:
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+		bIsMove = true;
+		break;
+	case EMoveState::Move:
+		bIsMove = true;
+		break;
+	case EMoveState::Run:
+		bIsMove = true;
+		break;
+	case EMoveState::Jump:
+		
+		bIsMove = true;
+		break;
+	case EMoveState::Stun:
+		bIsMove = false;
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+		PlayMontage("Stun", 1.0f);
+		break;
+	case EMoveState::Die:
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+		bIsMove = false;
+		PlayMontage("Die", 1.0f);
+		break;
+	case EMoveState::Start:
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+		bIsMove = false;
+		PlayMontage("Select", 1.0f);
+		break;
+	default:
+		break;
+	}
 }
 
 void ACharacter_Phase::InputAttack(const FInputActionValue& inputValue)
 {
+	if (not bIsMove) return;
+
+
 	int inputVector = inputValue.Get<float>();
 	inputVector--;
-	EAttackState state = static_cast<EAttackState>(inputVector);
-	ChangeAttackState(state);
+	AttackState = static_cast<EAttackState>(inputVector);
+	ChangeAttackState(AttackState);
 }
 
 void ACharacter_Phase::InputLShift()
@@ -135,16 +177,25 @@ void ACharacter_Phase::PlayMontage(FString Key, float InPlayRate, FName StartSec
 	{
 		UAnimMontage* Montage = AttackMontages[Key];
 
-
-		if (AnimInstance->Montage_IsPlaying(Montage))
+		for (auto & montage : AttackMontages)
 		{
-			return;
+			if (AnimInstance->Montage_IsPlaying(montage.Value))
+			{
+				return;
+			}
 		}
 		// 화면에 Key값 출력하기
 		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, Key);
 		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, StartSectionName.ToString());
 
 		PlayAnimMontage(Montage, InPlayRate);
+
+		if (Key == "Stun")
+		{
+			FTimerHandle stunTimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(stunTimerHandle, FTimerDelegate::CreateLambda([this]() {MoveState = EMoveState::Idle; ChangeState(MoveState); }), Montage->GetPlayLength(), false);
+		}
+
 	}
 }
 
