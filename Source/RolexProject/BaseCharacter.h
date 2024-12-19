@@ -12,7 +12,10 @@ enum class EMoveState : uint8
 	Idle,
 	Move,
 	Run,
-	Jump
+	Jump,
+	Stun,
+	Die,
+	Start,
 };
 
 UENUM(BlueprintType)
