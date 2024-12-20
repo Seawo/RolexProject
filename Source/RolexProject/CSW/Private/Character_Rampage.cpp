@@ -3,7 +3,7 @@
 
 #include "Character_Rampage.h"
 #include "EnhancedInputComponent.h"
-//#include <GameFramework\SpringArmComponent.h>
+#include <GameFramework\SpringArmComponent.h>
 #include "GameFramework/CharacterMovementComponent.h"
 #include "RampageAnimInstance.h"
 
@@ -15,6 +15,7 @@ ACharacter_Rampage::ACharacter_Rampage()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	// character setting 
 	Data.RoleType = ERoleType::Dealer;
 	Data.Name = "Phase";
 	Data.Team = true;
@@ -24,11 +25,17 @@ ACharacter_Rampage::ACharacter_Rampage()
 	Data.Speed = 400.0f;
 	Data.Power = 20.0f;
 
+	//SpringArmComp Setting 
+	SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
+
 
 	// combo_attack
 	MaxCnt = 5;
 	ComboCnt = 0;
 	ComboResetDelay = 1.5f;
+
+
+	
 
 }
 
@@ -246,6 +253,8 @@ void ACharacter_Rampage::EAttack()
 			return;
 	}
 
+	SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
+
 	PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f);
 
 	if (bIsDashing)
@@ -266,6 +275,8 @@ void ACharacter_Rampage::EAttack()
 		[this]()
 		{ 
 			bIsDashing = false;
+
+			SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
 
 			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 		}), 

@@ -112,31 +112,31 @@ void ACharacter_Phase::ChangeState(EMoveState state)
 	{
 	case EMoveState::Idle:
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-		bIsMove = true;
+		//bIsMove = true;
 		break;
 	case EMoveState::Move:
-		bIsMove = true;
+		//bIsMove = true;
 		break;
 	case EMoveState::Run:
-		bIsMove = true;
+		//bIsMove = true;
 		break;
 	case EMoveState::Jump:
 		
-		bIsMove = true;
+		//bIsMove = true;
 		break;
 	case EMoveState::Stun:
-		bIsMove = false;
+		//bIsMove = false;
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 		PlayMontage("Stun", 1.0f);
 		break;
 	case EMoveState::Die:
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-		bIsMove = false;
+		//bIsMove = false;
 		PlayMontage("Die", 1.0f);
 		break;
 	case EMoveState::Start:
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-		bIsMove = false;
+		//bIsMove = false;
 		PlayMontage("Select", 1.0f);
 		break;
 	default:
@@ -146,7 +146,7 @@ void ACharacter_Phase::ChangeState(EMoveState state)
 
 void ACharacter_Phase::InputAttack(const FInputActionValue& inputValue)
 {
-	if (not bIsMove) return;
+	//if (not bIsMove) return;
 
 
 	int inputVector = inputValue.Get<float>();

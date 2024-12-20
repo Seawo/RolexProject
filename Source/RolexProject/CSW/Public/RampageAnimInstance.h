@@ -20,4 +20,8 @@ public:
 	float SlopeForwardAngle = 0;
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
+
+protected:
+	
 };
