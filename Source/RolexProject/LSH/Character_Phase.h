@@ -32,7 +32,8 @@ class ROLEXPROJECT_API ACharacter_Phase : public ABaseCharacter
 
 	void PlayMontage(FString Key, float InPlayRate = 1.0f, FName StartSectionName = NAME_None);
 
-
+public:
+	void SpawnEffect(FName socketName);
 
 protected:
 	//void LMBActionBegin();
@@ -51,15 +52,20 @@ protected:
 	bool bHasNextLMBCommand = false;
 
 private:
-	class UAnimInstance_Phase* AnimInstance;
+	class UAnimInstance_Phase* AnimInstance;			// 에니메이션 인스턴스
+	FVector AimDirection;								// 에임 방향
 
-	bool bLShift = true;
+	bool bLShift = true;								// 쉬프트를 눌렀는지
 	float LerpAlpha = 0.0f;
 	float Duration = 5.0f;
 
 
-	public:
-	float SlopeForwardAngle = 0.0f;
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	TSubclassOf<class AActor_Effect> EffectActorClass;	// 이펙트 액터 클래스
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	class AActor_Effect* EffectActor;			// 이펙트 액터
+
+	float SlopeForwardAngle = 0.0f;
 };

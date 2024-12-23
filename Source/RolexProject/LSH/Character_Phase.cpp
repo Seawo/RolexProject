@@ -7,6 +7,12 @@
 #include "AnimInstance_Phase.h"
 #include "Animation/AnimMontage.h"
 #include "DataAsset_PhaseLMB.h"
+#include "Actor_Effect.h"
+#include "NiagaraSystem.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "Camera/CameraComponent.h"
+
 
 ACharacter_Phase::ACharacter_Phase()
 {
@@ -28,8 +34,13 @@ void ACharacter_Phase::BeginPlay()
 
 	AnimInstance = Cast<UAnimInstance_Phase>(GetMesh()->GetAnimInstance());
 
+	if (EffectActorClass)
+	{
+		EffectActor = Cast<AActor_Effect>(EffectActorClass);
+	}
+
 	//PlayMontage("Select", 1.0f);
-	ChangeState(EMoveState::Stun);
+	//ChangeState(EMoveState::Stun);
 }
 
 void ACharacter_Phase::Tick(float DeltaTime)
@@ -77,19 +88,7 @@ void ACharacter_Phase::ChangeAttackState(EAttackState state)
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("LMB"));
 		// Montage
 		PlayMontage("LMB",1.0f);
-		
-		//if (CurrentLMBCombo == 0)
-		//{
-		//	LMBActionBegin();
-		//}
-		//if(!LMBTimerHandle.IsValid())
-		//{
-		//	bHasNextLMBCommand = false;
-		//}
-		//else
-		//{
-		//	bHasNextLMBCommand = true;
-		//}
+		SpawnEffect("FX_Hand_R4");
 		
 		// Effect
 		break;
@@ -138,6 +137,15 @@ void ACharacter_Phase::ChangeState(EMoveState state)
 
 void ACharacter_Phase::InputAttack(const FInputActionValue& inputValue)
 {
+	for (auto& mon : AttackMontages)
+	{
+		if (AnimInstance->Montage_IsPlaying(mon.Value))
+		{
+			return;
+		}
+	}
+
+
 	int inputVector = inputValue.Get<float>();
 	inputVector--;
 	AttackState = static_cast<EAttackState>(inputVector);
@@ -164,11 +172,11 @@ void ACharacter_Phase::PlayMontage(FString Key, float InPlayRate, FName StartSec
 {
 	if (AttackMontages.Contains(Key))
 	{
-		UAnimMontage* Montage = AttackMontages[Key];
+		UAnimMontage* montage = AttackMontages[Key];
 
-		for (auto & montage : AttackMontages)
+		for (auto & mon : AttackMontages)
 		{
-			if (AnimInstance->Montage_IsPlaying(montage.Value))
+			if (AnimInstance->Montage_IsPlaying(mon.Value))
 			{
 				return;
 			}
@@ -177,16 +185,69 @@ void ACharacter_Phase::PlayMontage(FString Key, float InPlayRate, FName StartSec
 		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, Key);
 		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, StartSectionName.ToString());
 
-		PlayAnimMontage(Montage, InPlayRate);
+		PlayAnimMontage(montage, InPlayRate);
 
 		if (Key == "Stun")
 		{
 			FTimerHandle stunTimerHandle;
-			GetWorld()->GetTimerManager().SetTimer(stunTimerHandle, FTimerDelegate::CreateLambda([this]() {MoveState = EMoveState::Idle; ChangeState(MoveState); }), Montage->GetPlayLength(), false);
+			GetWorld()->GetTimerManager().SetTimer(stunTimerHandle, FTimerDelegate::CreateLambda([this]() {MoveState = EMoveState::Idle; ChangeState(MoveState); }), montage->GetPlayLength(), false);
 		}
 
 	}
 }
+
+void ACharacter_Phase::SpawnEffect(FName socketName)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("SpawnEffect_LMB"));
+
+	if (EffectActorClass)
+	{
+		// 소켓 위치에 생성시키기
+		FVector socketLocation = GetMesh()->GetSocketLocation(socketName);
+
+		// FVector를 FRotator로 변환
+		TpsCamComp->GetForwardVector();
+
+		// AActor_Effect생성하기
+		FRotator rot = TpsCamComp->GetForwardVector().Rotation();
+		//FRotator rot = AimDirection.Rotation();
+		GetWorld()->SpawnActor<AActor_Effect>(EffectActorClass, socketLocation, rot);
+		//EffectActor->SetDirection(AimDirection);
+	}
+}
+
+//void ACharacter_Phase::SetAimDirection()
+//{
+//	// 마우스 위치 가져오기
+//	APlayerController* playerController = Cast<APlayerController>(GetController());
+//
+//	if (playerController)
+//	{
+//		// 플레이어 컨트롤러에서 마우스포이션 가져오기
+//		FVector2D mousePosition;
+//		playerController->GetMousePosition(mousePosition.X, mousePosition.Y);
+//
+//		// 스크린 좌표를 월드 좌표로 변환해주기
+//		FVector worldLocation, worldDirection;
+//		playerController->DeprojectScreenPositionToWorld(mousePosition.X, mousePosition.Y, worldLocation, worldDirection);
+//
+//		// 라인트레이스 쏘기
+//		FHitResult hitResult;
+//		GetWorld()->LineTraceSingleByChannel(hitResult, worldLocation, worldLocation + worldDirection * 10000.0f, ECollisionChannel::ECC_Visibility);
+//
+//		// 라인 그리기
+//		DrawDebugLine(GetWorld(), worldLocation, worldLocation + worldDirection * 10000.0f, FColor::Red, false, 0.1f, 0,0.2f);
+//
+//		// 에임 방향 설정하기
+//		AimDirection = hitResult.ImpactPoint - GetActorLocation();
+//
+//		// Z값을 0으로 만들어주기
+//		//AimDirection.Z = 0.0f;
+//		AimDirection.Normalize();
+//	}
+//
+//	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("AimDirection X : %.2f, Y : %.2f, Z : %.2f"), AimDirection.X, AimDirection.Y, AimDirection.Z));
+//}
 
 //void ACharacter_Phase::LMBActionBegin()
 //{

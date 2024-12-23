@@ -20,3 +20,27 @@ void UAnimInstance_Phase::NativeUpdateAnimation(float DeltaSeconds)
 		SlopeForwardAngle = Phase->SlopeForwardAngle;
 	}
 }
+
+void UAnimInstance_Phase::AnimNotify_Attack1Spawn()
+{
+	UE_LOG(LogTemp, Warning, TEXT("AnimNotify_Attack1Spawn"));
+	Phase->SpawnEffect("FX_Hand_R4");
+}
+
+void UAnimInstance_Phase::AnimNotify_Attack2Spawn()
+{
+	UE_LOG(LogTemp, Warning, TEXT("AnimNotify_Attack2Spawn"));
+	Phase->SpawnEffect("FX_Hand_L4");
+}
+
+void UAnimInstance_Phase::AnimNotify_Attack3Spawn()
+{
+	UE_LOG(LogTemp, Warning, TEXT("AnimNotify_Attack3Spawn"));
+	Phase->SpawnEffect("FX_Hand_R4");
+}
+
+void UAnimInstance_Phase::AnimNotify_Attack4Spawn()
+{
+	UE_LOG(LogTemp, Warning, TEXT("AnimNotify_Attack4Spawn"));
+	Phase->SpawnEffect("FX_Hand_L4");
+}
