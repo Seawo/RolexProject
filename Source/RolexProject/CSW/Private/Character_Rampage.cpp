@@ -10,6 +10,9 @@
 #include "Animation\AnimInstance.h"
 #include "Animation\AnimMontage.h"
 
+#include "EffectActor.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ACharacter_Rampage::ACharacter_Rampage()
 {
@@ -240,7 +243,10 @@ void ACharacter_Rampage::QAttack()
 	}
 
 
-	PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f);
+	PlayAnimMontage(AttackMontages[TEXT("Q")], 0.8f);
+	
+	CreateStone();
+	
 }
 
 void ACharacter_Rampage::EAttack()
@@ -281,5 +287,63 @@ void ACharacter_Rampage::EAttack()
 			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 		}), 
 		DashDuration, false);
+
+}
+
+void ACharacter_Rampage::CreateStone()
+{
+	if (!StoneClass) return;
+
+	USkeletalMeshComponent* skeletalMesh = GetMesh();
+
+	if (!skeletalMesh) return;
+
+	SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
+
+	// 소켓 위치 가져오기
+	FVector SocketLocation = skeletalMesh->GetSocketLocation(TEXT("hand_r"));
+	FRotator SocketRotation = skeletalMesh->GetSocketRotation(TEXT("hand_r"));
+
+	// 돌 액터 붙착
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	Stone = GetWorld()->SpawnActor<AEffectActor>(StoneClass, SocketLocation, SocketRotation, SpawnParams);
+
+	if (Stone)
+	{
+		// 소켓의 부착
+		Stone->AttachToComponent(skeletalMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_r"));
+	}
+
+}
+
+void ACharacter_Rampage::ThrowStone()
+{
+
+	if (Stone)
+	{
+		// 소켓에서 불리
+		Stone->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+		// 던지기
+		FVector throwdir = GetActorForwardVector();
+		Stone->InititalizeThrowStone(throwdir, 3000.0f);
+
+		SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
+
+
+		/*
+		FVector throwDir = GetActorForwardVector() * 3000.0f;
+		UStaticMeshComponent* meshComp = Stone->FindComponentByClass< UStaticMeshComponent>();
+		if (meshComp && meshComp->IsSimulatingPhysics())
+		{
+			meshComp->AddImpulse(throwDir, NAME_None, true);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("MeshComp is not simulating physics!"));
+		}
+		*/
+	}
 
 }
