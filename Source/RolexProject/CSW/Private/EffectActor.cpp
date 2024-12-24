@@ -8,6 +8,9 @@
 #include "NiagaraFunctionLibrary.h"
 
 #include "Particles/ParticleSystemComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+
 
 // Sets default values
 AEffectActor::AEffectActor()
@@ -18,7 +21,7 @@ AEffectActor::AEffectActor()
 	// 충돌 컴포넌트 생성
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
 	RootComponent = CollisionComp;
-	CollisionComp->InitSphereRadius(100.0f); // 범위 조정
+	CollisionComp->InitSphereRadius(CollisionRadius); // 범위 조정
 	CollisionComp->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 
 	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComp"));
@@ -27,6 +30,9 @@ AEffectActor::AEffectActor()
 	ParticleComp = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleComp"));
 	ParticleComp->SetupAttachment(RootComponent);
 
+	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
+	StaticMeshComp->SetupAttachment(RootComponent);
+	StaticMeshComp->SetSimulatePhysics(true);
 }
 
 // Called when the game starts or when spawned
@@ -47,6 +53,16 @@ void AEffectActor::BeginPlay()
 void AEffectActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (!MoveDir.IsNearlyZero())
+	{
+		
+		FVector newVector = GetActorLocation() + (MoveDir * ThrowSpeed * DeltaTime);
+		SetActorLocation(newVector);
+
+
+
+	}
 
 }
 
@@ -72,13 +88,27 @@ void AEffectActor::InitializeEffect(UParticleSystem* particleEffect, FVector eff
 	}
 }
 
+void AEffectActor::InititalizeThrowStone(const FVector& dir, float speed)
+{
+	// 던질때 크기 조절??
+	//CollisionComp->InitSphereRadius(500.0f);
+	//StaticMeshComp->SetWorldScale3D(FVector(30.0f));
+
+	MoveDir = dir.GetSafeNormal();
+	ThrowSpeed = speed;
+}
+
+
 // 충돌 났을때
 void AEffectActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+
 	if (OtherActor && OtherActor != this)
 	{
 		// 효과 추가: 나이아가라 변경, 파티클 추가 등
 		UE_LOG(LogTemp, Log, TEXT("Effect collided with: %s"), *OtherActor->GetName());
+
+		
 
 		if (NiagaraCollusionEffect)
 		{

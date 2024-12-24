@@ -34,6 +34,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	float DestroyTime = 1.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	float CollisionRadius = 100.0f;
+
 	UPROPERTY(VisibleAnywhere)
 	UParticleSystemComponent* ParticleComp;
 	
@@ -42,6 +45,9 @@ public:
 
 	UPROPERTY()
 	class USphereComponent* CollisionComp;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
+	class UStaticMeshComponent* StaticMeshComp;
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
@@ -59,8 +65,13 @@ public:
 	// Initialize Particle Effect
 	void InitializeEffect(UParticleSystem* ParticleEffect, FVector EffectScale);
 
+	void InititalizeThrowStone(const FVector& dir, float speed);
 
 private:
+	FVector MoveDir;
+	float ThrowSpeed;
+
+	
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

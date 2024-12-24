@@ -31,6 +31,14 @@ public:
 	*/
 	EAttackState CurrAttackState;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AEffectActor> StoneClass;
+	
+	class AEffectActor* Stone;
+
+	void CreateStone();
+	void ThrowStone();
+
 private:
 	bool bIsRun = true;
 
@@ -59,7 +67,6 @@ private:
 	void RBMAttack();
 	void QAttack();
 	void EAttack();
-
 
 
 };
