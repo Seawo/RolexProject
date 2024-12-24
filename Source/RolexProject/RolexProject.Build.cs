@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+Ôªø// Copyright Epic Games, Inc. All Rights Reserved.
 
 using UnrealBuildTool;
 
@@ -6,24 +6,26 @@ public class RolexProject : ModuleRules
 {
 	public RolexProject(ReadOnlyTargetRules Target) : base(Target)
 	{
-        // Public ∆ƒ¿œ ∞Ê∑Œ √ﬂ∞°
+        // Public ÌååÏùº Í≤ΩÎ°ú Ï∂îÍ∞Ä
         PublicIncludePaths.AddRange(new string[] { 
-            "RolexProject", 
-            "RolexProject/LSH" , 
+            "RolexProject",
+            "RolexProject/LSH/Character",
+            "RolexProject/LSH/Animation",
+            "RolexProject/LSH/Actor",
             "RolexProject/CSW/Public", 
             "RolexProject/jaeun/Public"
         });
 
-        // Private ∆ƒ¿œ ∞Ê∑Œ √ﬂ∞°
+        // Private ÌååÏùº Í≤ΩÎ°ú Ï∂îÍ∞Ä
         PrivateIncludePaths.AddRange(new string[] { 
             "RolexProject/CSW/Private",
             "RolexProject/jaeun/Private" 
         });
 
-        // PCH ªÁøÎ º≥¡§
+        // PCH ÏÇ¨Ïö© ÏÑ§Ï†ï
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        // Public ¡æº”º∫ √ﬂ∞°
+        // Public Ï¢ÖÏÜçÏÑ± Ï∂îÍ∞Ä
 		PublicDependencyModuleNames.AddRange(new string[] { 
             "Core", 
             "CoreUObject", 
