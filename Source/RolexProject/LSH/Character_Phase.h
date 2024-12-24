@@ -33,7 +33,7 @@ class ROLEXPROJECT_API ACharacter_Phase : public ABaseCharacter
 	void PlayMontage(FString Key, float InPlayRate = 1.0f, FName StartSectionName = NAME_None);
 
 public:
-	void SpawnEffect(FName socketName);
+	void SpawnEffect(FName socketName, FName key);
 
 protected:
 	//void LMBActionBegin();
@@ -60,12 +60,21 @@ private:
 	float Duration = 5.0f;
 
 
+
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
-	TSubclassOf<class AActor_Effect> EffectActorClass;	// 이펙트 액터 클래스
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
-	class AActor_Effect* EffectActor;			// 이펙트 액터
+	TMap<FName, TSubclassOf<class AActor_Effect>> EffectMap;
 
 	float SlopeForwardAngle = 0.0f;
+
+	// 스킬 지속시간
+	float LRSkillDuration = 3.0f;
+	float QSkillDuration = 3.5f;
+	float ESkillDuration = 8.0f;
+
+	// 스킬 쿨타임
+	float RMBSkillCoolTime = 0.0f;		// 쿨타임 5초
+	float ESkillCoolTime = 0.0f;		// 쿨타임 20초
+	float QSkillCoolTime = 0.0f;		// 쿨타임 1분
 };

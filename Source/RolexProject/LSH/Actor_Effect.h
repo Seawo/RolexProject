@@ -19,6 +19,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	private:
+	void UpdateLocation(float DeltaTime);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -35,7 +38,9 @@ public:
 	class UNiagaraComponent* OrbNiagaraComponent;
 
 	UPROPERTY(EditAnywhere, Category = "Effect")
-	class USphereComponent* CollisionComp;
+	class USphereComponent* OrbCollision;
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	class USphereComponent* ShieldCollision;
 
 	UPROPERTY(EditAnywhere, Category = "Effect")
 	class UStaticMeshComponent* MeshComp;
@@ -47,4 +52,10 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float Speed = 2000.0f;
+
+	UPROPERTY(EditAnywhere)
+	FName SkillName = "LMBRMB";
+
+	UPROPERTY()
+	class ACharacter_Phase* Phase;
 };

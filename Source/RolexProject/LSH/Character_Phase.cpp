@@ -33,12 +33,7 @@ void ACharacter_Phase::BeginPlay()
 	Super::BeginPlay();
 
 	AnimInstance = Cast<UAnimInstance_Phase>(GetMesh()->GetAnimInstance());
-
-	if (EffectActorClass)
-	{
-		EffectActor = Cast<AActor_Effect>(EffectActorClass);
-	}
-
+	
 	//PlayMontage("Select", 1.0f);
 	//ChangeState(EMoveState::Stun);
 }
@@ -46,6 +41,28 @@ void ACharacter_Phase::BeginPlay()
 void ACharacter_Phase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// 화면에 출력하기
+	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("RMBSkillCoolTime : %.2f"), RMBSkillCoolTime));
+	GEngine->AddOnScreenDebugMessage(0, 0.0f, FColor::Red, FString::Printf(TEXT("ESkillCoolTime : %.2f"), ESkillCoolTime));
+	GEngine->AddOnScreenDebugMessage(1, 0.0f, FColor::Red, FString::Printf(TEXT("QSkillCoolTime : %.2f"), QSkillCoolTime));
+
+	// 쿨타임 돌리기
+	RMBSkillCoolTime -= DeltaTime;
+	if (RMBSkillCoolTime < 0)
+	{
+		RMBSkillCoolTime = 0.0f;
+	}
+	ESkillCoolTime -= DeltaTime;
+	if (ESkillCoolTime < 0)
+	{
+		ESkillCoolTime = 0.0f;
+	}
+	QSkillCoolTime -= DeltaTime;
+	if (QSkillCoolTime < 0)
+	{
+		QSkillCoolTime = 0.0f;
+	}
 }
 
 void ACharacter_Phase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -73,27 +90,49 @@ void ACharacter_Phase::ChangeAttackState(EAttackState state)
 	switch (state)
 	{
 	case EAttackState::QSkill:
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("QSkill"));
+		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("QSkill"));
+		// 쿨타임
+		if (QSkillCoolTime > 0)
+		{
+			return;
+		}
+		QSkillCoolTime = 60.0f;
 		// Montage
 		PlayMontage("Q", 1.0f);
 		// Effect
 		break;
 	case EAttackState::ESkill:
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("ESkill"));
+		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("ESkill"));
+		// 쿨타임
+		if (ESkillCoolTime > 0)
+		{
+			return;
+		}
+		ESkillCoolTime = 20.0f;
 		// Montage
 		PlayMontage("E", 1.0f);
+		GetCharacterMovement()->GravityScale = 0.7f;
+		Jump();
 		// Effect
 		break;
 	case EAttackState::LMB:
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("LMB"));
+		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("LMB"));
 		// Montage
 		PlayMontage("LMB",1.0f);
-		SpawnEffect("FX_Hand_R4");
+		//SpawnEffect("FX_Hand_R4");
 		
 		// Effect
 		break;
 	case EAttackState::RMB:
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("RMB"));
+		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("RMB"));
+		// 쿨타임
+		if (RMBSkillCoolTime > 0)
+		{
+			return;
+		}
+		RMBSkillCoolTime = 5.0f;
+
+
 		// Montage
 		PlayMontage("RMB", 1.0f);
 		// Effect
@@ -196,25 +235,38 @@ void ACharacter_Phase::PlayMontage(FString Key, float InPlayRate, FName StartSec
 	}
 }
 
-void ACharacter_Phase::SpawnEffect(FName socketName)
+void ACharacter_Phase::SpawnEffect(FName socketName, FName key)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("SpawnEffect_LMB"));
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("SpawnEffect"));
 
-	if (EffectActorClass)
+	if (EffectMap.Contains(key))
 	{
-		// 소켓 위치에 생성시키기
-		FVector socketLocation = GetMesh()->GetSocketLocation(socketName);
+		TSubclassOf<AActor_Effect> effect = EffectMap[key];
+		if (effect)
+		{
+			FVector socketLocation;
+			if (socketName == "None")
+			{
+				socketLocation = GetActorLocation();
+			}
+			else
+			{
+				// 소켓 위치에 생성시키기
+				socketLocation = GetMesh()->GetSocketLocation(socketName);
+			}
+			
 
-		// FVector를 FRotator로 변환
-		TpsCamComp->GetForwardVector();
+			// FVector를 FRotator로 변환
+			TpsCamComp->GetForwardVector();
 
-		// AActor_Effect생성하기
-		FRotator rot = TpsCamComp->GetForwardVector().Rotation();
-		//FRotator rot = AimDirection.Rotation();
-		GetWorld()->SpawnActor<AActor_Effect>(EffectActorClass, socketLocation, rot);
-		//EffectActor->SetDirection(AimDirection);
+			// AActor_Effect생성하기
+			FRotator rot = TpsCamComp->GetForwardVector().Rotation();
+			AActor_Effect* ef = GetWorld()->SpawnActor<AActor_Effect>(effect, socketLocation, rot);
+		}
 	}
 }
+
+
 
 //void ACharacter_Phase::SetAimDirection()
 //{

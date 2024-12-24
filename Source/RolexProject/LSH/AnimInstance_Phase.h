@@ -27,6 +27,12 @@ class ROLEXPROJECT_API UAnimInstance_Phase : public UBaseAnimInstance
 	void AnimNotify_Attack3Spawn();
 	UFUNCTION()
 	void AnimNotify_Attack4Spawn();
+	UFUNCTION()
+	void AnimNotify_LMBAttack();
+	UFUNCTION()
+	void AnimNotify_QAttack();
+	UFUNCTION()
+	void AnimNotify_EAttack();
 
 	public:
 	class ACharacter_Phase* Phase;
