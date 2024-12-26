@@ -17,10 +17,16 @@ void UEffectSpawnNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceB
 
     FRotator SpawnRotation = MeshComp->GetComponentRotation() + RotationOffset;
 
-    AEffectActor* spawnActor = MeshComp->GetWorld()->SpawnActor<AEffectActor>(EffectActorClass, spawnLocation, SpawnRotation);
+    //AEffectActor* spawnActor = MeshComp->GetWorld()->SpawnActor<AEffectActor>(EffectActorClass, spawnLocation, SpawnRotation);
+
+    AEffectActor* spawnActor = MeshComp->GetWorld()->SpawnActorDeferred<AEffectActor>(EffectActorClass, FTransform(SpawnRotation, spawnLocation), MeshComp->GetOwner());
 
     if (spawnActor)
     {
+        spawnActor->FinishSpawning(FTransform(SpawnRotation, spawnLocation));
+        
+        /*spawnActor->SetOwner(MeshComp->GetOwner());*/
+
         USphereComponent* sphereComp = spawnActor->FindComponentByClass<USphereComponent>();
 
         sphereComp->SetSphereRadius(collionRang);

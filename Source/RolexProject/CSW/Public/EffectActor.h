@@ -54,7 +54,7 @@ public:
 	class UNiagaraSystem* NiagaraCollusionEffect;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
-	class UNiagaraSystem* ParticleCollusionEffect;
+	class UParticleSystem* ParticleCollusionEffect;
 
 
 

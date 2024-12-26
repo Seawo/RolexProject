@@ -37,9 +37,6 @@ ACharacter_Rampage::ACharacter_Rampage()
 	ComboCnt = 0;
 	ComboResetDelay = 1.5f;
 
-
-	
-
 }
 
 void ACharacter_Rampage::BeginPlay()
