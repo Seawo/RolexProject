@@ -12,10 +12,15 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
 
+#include "AudioComponent_Phase.h"
+
 #include "Actor_Effect_Orb.h"
 #include "Actor_Effect_Orb.h"
 #include "Actor_Effect_Orb.h"
 
+#include "UI/UI_InGame.h"
+#include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
 
 ACharacter_Phase::ACharacter_Phase()
 {
@@ -30,6 +35,9 @@ ACharacter_Phase::ACharacter_Phase()
 	Data.Speed = 400.0f;
 	Data.Power = 20.0f;
 
+
+	AudioComponent = CreateDefaultSubobject<UAudioComponent_Phase>(TEXT("AudioComponent"));
+
 	//EffectMap.Add(TEXT("LMBRMB"), AActor_Effect_Orb::StaticClass());
 	//EffectMap.Add(TEXT("E"), AActor_Effect_E::StaticClass());
 	//EffectMap.Add(TEXT("Q"), AActor_Effect_Q::StaticClass());
@@ -41,6 +49,15 @@ void ACharacter_Phase::BeginPlay()
 
 	AnimInstance = Cast<UAnimInstance_Phase>(GetMesh()->GetAnimInstance());
 	
+	if (UI_InGameClass)
+	{
+		UI_InGame = CreateWidget<UUI_InGame>(GetWorld(), UI_InGameClass);
+		if (UI_InGame)
+		{
+			UI_InGame->AddToViewport();
+		}
+	
+	}
 	//PlayMontage("Select", 1.0f);
 	//ChangeState(EMoveState::Stun);
 }
@@ -55,20 +72,14 @@ void ACharacter_Phase::Tick(float DeltaTime)
 	GEngine->AddOnScreenDebugMessage(1, 0.0f, FColor::Red, FString::Printf(TEXT("QSkillCoolTime : %.2f"), QSkillCoolTime));
 
 	// 쿨타임 돌리기
-	RMBSkillCoolTime -= DeltaTime;
-	if (RMBSkillCoolTime < 0)
+	UpdateCoolTime(DeltaTime);
+
+
+
+	// 임시로 UI 출력
+	if (UI_InGame)
 	{
-		RMBSkillCoolTime = 0.0f;
-	}
-	ESkillCoolTime -= DeltaTime;
-	if (ESkillCoolTime < 0)
-	{
-		ESkillCoolTime = 0.0f;
-	}
-	QSkillCoolTime -= DeltaTime;
-	if (QSkillCoolTime < 0)
-	{
-		QSkillCoolTime = 0.0f;
+		UpdateUI();
 	}
 }
 
@@ -239,6 +250,37 @@ void ACharacter_Phase::PlayMontage(FString Key, float InPlayRate, FName StartSec
 			GetWorld()->GetTimerManager().SetTimer(stunTimerHandle, FTimerDelegate::CreateLambda([this]() {MoveState = EMoveState::Idle; ChangeState(MoveState); }), montage->GetPlayLength(), false);
 		}
 
+	}
+}
+
+void ACharacter_Phase::UpdateUI()
+{
+	UI_InGame->PB_HPBar->SetPercent(Data.Hp / Data.MaxHp);
+	int rmb = RMBSkillCoolTime;
+	int e = ESkillCoolTime;
+	int q = QSkillCoolTime;
+
+	UI_InGame->Text_RMBCooltime->SetText(FText::AsNumber(rmb));
+	UI_InGame->Text_ESkillCooltime->SetText(FText::AsNumber(e));
+	UI_InGame->Text_QSkillCooltime->SetText(FText::AsNumber(q));
+}
+
+void ACharacter_Phase::UpdateCoolTime(float DeltaTime)
+{
+	RMBSkillCoolTime -= DeltaTime;
+	if (RMBSkillCoolTime < 0)
+	{
+		RMBSkillCoolTime = 0.0f;
+	}
+	ESkillCoolTime -= DeltaTime;
+	if (ESkillCoolTime < 0)
+	{
+		ESkillCoolTime = 0.0f;
+	}
+	QSkillCoolTime -= DeltaTime;
+	if (QSkillCoolTime < 0)
+	{
+		QSkillCoolTime = 0.0f;
 	}
 }
 

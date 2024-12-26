@@ -31,7 +31,7 @@ void AActor_Effect_Q::BeginPlay()
 			Destroy(); 
 			NiagaraComponent->Deactivate();
 			OverlappedActors.Empty();
-			}), 100, false);
+			}), Phase->QSkillDuration, false);
 }
 
 void AActor_Effect_Q::Tick(float DeltaTime)

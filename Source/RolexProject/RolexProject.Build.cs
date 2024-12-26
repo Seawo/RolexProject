@@ -9,6 +9,8 @@ public class RolexProject : ModuleRules
         // Public 파일 경로 추가
         PublicIncludePaths.AddRange(new string[] { 
             "RolexProject",
+            "RolexProject/LSH",
+            "RolexProject/LSH/UI",
             "RolexProject/LSH/Character",
             "RolexProject/LSH/Animation",
             "RolexProject/LSH/Actor",

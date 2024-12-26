@@ -46,19 +46,21 @@ void AActor_Effect_E::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 	{
 		return;
 	}
+	// LMB RMB가 E스킬에 막히는거 방치용
 	AActor_Effect* effect = Cast<AActor_Effect>(OtherActor);
 	if (effect)
 	{
 		return;
 	}
 
-	if (bIsOverlap) return;
-	bIsOverlap = true;
+	//if (bIsOverlap) return;	// 중복 방지
+	//bIsOverlap = true;
 
 
 	UE_LOG(LogTemp, Warning, TEXT("[E] Other : %s, Owner : %s"),
 		*OtherActor->GetName(), *GetOwner()->GetName());
 	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
+
 	if (character and OtherActor != this)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Shield Overlap Begin"));

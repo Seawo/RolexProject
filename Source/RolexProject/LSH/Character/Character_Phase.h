@@ -41,7 +41,8 @@ class ROLEXPROJECT_API ACharacter_Phase : public ABaseCharacter
 
 
 	void PlayMontage(FString Key, float InPlayRate = 1.0f, FName StartSectionName = NAME_None);
-
+	void UpdateUI();
+	void UpdateCoolTime(float DeltaTime);
 public:
 	void SpawnEffect(FName socketName, FName key);
 
@@ -58,13 +59,19 @@ private:
 	bool bLShift = true;								// 쉬프트를 눌렀는지
 	float LerpAlpha = 0.0f;
 	float Duration = 5.0f;
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	class UAudioComponent_Phase* AudioComponent;
 
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UUI_InGame> UI_InGameClass;
 
-
+	UPROPERTY()
+	class UUI_InGame* UI_InGame;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	TMap<FName, TSubclassOf<class AActor_Effect>> EffectMap;
+
 
 	float SlopeForwardAngle = 0.0f;
 
