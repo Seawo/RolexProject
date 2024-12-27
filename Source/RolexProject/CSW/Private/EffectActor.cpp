@@ -13,6 +13,8 @@
 
 #include "Kismet/GameplayStatics.h"
 
+#include "BaseCharacter.h"
+
 // Sets default values
 AEffectActor::AEffectActor()
 {
@@ -110,29 +112,37 @@ void AEffectActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 		// 효과 추가: 나이아가라 변경, 파티클 추가 등
 		UE_LOG(LogTemp, Log, TEXT("Effect collided with: %s"), *OtherActor->GetName());
 
-		if (NiagaraCollusionEffect)
+		ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
+		if (character)
 		{
+			character->ModifyHP(-Damage);
+			
+			UE_LOG(LogTemp, Log, TEXT("character : %s Hp : %d"), *OtherActor->GetName(), character->Data.Hp);
 
-		}
-		else if (ParticleCollusionEffect)
-		{
-			UGameplayStatics::SpawnEmitterAtLocation(
-				GetWorld(),
-				ParticleCollusionEffect,
-				OtherActor->GetActorLocation(),
-				FRotator::ZeroRotator,
-				true // 자동 크기 조정
-			);
-		}
-
-		FTimerHandle handle;
-
-		GetWorld()->GetTimerManager().SetTimer(handle, FTimerDelegate::CreateLambda(
-			[this]()
+			if (NiagaraCollusionEffect)
 			{
-				Destroy();
-			}),
-			0.2f, false);
+
+			}
+			else if (ParticleCollusionEffect)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(
+					GetWorld(),
+					ParticleCollusionEffect,
+					OtherActor->GetActorLocation(),
+					FRotator::ZeroRotator,
+					true // 자동 크기 조정
+				);
+			}
+
+			FTimerHandle handle;
+
+			GetWorld()->GetTimerManager().SetTimer(handle, FTimerDelegate::CreateLambda(
+				[this]()
+				{
+					Destroy();
+				}),
+				0.2f, false);
+		}
 	}
 }
 

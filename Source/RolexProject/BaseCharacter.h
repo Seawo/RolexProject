@@ -69,9 +69,6 @@ protected:
 
 	virtual void ChangeAttackState(EAttackState newState) PURE_VIRTUAL(ABaseCharacter::ChangeState,);
 	virtual void InputAttack(const struct FInputActionValue& inputValue) PURE_VIRTUAL(ABaseCharacter::InputAttack,);
-	void ModifyHP(int Value);
-	void ModifyShield(int shield);
-
 
 	void ChangeState(EMoveState newState, UAnimMontage* montage);
 
@@ -135,4 +132,7 @@ public:
 	void Sturn(UAnimMontage* montage);
 	void Die(UAnimMontage* montage);
 	void Start(UAnimMontage* montage);
+
+	void ModifyHP(int Value);
+	void ModifyShield(int shield);
 };
