@@ -11,6 +11,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AEffectActor::AEffectActor()
@@ -60,10 +61,7 @@ void AEffectActor::Tick(float DeltaTime)
 		FVector newVector = GetActorLocation() + (MoveDir * ThrowSpeed * DeltaTime);
 		SetActorLocation(newVector);
 
-
-
 	}
-
 }
 
 // 생성될때,
@@ -102,13 +100,15 @@ void AEffectActor::InititalizeThrowStone(const FVector& dir, float speed)
 // 충돌 났을때
 void AEffectActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (!OtherActor || OtherActor == this || OtherActor == GetOwner()|| OtherActor->IsA(AEffectActor::StaticClass()))
+	{
+		return;
+	}
 
 	if (OtherActor && OtherActor != this)
 	{
 		// 효과 추가: 나이아가라 변경, 파티클 추가 등
 		UE_LOG(LogTemp, Log, TEXT("Effect collided with: %s"), *OtherActor->GetName());
-
-		
 
 		if (NiagaraCollusionEffect)
 		{
@@ -116,9 +116,23 @@ void AEffectActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 		}
 		else if (ParticleCollusionEffect)
 		{
-
+			UGameplayStatics::SpawnEmitterAtLocation(
+				GetWorld(),
+				ParticleCollusionEffect,
+				OtherActor->GetActorLocation(),
+				FRotator::ZeroRotator,
+				true // 자동 크기 조정
+			);
 		}
 
+		FTimerHandle handle;
+
+		GetWorld()->GetTimerManager().SetTimer(handle, FTimerDelegate::CreateLambda(
+			[this]()
+			{
+				Destroy();
+			}),
+			0.2f, false);
 	}
 }
 
