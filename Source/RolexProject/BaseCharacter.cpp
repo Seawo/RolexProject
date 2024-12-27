@@ -61,10 +61,32 @@ void ABaseCharacter::BeginPlay()
 
 }
 
+// Called every frame
+void ABaseCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	// 캐릭터에 hp 달아주기
+	DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 70), FString::Printf(TEXT("HP : %d"), Data.Hp), nullptr, FColor::Green, DeltaTime);
+}
+
+
 void ABaseCharacter::ModifyHP(int Value)
 {
-	// Value > 0 : 힐, Value < 0 : 데미지
 	Data.Hp += Value;
+	// Value > 0 : 힐, Value < 0 : 데미지
+	if (Data.Hp >= Data.MaxHp)
+	{
+		Data.Hp = Data.MaxHp;
+	}
+	else if (Data.Hp <= 0)
+	{
+		Data.Hp = 0;
+		if (stateMontages.Contains("Die"))
+		{
+			ChangeState(EMoveState::Die, stateMontages["Die"]);
+		}
+	}
 }
 
 void ABaseCharacter::ModifyShield(int shield)
@@ -90,13 +112,6 @@ void ABaseCharacter::ChangeState(EMoveState newState, UAnimMontage* montage)
 	default:
 		break;
 	}
-}
-
-// Called every frame
-void ABaseCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input

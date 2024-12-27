@@ -28,12 +28,18 @@ ACharacter_Phase::ACharacter_Phase()
 
 	Data.RoleType = ERoleType::Dealer;
 	Data.Name = "Phase";
-	Data.Team = true;
+	Data.Team = false;
 	Data.MaxHp = 250.0f;
 	Data.Hp = 250.0f;
 	Data.Shield = 0.0f;
 	Data.Speed = 400.0f;
 	Data.Power = 20.0f;
+
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> mesh(TEXT("/Script/Engine.SkeletalMesh'/Game/ParagonPhase/Characters/Heroes/Phase/Meshes/Phase_GDC.Phase_GDC'"));
+	if (mesh.Succeeded())
+	{
+		GetMesh()->SetSkeletalMesh(mesh.Object);
+	}
 
 
 	AudioComponent = CreateDefaultSubobject<UAudioComponent_Phase>(TEXT("AudioComponent"));
@@ -66,10 +72,11 @@ void ACharacter_Phase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// 화면에 출력하기
-	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("RMBSkillCoolTime : %.2f"), RMBSkillCoolTime));
-	GEngine->AddOnScreenDebugMessage(0, 0.0f, FColor::Red, FString::Printf(TEXT("ESkillCoolTime : %.2f"), ESkillCoolTime));
-	GEngine->AddOnScreenDebugMessage(1, 0.0f, FColor::Red, FString::Printf(TEXT("QSkillCoolTime : %.2f"), QSkillCoolTime));
+	//// 화면에 출력하기
+	//GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("RMBSkillCoolTime : %.2f"), RMBSkillCoolTime));
+	//GEngine->AddOnScreenDebugMessage(0, 0.0f, FColor::Red, FString::Printf(TEXT("ESkillCoolTime : %.2f"), ESkillCoolTime));
+	//GEngine->AddOnScreenDebugMessage(1, 0.0f, FColor::Red, FString::Printf(TEXT("QSkillCoolTime : %.2f"), QSkillCoolTime));
+
 
 	// 쿨타임 돌리기
 	UpdateCoolTime(DeltaTime);
@@ -90,7 +97,7 @@ void ACharacter_Phase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	if (auto characterInput = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		characterInput->BindAction(IA_Spacebar, ETriggerEvent::Started, this, &ACharacter_Phase::PhaseJump);
-		characterInput->BindAction(IA_Spacebar, ETriggerEvent::Completed, this, &ACharacter_Phase::PhaseJumpEnd);
+		characterInput->BindAction(IA_Spacebar, ETriggerEvent::Completed, this, &ACharacter_Phase::StopJumping);
 
 		characterInput->BindAction(IA_LShift, ETriggerEvent::Started, this, &ACharacter_Phase::InputLShift);
 		characterInput->BindAction(IA_LShift, ETriggerEvent::Completed, this, &ACharacter_Phase::InputLShift);
@@ -99,7 +106,6 @@ void ACharacter_Phase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		characterInput->BindAction(IA_E, ETriggerEvent::Started, this, &ACharacter_Phase::InputAttack);
 		characterInput->BindAction(IA_LBM, ETriggerEvent::Started, this, &ACharacter_Phase::InputAttack);
 		characterInput->BindAction(IA_RBM, ETriggerEvent::Started, this, &ACharacter_Phase::InputAttack);
-
 	}
 }
 
@@ -216,11 +222,6 @@ void ACharacter_Phase::PhaseJump()
 		AudioComponent->PlaySound("Jump");
 	}
 	Jump();
-}
-
-void ACharacter_Phase::PhaseJumpEnd()
-{
-	StopJumping();
 }
 
 void ACharacter_Phase::InputLShift()

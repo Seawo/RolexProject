@@ -23,27 +23,14 @@ void AActor_Effect_Orb::BeginPlay()
 {
 	Super::BeginPlay();
 
-
-	FVector start = GetActorLocation();
-	FVector end = start + GetActorForwardVector() * 100000.0f;
-
-	// 레이캐스트를 통해 충돌체크
-	FHitResult hit;
-	FCollisionQueryParams params;
-	params.AddIgnoredActor(this);
-	params.AddIgnoredActor(GetOwner());
-	if (GetWorld()->LineTraceSingleByChannel(hit, start, end, ECollisionChannel::ECC_Visibility, params))
-	{
-		HitLocation1 = hit.ImpactPoint;
-	}
-	UE_LOG(LogTemp, Warning, TEXT("[Orb] HitLocation x : %.2f, y : %.2f, z : %.2f"), HitLocation1.X, HitLocation1.Y, HitLocation1.Z);
-
 	OrbCollision->OnComponentBeginOverlap.AddDynamic(this, &AActor_Effect_Orb::OnOverlapBegin);
 
 	// 각각의 생성시간에 따른 Timer 설정
-	FTimerHandle deathTimer;
-	GetWorld()->GetTimerManager().SetTimer(deathTimer,
-		FTimerDelegate::CreateLambda([this]() {Destroy(); NiagaraComponent->Deactivate(); }), Phase->LRSkillDuration, false);
+	SetLifeSpan(Phase->LRSkillDuration);
+
+	//FTimerHandle deathTimer;
+	//GetWorld()->GetTimerManager().SetTimer(deathTimer,
+	//	FTimerDelegate::CreateLambda([this]() {NiagaraComponent->Deactivate(); Destroy(); }), Phase->LRSkillDuration, false);
 }
 
 void AActor_Effect_Orb::Tick(float DeltaTime)
@@ -91,10 +78,20 @@ void AActor_Effect_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitNiagaraSystem, GetActorLocation());
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("[Orb] Other : %s, Owner : %s"),
-		*OtherActor->GetName(), *GetOwner()->GetName());
-	UE_LOG(LogTemp, Log, TEXT("[Orb] Overlap Begin"));
-	UE_LOG(LogTemp, Warning, TEXT("[Orb] HitLocation x : %.2f, y : %.2f, z : %.2f"), HitLocation1.X, HitLocation1.Y, HitLocation1.Z);
+	//UE_LOG(LogTemp, Warning, TEXT("[Orb] Other : %s, Owner : %s"),
+	//	*OtherActor->GetName(), *GetOwner()->GetName());
+	//UE_LOG(LogTemp, Log, TEXT("[Orb] Overlap Begin"));
+	//UE_LOG(LogTemp, Warning, TEXT("[Orb] HitLocation x : %.2f, y : %.2f, z : %.2f"), HitLocation1.X, HitLocation1.Y, HitLocation1.Z);
+
+	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
+	ABaseCharacter* onwer = Cast<ABaseCharacter>(GetOwner());
+
+	// 캐릭터 이면서 다른 팀이라면
+	if (character && character->Data.Team != onwer ->Data.Team)
+	{
+		character->ModifyHP(-1);
+	}
+
 
 	Destroy();
 }

@@ -24,6 +24,11 @@ class ROLEXPROJECT_API AActor_Effect_Q : public AActor_Effect
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	UFUNCTION()
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	void TakeDamageToCharacter();
+
 	void DrawLineTrace();
 
 private:
@@ -32,8 +37,10 @@ private:
 	class UBoxComponent* BeamCollision;
 
 	UPROPERTY(EditAnywhere, Category = "Effect")
-	TArray<AActor*> OverlappedActors;
+	TArray<class ABaseCharacter*> OverlappedActors;
+
+	FTimerHandle DamageTimer;
 
 	float LineTraceDistance = 10000.0f;
-	bool bIsCollideLineTrace = false;
+	bool bIsOverlap = false;
 };

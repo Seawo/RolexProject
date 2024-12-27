@@ -10,15 +10,6 @@
 /**
  * 
  */
- USTRUCT(BlueprintType)
- struct FEffectData
- {
-	 GENERATED_BODY()
-
-	 FName EffectName;
-	 TSubclassOf<class AActor_Effect> EffectClass;
- };
-
 
 UCLASS()
 class ROLEXPROJECT_API ACharacter_Phase : public ABaseCharacter
@@ -36,7 +27,6 @@ class ROLEXPROJECT_API ACharacter_Phase : public ABaseCharacter
 	virtual void ChangeAttackState(EAttackState state) override;
 	virtual void InputAttack(const struct FInputActionValue& inputValue) override;
 	void PhaseJump();
-	void PhaseJumpEnd();
 
 
 	void InputLShift();							// 쉬프트 입력 

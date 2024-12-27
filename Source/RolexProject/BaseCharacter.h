@@ -69,8 +69,7 @@ protected:
 
 	virtual void ChangeAttackState(EAttackState newState) PURE_VIRTUAL(ABaseCharacter::ChangeState,);
 	virtual void InputAttack(const struct FInputActionValue& inputValue) PURE_VIRTUAL(ABaseCharacter::InputAttack,);
-	void ModifyHP(int Value);
-	void ModifyShield(int shield);
+
 
 
 	void ChangeState(EMoveState newState, UAnimMontage* montage);
@@ -128,7 +127,8 @@ public:
 	class UInputAction* IA_Q;
 	UPROPERTY(EditAnywhere, Category = "Input")
 	class UInputAction* IA_E;
-
+	void ModifyHP(int Value);
+	void ModifyShield(int shield);
 	void InputMove(const struct FInputActionValue& inputValue);
 	void InputRotation(const struct FInputActionValue& inputValue);
 
