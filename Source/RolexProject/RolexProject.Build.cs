@@ -15,13 +15,13 @@ public class RolexProject : ModuleRules
             "RolexProject/LSH/Animation",
             "RolexProject/LSH/Actor",
             "RolexProject/CSW/Public", 
-            "RolexProject/jaeun/Public"
+            "RolexProject/PJE/Public"
         });
 
         // Private 파일 경로 추가
         PrivateIncludePaths.AddRange(new string[] { 
             "RolexProject/CSW/Private",
-            "RolexProject/jaeun/Private" 
+            "RolexProject/PJE/Private" 
         });
 
         // PCH 사용 설정

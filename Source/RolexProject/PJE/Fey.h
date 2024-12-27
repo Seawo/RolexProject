@@ -1,0 +1,45 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "BaseCharacter.h"
+#include "Fey.generated.h"
+
+UCLASS()
+class ROLEXPROJECT_API AFey : public ABaseCharacter
+{
+	GENERATED_BODY()
+
+public:
+	// Sets default values for this character's properties
+	AFey();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual void InputAttack(const struct FInputActionValue& inputValue) override;
+	
+	virtual void ChangeAttackState(EAttackState newState) override;
+
+public:
+	EAttackState CurrentAttackState;
+
+	void QAttack();
+	void EAttack();
+	void LMBAttack();
+	void RMBAttack();
+
+	bool IsMontagePlaying(UAnimMontage* Montage);
+public:
+ 
+	
+};
