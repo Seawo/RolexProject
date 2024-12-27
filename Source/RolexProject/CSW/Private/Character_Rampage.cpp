@@ -179,9 +179,6 @@ void ACharacter_Rampage::LBMAttack()
 			return;
 	}
 
-
-
-
 	if (ComboCnt < MaxCnt)
 	{
 		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(AttackMontages[TEXT("LBM")]))
@@ -208,8 +205,6 @@ void ACharacter_Rampage::LBMAttack()
 	{
 		ComboCnt = 0;
 	}
-
-
 
 }
 
