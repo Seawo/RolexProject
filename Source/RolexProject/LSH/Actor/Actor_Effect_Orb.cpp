@@ -5,6 +5,8 @@
 #include "Components/SphereComponent.h"
 #include "Character_Phase.h"
 #include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "Particles/ParticleSystemComponent.h"
 
 AActor_Effect_Orb::AActor_Effect_Orb()
 {
@@ -12,6 +14,9 @@ AActor_Effect_Orb::AActor_Effect_Orb()
 
 	OrbCollision = CreateDefaultSubobject<USphereComponent>(TEXT("OrbCollision"));
 	OrbCollision->SetupAttachment(RootComponent);
+
+	HitNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("HitNiagaraComponent"));
+	HitNiagaraComponent->SetupAttachment(ColComp);
 }
 
 void AActor_Effect_Orb::BeginPlay()
@@ -19,9 +24,22 @@ void AActor_Effect_Orb::BeginPlay()
 	Super::BeginPlay();
 
 
+	FVector start = GetActorLocation();
+	FVector end = start + GetActorForwardVector() * 100000.0f;
 
-	OrbCollision->OnComponentBeginOverlap.AddDynamic(this, &AActor_Effect_Orb::OnOverlapBegin);
+	// 레이캐스트를 통해 충돌체크
+	FHitResult hit;
+	FCollisionQueryParams params;
+	params.AddIgnoredActor(this);
+	params.AddIgnoredActor(GetOwner());
+	if (GetWorld()->LineTraceSingleByChannel(hit, start, end, ECollisionChannel::ECC_Visibility, params))
+	{
+		HitLocation1 = hit.ImpactPoint;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("[Orb] HitLocation x : %.2f, y : %.2f, z : %.2f"), HitLocation1.X, HitLocation1.Y, HitLocation1.Z);
 
+	//OrbCollision->OnComponentBeginOverlap.AddDynamic(this, &AActor_Effect_Orb::OnOverlapBegin);
+	OrbCollision->OnComponentHit.AddDynamic(this, &AActor_Effect_Orb::OnHit);
 
 	// 각각의 생성시간에 따른 Timer 설정
 	FTimerHandle deathTimer;
@@ -49,7 +67,7 @@ void AActor_Effect_Orb::UpdateLocation(float DeltaTime)
 	}
 }
 
-void AActor_Effect_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AActor_Effect_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor == this)
 	{
@@ -67,10 +85,49 @@ void AActor_Effect_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 		return;
 	}
 
+	// NiagaraSystem 실행
+	if (HitNiagaraSystem)
+	{
+		FVector hitloc = OtherActor->GetActorLocation();
+		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitNiagaraSystem, HitLocation1);
+	}
 
 	UE_LOG(LogTemp, Warning, TEXT("[Orb] Other : %s, Owner : %s"),
 		*OtherActor->GetName(), *GetOwner()->GetName());
 	UE_LOG(LogTemp, Log, TEXT("[Orb] Overlap Begin"));
+	UE_LOG(LogTemp, Warning, TEXT("[Orb] HitLocation x : %.2f, y : %.2f, z : %.2f"), HitLocation1.X, HitLocation1.Y, HitLocation1.Z);
+
+	Destroy();
+}
+
+void AActor_Effect_Orb::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (OtherActor == this)
+	{
+		UE_LOG(LogTemp, Log, TEXT("OtherActor Equal This"));
+		return;
+	}
+	if (OtherActor == GetOwner())
+	{
+		UE_LOG(LogTemp, Log, TEXT("OtherActor Equal Owner"));
+		return;
+	}
+	AActor_Effect* effect = Cast<AActor_Effect>(OtherActor);
+	if (effect)
+	{
+		return;
+	}
+
+	// NiagaraSystem 실행
+	if (HitNiagaraSystem)
+	{
+		FVector hitloc = OtherActor->GetActorLocation();
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("[Orb] Other : %s, Owner : %s"),
+		*OtherActor->GetName(), *GetOwner()->GetName());
+	UE_LOG(LogTemp, Log, TEXT("[Orb] OnHit"));
+	UE_LOG(LogTemp, Warning, TEXT("[Orb] HitLocation x : %.2f, y : %.2f, z : %.2f"), HitLocation1.X, HitLocation1.Y, HitLocation1.Z);
 
 	Destroy();
 }

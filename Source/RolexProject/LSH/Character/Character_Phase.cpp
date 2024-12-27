@@ -89,8 +89,8 @@ void ACharacter_Phase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	if (auto characterInput = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		characterInput->BindAction(IA_Spacebar, ETriggerEvent::Started, this, &ACharacter_Phase::Jump);
-		characterInput->BindAction(IA_Spacebar, ETriggerEvent::Completed, this, &ACharacter_Phase::StopJumping);
+		characterInput->BindAction(IA_Spacebar, ETriggerEvent::Started, this, &ACharacter_Phase::PhaseJump);
+		characterInput->BindAction(IA_Spacebar, ETriggerEvent::Completed, this, &ACharacter_Phase::PhaseJumpEnd);
 
 		characterInput->BindAction(IA_LShift, ETriggerEvent::Started, this, &ACharacter_Phase::InputLShift);
 		characterInput->BindAction(IA_LShift, ETriggerEvent::Completed, this, &ACharacter_Phase::InputLShift);
@@ -209,6 +209,20 @@ void ACharacter_Phase::InputAttack(const FInputActionValue& inputValue)
 	ChangeAttackState(AttackState);
 }
 
+void ACharacter_Phase::PhaseJump()
+{
+	if (GetCharacterMovement()->IsMovingOnGround())
+	{
+		AudioComponent->PlaySound("Jump");
+	}
+	Jump();
+}
+
+void ACharacter_Phase::PhaseJumpEnd()
+{
+	StopJumping();
+}
+
 void ACharacter_Phase::InputLShift()
 {
 	if (bLShift)
@@ -229,7 +243,6 @@ void ACharacter_Phase::PlayMontage(FString Key, float InPlayRate, FName StartSec
 {
 	if (AttackMontages.Contains(Key))
 	{
-		UAnimMontage* montage = AttackMontages[Key];
 
 		for (auto & mon : AttackMontages)
 		{
@@ -238,6 +251,10 @@ void ACharacter_Phase::PlayMontage(FString Key, float InPlayRate, FName StartSec
 				return;
 			}
 		}
+		
+
+
+		UAnimMontage* montage = AttackMontages[Key];
 		// 화면에 Key값 출력하기
 		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, Key);
 		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, StartSectionName.ToString());

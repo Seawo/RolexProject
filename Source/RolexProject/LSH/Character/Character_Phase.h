@@ -35,14 +35,19 @@ class ROLEXPROJECT_API ACharacter_Phase : public ABaseCharacter
 
 	virtual void ChangeAttackState(EAttackState state) override;
 	virtual void InputAttack(const struct FInputActionValue& inputValue) override;
+	void PhaseJump();
+	void PhaseJumpEnd();
 
-	void InputLShift();
-	void ChangeState(EMoveState state);
+
+	void InputLShift();							// 쉬프트 입력 
+	void ChangeState(EMoveState state);			// 상태 변경
 
 
+	// 몽타주 실행함수
 	void PlayMontage(FString Key, float InPlayRate = 1.0f, FName StartSectionName = NAME_None);
-	void UpdateUI();
-	void UpdateCoolTime(float DeltaTime);
+	void UpdateUI();							// UI 업데이트 함수(Tick)
+	void UpdateCoolTime(float DeltaTime);		// 쿨타임 업데이트 함수(Tick)
+
 public:
 	void SpawnEffect(FName socketName, FName key);
 
@@ -57,6 +62,12 @@ private:
 	FVector AimDirection;								// 에임 방향
 
 	bool bLShift = true;								// 쉬프트를 눌렀는지
+	bool bIsJumping = false;							// 점프중인지
+	
+
+
+
+
 	float LerpAlpha = 0.0f;
 	float Duration = 5.0f;
 	UPROPERTY(EditAnywhere, Category = "Effect")
@@ -74,6 +85,8 @@ public:
 
 
 	float SlopeForwardAngle = 0.0f;
+	bool bIsPlayingQSkill = false;
+
 
 	// 스킬 지속시간
 	float LRSkillDuration = 3.0f;

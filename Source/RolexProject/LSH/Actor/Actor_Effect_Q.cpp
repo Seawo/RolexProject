@@ -31,7 +31,13 @@ void AActor_Effect_Q::BeginPlay()
 			Destroy(); 
 			NiagaraComponent->Deactivate();
 			OverlappedActors.Empty();
-			}), Phase->QSkillDuration, false);
+			}), 100, false);
+		// Phase->QSkillDuration
+
+	// 라인트레이스
+	FTimerHandle lineTraceTimer;
+	GetWorld()->GetTimerManager().SetTimer(lineTraceTimer, this, &AActor_Effect_Q::DrawLineTrace,0.2f,true);
+
 }
 
 void AActor_Effect_Q::Tick(float DeltaTime)
@@ -74,4 +80,51 @@ void AActor_Effect_Q::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 	UE_LOG(LogTemp, Warning, TEXT("[Q] Other : %s, Owner : %s"),
 		*OtherActor->GetName(), *GetOwner()->GetName());
 	UE_LOG(LogTemp, Log, TEXT("[Q] Overlap Begin"));
+}
+
+void AActor_Effect_Q::DrawLineTrace()
+{
+	// 라인트레이스
+	FVector start = GetActorLocation();
+	FVector end = start + GetActorForwardVector() * 10000.0f;
+
+	FHitResult hitResult;
+	FCollisionQueryParams params;
+	params.AddIgnoredActor(this);
+	params.AddIgnoredActor(GetOwner());
+	FVector pivot;
+
+
+	if (GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_Visibility, params))
+	{
+		bIsCollideLineTrace = true;
+		UE_LOG(LogTemp, Log, TEXT("Hit : %s"), *hitResult.GetActor()->GetName());
+
+		// 충돌위치값가져오기
+		FVector hitLoc = hitResult.ImpactPoint;
+		LineTraceDistance = FVector::Distance(start, hitLoc);
+
+		pivot = FMath::Lerp(GetActorLocation(), hitLoc, 0.5f);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("Hit false"));
+
+		bIsCollideLineTrace = false;
+		LineTraceDistance = 10000.0f;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("LineTraceDistance : %f"), LineTraceDistance);
+
+	// 1 : 1650
+
+	float NiagaraScaleX = FMath::Min(LineTraceDistance / 1650.0f, 1.0f);
+	float ColScaleX = FMath::Min(LineTraceDistance / 1650.0f * 26.5f, 26.5f);
+	NiagaraComponent->SetRelativeScale3D(FVector(NiagaraScaleX, 1,1));
+	BeamCollision->SetRelativeScale3D(FVector(ColScaleX, 2,2));
+	BeamCollision->SetWorldLocation(pivot);
+
+
+	UE_LOG(LogTemp, Log, TEXT("ColScaleX : %f"), ColScaleX);
+	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 0.2f, 0, 1.0f);
 }

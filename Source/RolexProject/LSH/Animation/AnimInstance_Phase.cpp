@@ -58,6 +58,16 @@ void UAnimInstance_Phase::AnimNotify_QAttack()
 	Phase->SpawnEffect("FX_Hand_R4", "Q");
 }
 
+void UAnimInstance_Phase::AnimNotify_QSkillStart()
+{
+	bIsPlayingQSkill = true;
+}
+
+void UAnimInstance_Phase::AnimNotify_QSkillEnd()
+{
+	bIsPlayingQSkill = false;
+}
+
 void UAnimInstance_Phase::AnimNotify_EAttack()
 {
 	Phase->SpawnEffect("None", "E");

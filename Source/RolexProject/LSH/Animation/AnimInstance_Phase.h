@@ -32,10 +32,17 @@ class ROLEXPROJECT_API UAnimInstance_Phase : public UBaseAnimInstance
 	UFUNCTION()
 	void AnimNotify_QAttack();
 	UFUNCTION()
+	void AnimNotify_QSkillStart();
+	UFUNCTION()
+	void AnimNotify_QSkillEnd();
+	UFUNCTION()
 	void AnimNotify_EAttack();
 
 	public:
 	class ACharacter_Phase* Phase;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterData")
 	float SlopeForwardAngle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterData")
+	bool bIsPlayingQSkill = false;
 };
