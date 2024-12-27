@@ -38,8 +38,7 @@ void AActor_Effect_Orb::BeginPlay()
 	}
 	UE_LOG(LogTemp, Warning, TEXT("[Orb] HitLocation x : %.2f, y : %.2f, z : %.2f"), HitLocation1.X, HitLocation1.Y, HitLocation1.Z);
 
-	//OrbCollision->OnComponentBeginOverlap.AddDynamic(this, &AActor_Effect_Orb::OnOverlapBegin);
-	OrbCollision->OnComponentHit.AddDynamic(this, &AActor_Effect_Orb::OnHit);
+	OrbCollision->OnComponentBeginOverlap.AddDynamic(this, &AActor_Effect_Orb::OnOverlapBegin);
 
 	// 각각의 생성시간에 따른 Timer 설정
 	FTimerHandle deathTimer;
@@ -89,44 +88,12 @@ void AActor_Effect_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 	if (HitNiagaraSystem)
 	{
 		FVector hitloc = OtherActor->GetActorLocation();
-		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitNiagaraSystem, HitLocation1);
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitNiagaraSystem, GetActorLocation());
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("[Orb] Other : %s, Owner : %s"),
 		*OtherActor->GetName(), *GetOwner()->GetName());
 	UE_LOG(LogTemp, Log, TEXT("[Orb] Overlap Begin"));
-	UE_LOG(LogTemp, Warning, TEXT("[Orb] HitLocation x : %.2f, y : %.2f, z : %.2f"), HitLocation1.X, HitLocation1.Y, HitLocation1.Z);
-
-	Destroy();
-}
-
-void AActor_Effect_Orb::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
-{
-	if (OtherActor == this)
-	{
-		UE_LOG(LogTemp, Log, TEXT("OtherActor Equal This"));
-		return;
-	}
-	if (OtherActor == GetOwner())
-	{
-		UE_LOG(LogTemp, Log, TEXT("OtherActor Equal Owner"));
-		return;
-	}
-	AActor_Effect* effect = Cast<AActor_Effect>(OtherActor);
-	if (effect)
-	{
-		return;
-	}
-
-	// NiagaraSystem 실행
-	if (HitNiagaraSystem)
-	{
-		FVector hitloc = OtherActor->GetActorLocation();
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("[Orb] Other : %s, Owner : %s"),
-		*OtherActor->GetName(), *GetOwner()->GetName());
-	UE_LOG(LogTemp, Log, TEXT("[Orb] OnHit"));
 	UE_LOG(LogTemp, Warning, TEXT("[Orb] HitLocation x : %.2f, y : %.2f, z : %.2f"), HitLocation1.X, HitLocation1.Y, HitLocation1.Z);
 
 	Destroy();

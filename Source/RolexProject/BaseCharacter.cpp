@@ -61,6 +61,19 @@ void ABaseCharacter::BeginPlay()
 
 }
 
+void ABaseCharacter::ModifyHP(int Value)
+{
+	// Value > 0 : 힐, Value < 0 : 데미지
+	Data.Hp += Value;
+}
+
+void ABaseCharacter::ModifyShield(int shield)
+{
+	if(shield < 0) return;
+
+	Data.Shield += shield;
+}
+
 void ABaseCharacter::ChangeState(EMoveState newState, UAnimMontage* montage)
 {
 	switch (newState)

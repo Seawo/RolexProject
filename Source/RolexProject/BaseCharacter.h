@@ -47,11 +47,11 @@ public:
 	bool Team;				// 팀 여부 (true = Red , false = Blue)
 
 	// Stat
-	float MaxHp;			// 최대 체력
-	float Hp;				// 현재 체력
-	float Shield;			// 쉴드
+	int MaxHp;				// 최대 체력
+	int Hp;					// 현재 체력
+	int Shield;				// 쉴드
 	float Speed;			// 이동속도
-	float Power;			// 공격력
+	int Power;				// 공격력
 };
 
 UCLASS()
@@ -69,6 +69,10 @@ protected:
 
 	virtual void ChangeAttackState(EAttackState newState) PURE_VIRTUAL(ABaseCharacter::ChangeState,);
 	virtual void InputAttack(const struct FInputActionValue& inputValue) PURE_VIRTUAL(ABaseCharacter::InputAttack,);
+	void ModifyHP(int Value);
+	void ModifyShield(int shield);
+
+
 	void ChangeState(EMoveState newState, UAnimMontage* montage);
 
 
@@ -78,6 +82,9 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+
+
 
 	UPROPERTY(EditAnywhere)
 	FCharacterData Data;				// 캐릭터 데이터를 가지고있을 구조체
