@@ -50,13 +50,15 @@ void AFey::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(IA_Q, ETriggerEvent::Started, this, &AFey::InputAttack);
 		EnhancedInputComponent->BindAction(IA_E, ETriggerEvent::Started, this, &AFey::InputAttack);
 		EnhancedInputComponent->BindAction(IA_LBM, ETriggerEvent::Started, this, &AFey::InputAttack);
+		EnhancedInputComponent->BindAction(IA_LBM, ETriggerEvent::Completed, this, &AFey::LMBAttack);
 		EnhancedInputComponent->BindAction(IA_RBM, ETriggerEvent::Started, this, &AFey::InputAttack);
+		EnhancedInputComponent->BindAction(IA_RBM, ETriggerEvent::Completed, this, &AFey::RMBAttack);
 	}
 }
 
 void AFey::InputAttack(const FInputActionValue& inputValue)
 {
-	int32 InputVector = inputValue.Get<float>();
+	int32 InputVector = inputValue.Get<float>();	// each input value are represented as a float val
 	InputVector--;
 	CurrentAttackState = static_cast<EAttackState>(InputVector);
 	ChangeAttackState(CurrentAttackState);
@@ -73,10 +75,10 @@ void AFey::ChangeAttackState(EAttackState newState)
 		EAttack();
 		break;
 	case EAttackState::LMB:
-		LMBAttack();
+		LMBAttackStart();
 		break;
 	case EAttackState::RMB:
-		RMBAttack();
+		RMBAttackStart();
 		break;
 	default:
 		break;
@@ -88,8 +90,11 @@ void AFey::QAttack()
 	 FString AttackName = TEXT("Q");
 	if (AttackMontages[AttackName] == nullptr) return;
 
+	// block montage being overlapped
 	for (const TPair<FString, UAnimMontage*>& Pair : AttackMontages)
-		if (IsMontagePlaying(Pair.Value)) return;	
+		if (IsMontagePlaying(Pair.Value)) return;
+
+	// spawn heal & damage balls
 
 	SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
 	PlayAnimMontage(AttackMontages[AttackName], 1.0f);
@@ -101,25 +106,93 @@ void AFey::EAttack()
 	FString AttackName = TEXT("E");
 	if (AttackMontages[AttackName] == nullptr) return;
 
+	// block montage being overlapped
 	for (const TPair<FString, UAnimMontage*>& Pair : AttackMontages)
 		if (IsMontagePlaying(Pair.Value)) return;	
 
+	// heal friends within 100 units in front of the character
+	
 	SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
 	PlayAnimMontage(AttackMontages[AttackName], 1.0f);
 	SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
 }
 
+void AFey::LMBAttackStart()
+{
+	HealTime = 0;
+	HealValue = 0;
+	
+	GetWorld()->GetTimerManager().SetTimer(StackHealTimer, this, &AFey::StackHeal, 1.0f, true);
+}
+
+void AFey::StackHeal()
+{
+	HealTime += 1;
+	HealValue += 5;
+
+	UE_LOG(LogTemp, Warning, TEXT("Heal Stacking"));
+	
+	if (HealTime > StackTimeLimit)
+		LMBAttack();
+}
+
 void AFey::LMBAttack()
 {
+	GetWorld()->GetTimerManager().ClearTimer(StackHealTimer);
+
+	// check montage is available
 	FString AttackName = TEXT("LMB");
 	if (AttackMontages[AttackName] == nullptr) return;
 
+	// block montage being overlapped
 	for (const TPair<FString, UAnimMontage*>& Pair : AttackMontages)
 		if (IsMontagePlaying(Pair.Value)) return;	
 
+	FHitResult HitResult;
+	// TODO: make float values as a variable
+	bool bHit = GetWorld()->SweepSingleByChannel(
+		HitResult,
+		GetActorLocation(),
+		GetActorLocation() + 10.0f,
+		FQuat::Identity,
+		ECC_Pawn,
+		FCollisionShape::MakeCapsule(1.0f, 5.0f)
+		);
+
+	DrawDebugCapsule(
+		GetWorld(),
+		(GetActorLocation()+GetActorLocation() + 10.0f)*0.5f,
+		5.0f,
+		1.0f,
+		FQuat::Identity,
+		bHit ? FColor::Red : FColor::Green,
+		false,
+		2.0f
+		);
+
+	if (bHit)
+		UE_LOG(LogTemp, Warning, TEXT("Heal Value: %d"), HealValue);
+	
 	SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
 	PlayAnimMontage(AttackMontages[AttackName], 1.0f);
 	SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
+}
+
+void AFey::RMBAttackStart()
+{
+	AttackTime = 0;
+	AttackValue = 0;
+	
+	GetWorld()->GetTimerManager().SetTimer(StackAttackTimer, this, &AFey::StackAttack, 1.0f, true);
+}
+
+void AFey::StackAttack()
+{
+	AttackTime += 1;
+	AttackValue += 5;
+
+	if (AttackTime > StackTimeLimit)
+		RMBAttack();
 }
 
 void AFey::RMBAttack()
