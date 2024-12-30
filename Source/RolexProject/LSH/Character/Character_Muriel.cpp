@@ -49,7 +49,10 @@ void ACharacter_Muriel::Tick(float DeltaTime)
 		}
 	}
 
-	
+	if (bIsSearchQSkill)
+	{
+		UpdateQSkillSearchPlayer();
+	}
 
 	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("QSkillMovement : %d"), static_cast<int>(QSkillMovement)));
 	if (bStartQSkill)
@@ -71,9 +74,10 @@ void ACharacter_Muriel::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		characterInput->BindAction(IA_LShift, ETriggerEvent::Started, this, &ACharacter_Muriel::MurielLShift);
 		characterInput->BindAction(IA_LShift, ETriggerEvent::Completed, this, &ACharacter_Muriel::MurielLShift);
 
-		characterInput->BindAction(IA_Q, ETriggerEvent::Triggered, this, &ACharacter_Muriel::InputAttack);
+		characterInput->BindAction(IA_Q, ETriggerEvent::Started, this, &ACharacter_Muriel::InputAttack);
 		characterInput->BindAction(IA_Q, ETriggerEvent::Completed, this, &ACharacter_Muriel::MurielQSkillComplete);
 		characterInput->BindAction(IA_E, ETriggerEvent::Started, this, &ACharacter_Muriel::InputAttack);
+		characterInput->BindAction(IA_E, ETriggerEvent::Completed, this, &ACharacter_Muriel::MurielESkillComplete);
 		characterInput->BindAction(IA_LBM, ETriggerEvent::Started, this, &ACharacter_Muriel::InputAttack);
 		characterInput->BindAction(IA_RBM, ETriggerEvent::Started, this, &ACharacter_Muriel::InputAttack);
 		characterInput->BindAction(IA_RBM, ETriggerEvent::Completed, this, &ACharacter_Muriel::MurielRMBEnd);
@@ -82,11 +86,10 @@ void ACharacter_Muriel::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void ACharacter_Muriel::ChangeAttackState(EAttackState state)
 {
-
-
-
 	if (state == EAttackState::QSkill)
 	{
+		if (bIsSearchQSkill) return;
+
 		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("QSkill"));
 		// 쿨타임
 		//if (QSkillCoolTime > 0)
@@ -95,34 +98,17 @@ void ACharacter_Muriel::ChangeAttackState(EAttackState state)
 		//}
 		//QSkillCoolTime = 60.0f;
 
-		// LineTrace 쏘기
-		FVector start = GetActorLocation();
-		FVector end = start + GetActorForwardVector() * 100000.0f;
-		FCollisionQueryParams params;
-		params.AddIgnoredActor(this);
-
-		FHitResult hitResult;
-
-		if (GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_WorldStatic, params))
-		{
-			ABaseCharacter* character = Cast<ABaseCharacter>(hitResult.GetActor());
-			if (character and character->Data.Team == Data.Team)
-			{
-				//UE_LOG(LogTemp, Error, TEXT("My Team"));
-				QSkillStartLocation = GetActorLocation();
-				QSkillTargetLocation = character->GetActorLocation();
-				//UE_LOG(LogTemp, Error, TEXT("QSkillTargetLocation X : %.2f, Y : %.2f, Z : %.2f"), QSkillTargetLocation.X, QSkillTargetLocation.Y, QSkillTargetLocation.Z);
-			}
-		}
-
-		DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 0.2f, 0, 1.0f);
+		bIsSearchQSkill = true;
+		
 
 		// Montage
-		//PlayAttackMontage("Q", 1.0f);
+		PlayAttackMontage("Q", 1.0f, "QSkillStart");
 		// Effect
 	}
 	else if (state == EAttackState::ESkill)
 	{
+		if (bStartESkill) return;
+
 		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("ESkill"));
 		// 쿨타임
 		//if (ESkillCoolTime > 0)
@@ -130,10 +116,12 @@ void ACharacter_Muriel::ChangeAttackState(EAttackState state)
 		//	return;
 		//}
 		//ESkillCoolTime = 20.0f;
-		//// Montage
-		//PlayAttackMontage("E", 1.0f);
-		//GetCharacterMovement()->GravityScale = 0.7f;
-		//Jump();
+		
+		bIsESkillCharge = true;
+		
+		// Montage
+		PlayAttackMontage("E", 1.0f, "ESkillStart");
+
 		// Effect
 	}
 	else if (state == EAttackState::LMB)
@@ -148,6 +136,7 @@ void ACharacter_Muriel::ChangeAttackState(EAttackState state)
 	}
 	else if (state == EAttackState::RMB)
 	{
+		if (bIsRMBCharging) return;
 		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("RMB"));
 		// 쿨타임
 		//if (RMBSkillCoolTime > 0)
@@ -155,9 +144,9 @@ void ACharacter_Muriel::ChangeAttackState(EAttackState state)
 		//	return;
 		//}
 		//RMBSkillCoolTime = 5.0f;
-
+		bIsRMBCharging = true;
 		// Montage
-		PlayAttackMontage("RMB", 1.0f);
+		PlayAttackMontage("RMB", 1.0f, "RMBStart");
 		// Effect
 	}
 	else
@@ -179,18 +168,10 @@ void ACharacter_Muriel::InputAttack(const FInputActionValue& inputValue)
 			return;
 		}
 	}
-	
+
 	int inputVector = inputValue.Get<float>();
 	inputVector--;
-
-	// RMB공격이 나갈 차례라면
-	if (inputVector == 3)
-	{
-		bIsRMBCharging = true;
-	}
-
 	AttackState = static_cast<EAttackState>(inputVector);
-	//UE_LOG(LogTemp, Warning, TEXT("AttackState : %d"), static_cast<int>(AttackState));
 	ChangeAttackState(AttackState);
 }
 
@@ -264,20 +245,51 @@ void ACharacter_Muriel::MurielJump()
 
 void ACharacter_Muriel::MurielRMBEnd()
 {
+	if (not bIsRMBCharging) return;
 	bIsRMBCharging = false;
 	// puase인 몽타주 다시 실행
-	AnimInstance->Montage_Resume(AttackMontages["RMB"]);
+	PlayAttackMontage("RMB", 1.0f, "RMBFire");
 }
 
 void ACharacter_Muriel::MurielQSkillComplete()
 {
+	// Q키를 뗐을 때 플레이어를 찾는 행위를 멈추게 하기 위해 bool값 false로 변경
+	if (not bIsSearchQSkill) return;
+	bIsSearchQSkill = false;
+
+
+	if (QSkillTargetLocation == FVector::ZeroVector)
+	{
+		// 목표 지점이 없다면 재생중인 몽타주 멈추기
+		AnimInstance->Montage_Stop(0.2f, AttackMontages["Q"]);
+		return;
+	}
+
+	// 멈춰놨던 몽타주 다시 실행하기
+	PlayAttackMontage("Q", 1.0f, "QSkillFire");
+	//AnimInstance->Montage_Resume(AttackMontages["Q"]);
+
 	//Jump(); // 땅에서 떨어뜨리기 위해
 	//SetActorLocation(GetActorLocation() + FVector(0, 0, 100.0f));
 
+	// QSkill 몽타주를 Tick에서 플레이어의 이동처리 해주기 위한 bool값 true로 변경
 	bStartQSkill = true;
+	// 중력의 초기값 담아주기
 	DefaultGravityScale = GetCharacterMovement()->GravityScale;
+	// QSkill 이동 상태를 시작단계로 변경
 	QSkillMovement = EQkillMovement::Ascending;
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+	//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+}
+
+void ACharacter_Muriel::MurielESkillComplete()
+{
+	// E스킬 차징중이 아니라면 리턴
+	if (not bIsESkillCharge) return;
+
+	bIsESkillCharge = false;
+
+	// Montage 실행
+	PlayAttackMontage("E", 1.0f, "ESkillFire");
 }
 
 void ACharacter_Muriel::PlayAttackMontage(FString Key, float InPlayRate, FName StartSectionName)
@@ -289,12 +301,24 @@ void ACharacter_Muriel::PlayAttackMontage(FString Key, float InPlayRate, FName S
 		{
 			if (AnimInstance->Montage_IsPlaying(mon.Value))
 			{
-				return;
+				// QSkill에서 SectionName이 QSkillDescending, QSkillLand, ESkillFire일 때는 다음 몽타주가 실행될수 있도록 리턴하지 않음
+				if (StartSectionName == "RMBFire" or
+					StartSectionName == "QSkillFire" or
+					StartSectionName == "QSkillDescending" or
+					StartSectionName == "QSkillLand" or 
+					StartSectionName == "ESkillFire")
+				{
+					continue;
+				}
+				else
+				{
+					return;
+				}
 			}
 		}
 
 		UAnimMontage* montage = AttackMontages[Key];
-		PlayAnimMontage(montage, InPlayRate);
+		PlayAnimMontage(montage, InPlayRate, StartSectionName);
 	}
 }
 
@@ -316,6 +340,12 @@ void ACharacter_Muriel::PlayStateMontage(FString Key, float InPlayRate, FName St
 	}
 }
 
+void ACharacter_Muriel::SpawnEffect(FName socketName, FName key)
+{
+}
+
+
+
 void ACharacter_Muriel::UpdateCoolTime(float DeltaTime)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("FlyCoolTime : %.2f"), FlyCoolTime));
@@ -330,11 +360,10 @@ void ACharacter_Muriel::UpdateQSkillMovement(float DeltaTime)
 {
 	FVector currentLocation = GetActorLocation();
 	//UE_LOG(LogTemp, Warning, TEXT("AttackState : %d"), static_cast<int>(AttackState));
-	FVector direction;
 	
 	if (QSkillMovement == EQkillMovement::Ascending)
 	{
-		GetCharacterMovement()->GravityScale = 0.0f;
+		//GetCharacterMovement()->GravityScale = 0.0f;
 
 		currentLocation.Z += QSkillVerticalSpeed * DeltaTime;
 
@@ -342,29 +371,35 @@ void ACharacter_Muriel::UpdateQSkillMovement(float DeltaTime)
 		{
 			currentLocation.Z = ZHeight;
 			QSkillMovement = EQkillMovement::MovingHorizontally;
+			PlayAttackMontage("Q", 1.0f, "QSkillDescending");
 		}
 	}
 	else if (QSkillMovement == EQkillMovement::MovingHorizontally)
 	{
-		FVector horizontalTargetLocation = FVector(QSkillTargetLocation.X, QSkillTargetLocation.Y, ZHeight);
-		FVector horizontalDirection = (horizontalTargetLocation - currentLocation).GetSafeNormal2D() * QSkillHorizontalSpeed * DeltaTime;
+		FVector horizontalTargetLocation = FVector(QSkillTargetLocation.X + 200.0f, QSkillTargetLocation.Y, ZHeight);
+		FVector horizontalDirection = (horizontalTargetLocation - currentLocation).GetSafeNormal2D();
 
 
 		currentLocation += horizontalDirection * QSkillHorizontalSpeed * DeltaTime;
 
-		if (FVector::Dist2D(currentLocation, horizontalTargetLocation) <= 10.0f)
+		if (FVector::Dist2D(currentLocation, horizontalTargetLocation) <= 300.0f)
 		{
 			currentLocation = horizontalTargetLocation;
 			QSkillMovement = EQkillMovement::Descending;
+			
 		}
 	}
 	else if (QSkillMovement == EQkillMovement::Descending)
 	{
-		currentLocation.Z -= QSkillVerticalSpeed * DeltaTime;
+		currentLocation.Z -= QSkillVerticalSpeed *2.0f * DeltaTime;
 		if (currentLocation.Z <= QSkillTargetLocation.Z)
 		{
 			currentLocation.Z = QSkillTargetLocation.Z;
+			currentLocation = FVector(QSkillTargetLocation.X + 200.0f, QSkillTargetLocation.Y, QSkillTargetLocation.Z);
+
+
 			QSkillMovement = EQkillMovement::Idle;
+			PlayAttackMontage("Q", 1.0f, "QSkillLand");
 		}
 	}
 	else if (QSkillMovement == EQkillMovement::Idle)
@@ -374,9 +409,59 @@ void ACharacter_Muriel::UpdateQSkillMovement(float DeltaTime)
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 	}
 
-	SetActorLocation(GetActorLocation() + direction);
+	SetActorLocation(currentLocation);
 }
 
-void ACharacter_Muriel::SpawnEffect(FName socketName, FName key)
+void ACharacter_Muriel::UpdateQSkillSearchPlayer()
 {
+	QSkillTargetLocation = FVector::ZeroVector;
+
+
+	// LineTrace 쏘기
+	FVector start = GetActorLocation();
+	FVector end = start + GetActorForwardVector() * 100000.0f;
+	FCollisionQueryParams params;
+	params.AddIgnoredActor(this);
+
+	FHitResult hitResult;
+
+	if (GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_WorldStatic, params))
+	{
+		ABaseCharacter* character = Cast<ABaseCharacter>(hitResult.GetActor());
+		if (character and character->Data.Team == Data.Team)
+		{
+			QSkillStartLocation = GetActorLocation();
+			QSkillTargetLocation = character->GetActorLocation();
+		}
+	}
+
+	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 0.2f, 0, 1.0f);
+}
+
+bool ACharacter_Muriel::IsMurielPlayingMontage(FName state) const
+{
+	if (state == "Attack")
+	{
+		for (auto& mon : AttackMontages)
+		{
+			if (AnimInstance->Montage_IsPlaying(mon.Value))
+			{
+				return true;
+			}
+		}
+	}
+	else if (state == "State")
+	{
+		for (auto& mon : stateMontages)
+		{
+			if (AnimInstance->Montage_IsPlaying(mon.Value))
+			{
+				return true;
+			}
+		}
+	}
+
+
+
+	return false;
 }

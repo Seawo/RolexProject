@@ -18,6 +18,7 @@ void UAnimInstance_Muriel::NativeUpdateAnimation(float DeltaSeconds)
 	if (Muriel)
 	{
 		SlopeForwardAngle = Muriel->GetSlopeForwrdAngle();
+		bIsPlayingQSkill = Muriel->GetIsPlayingQSkill();
 	}
 }
 
@@ -26,6 +27,11 @@ void UAnimInstance_Muriel::AnimNotify_RMBCharge()
 	UE_LOG(LogTemp, Warning, TEXT("AnimNotify_RMBCharge"));
 	if (Muriel->GetIsRMBCharging())
 	{
-		Montage_Pause();
+		//Montage_Pause();
 	}
+}
+
+void UAnimInstance_Muriel::AnimNotify_QSkillReadyPause()
+{
+	//Montage_Pause();
 }

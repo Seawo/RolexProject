@@ -21,12 +21,13 @@ class ROLEXPROJECT_API UAnimInstance_Muriel : public UBaseAnimInstance
 
 	UFUNCTION()
 	void AnimNotify_RMBCharge();
-
+	UFUNCTION()
+	void AnimNotify_QSkillReadyPause();
 public:
 	class ACharacter_Muriel* Muriel;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterData")
 	float SlopeForwardAngle;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterData")
-	//bool bIsPlayingQSkill = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterData")
+	bool bIsPlayingQSkill = false;
 };
