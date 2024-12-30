@@ -4,36 +4,30 @@
 
 #include "CoreMinimal.h"
 #include "LSH/Actor/Actor_Effect.h"
-#include "Actor_Effect_Orb.generated.h"
+#include "Actor_Effect_Phase_E.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ROLEXPROJECT_API AActor_Effect_Orb : public AActor_Effect
+class ROLEXPROJECT_API AActor_Effect_Phase_E : public AActor_Effect
 {
 	GENERATED_BODY()
-	
-	AActor_Effect_Orb();
+
+	AActor_Effect_Phase_E();
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void UpdateLocation(float DeltaTime) override;
 
-
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 private:
-	UPROPERTY(EditAnywhere, Category = "Effect")
-	class USphereComponent* OrbCollision;
 
 
 	UPROPERTY(EditAnywhere, Category = "Effect")
-	class UNiagaraComponent* HitNiagaraComponent;
+	class USphereComponent* ShieldCollision;
 
-	UPROPERTY(EditAnywhere, Category = "Effect")
-	class UNiagaraSystem* HitNiagaraSystem;
-
-	FVector HitLocation1;
+	bool bIsOverlap = false;
 };

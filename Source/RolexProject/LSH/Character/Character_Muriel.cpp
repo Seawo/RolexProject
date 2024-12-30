@@ -4,8 +4,13 @@
 #include "LSH/Character/Character_Muriel.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
+
+
 #include "AnimInstance_Muriel.h"
+#include "Actor_Effect.h"
+
 
 ACharacter_Muriel::ACharacter_Muriel()
 {
@@ -148,6 +153,7 @@ void ACharacter_Muriel::ChangeAttackState(EAttackState state)
 		// Montage
 		PlayAttackMontage("RMB", 1.0f, "RMBStart");
 		// Effect
+		SpawnEffect("Muzzle_01", "RMB");
 	}
 	else
 	{
@@ -342,6 +348,49 @@ void ACharacter_Muriel::PlayStateMontage(FString Key, float InPlayRate, FName St
 
 void ACharacter_Muriel::SpawnEffect(FName socketName, FName key)
 {
+	if (EffectMap.Contains(key))
+	{
+		TSubclassOf<AActor_Effect> effectClass = EffectMap[key];
+		if (effectClass)
+		{
+			FVector socketLocation;
+			if (socketName == "None")
+			{
+				socketLocation = GetActorLocation();
+			}
+			else
+			{
+				// 소켓 위치에 생성시키기
+				socketLocation = GetMesh()->GetSocketLocation(socketName);
+			}
+
+
+			// FVector를 FRotator로 변환
+			TpsCamComp->GetForwardVector();
+
+			// AActor_Effect생성하기
+			FRotator rot = TpsCamComp->GetForwardVector().Rotation();
+			//AActor_Effect* ef = GetWorld()->SpawnActor<AActor_Effect>(effect, socketLocation, rot);
+			AActor_Effect* effect = GetWorld()->SpawnActorDeferred<AActor_Effect>(
+				effectClass,
+				FTransform(rot, socketLocation),
+				this);
+			if (key == "LMB")
+			{
+				effect->SetIsLMB(true);
+			}
+			else if (key == "RMB")
+			{
+				effect->SetIsLMB(false);
+			}
+
+			
+			if (effect)
+			{
+				effect->FinishSpawning(FTransform(rot, socketLocation));
+			}
+		}
+	}
 }
 
 

@@ -23,6 +23,10 @@ class ROLEXPROJECT_API UAnimInstance_Muriel : public UBaseAnimInstance
 	void AnimNotify_RMBCharge();
 	UFUNCTION()
 	void AnimNotify_QSkillReadyPause();
+
+
+	UFUNCTION()
+	void AnimNotify_LMBAttack();
 public:
 	class ACharacter_Muriel* Muriel;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterData")

@@ -1,14 +1,14 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "LSH/Actor/Actor_Effect_Q.h"
+#include "LSH/Actor/Actor_Effect_Phase_Q.h"
 #include "Components/BoxComponent.h"
 
 #include "Character_Phase.h"
 #include "NiagaraComponent.h"
 #include "Camera/CameraComponent.h"
 
-AActor_Effect_Q::AActor_Effect_Q()
+AActor_Effect_Phase_Q::AActor_Effect_Phase_Q()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -18,15 +18,15 @@ AActor_Effect_Q::AActor_Effect_Q()
 	BeamCollision->SetRelativeScale3D(FVector(26.5f, 2.0f, 2.0f));
 }
 
-void AActor_Effect_Q::BeginPlay()
+void AActor_Effect_Phase_Q::BeginPlay()
 {
 	Super::BeginPlay();
 
 	// 충돌체 BeginOverlap
-	BeamCollision->OnComponentBeginOverlap.AddDynamic(this, &AActor_Effect_Q::OnOverlapBegin);
+	BeamCollision->OnComponentBeginOverlap.AddDynamic(this, &AActor_Effect_Phase_Q::OnOverlapBegin);
 
 	// 충돌체 EndOverlap
-	BeamCollision->OnComponentEndOverlap.AddDynamic(this, &AActor_Effect_Q::OnOverlapEnd);
+	BeamCollision->OnComponentEndOverlap.AddDynamic(this, &AActor_Effect_Phase_Q::OnOverlapEnd);
 
 
 
@@ -43,15 +43,15 @@ void AActor_Effect_Q::BeginPlay()
 
 	// 라인트레이스
 	FTimerHandle lineTraceTimer;
-	GetWorld()->GetTimerManager().SetTimer(lineTraceTimer, this, &AActor_Effect_Q::DrawLineTrace,0.2f,true);
+	GetWorld()->GetTimerManager().SetTimer(lineTraceTimer, this, &AActor_Effect_Phase_Q::DrawLineTrace,0.2f,true);
 }
 
-void AActor_Effect_Q::Tick(float DeltaTime)
+void AActor_Effect_Phase_Q::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
-void AActor_Effect_Q::UpdateLocation(float DeltaTime)
+void AActor_Effect_Phase_Q::UpdateLocation(float DeltaTime)
 {
 	FVector newLoc = Phase->GetMesh()->GetSocketLocation("FX_Hand_L4");
 
@@ -59,7 +59,7 @@ void AActor_Effect_Q::UpdateLocation(float DeltaTime)
 	SetActorRotation(Phase->TpsCamComp->GetForwardVector().Rotation());
 }
 
-void AActor_Effect_Q::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AActor_Effect_Phase_Q::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor == GetOwner() or OtherActor == this)
 	{
@@ -86,10 +86,10 @@ void AActor_Effect_Q::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 	//UE_LOG(LogTemp, Warning, TEXT("[Q] Other : %s, Owner : %s"),*OtherActor->GetName(), *GetOwner()->GetName());
 	UE_LOG(LogTemp, Log, TEXT("[Q] Overlap Begin"));
 
-	GetWorld()->GetTimerManager().SetTimer(DamageTimer, this, &AActor_Effect_Q::TakeDamageToCharacter, 0.2f, true);
+	GetWorld()->GetTimerManager().SetTimer(DamageTimer, this, &AActor_Effect_Phase_Q::TakeDamageToCharacter, 0.2f, true);
 }
 
-void AActor_Effect_Q::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void AActor_Effect_Phase_Q::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if (OtherActor == GetOwner() or OtherActor == this)
 	{
@@ -118,7 +118,7 @@ void AActor_Effect_Q::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AAc
 	GetWorld()->GetTimerManager().ClearTimer(DamageTimer);
 }
 
-void AActor_Effect_Q::TakeDamageToCharacter()
+void AActor_Effect_Phase_Q::TakeDamageToCharacter()
 {
 	// 데미지 주기
 	if (bIsOverlap)
@@ -133,7 +133,7 @@ void AActor_Effect_Q::TakeDamageToCharacter()
 	}
 }
 
-void AActor_Effect_Q::DrawLineTrace()
+void AActor_Effect_Phase_Q::DrawLineTrace()
 {
 	// 라인트레이스
 	FVector start = GetActorLocation();

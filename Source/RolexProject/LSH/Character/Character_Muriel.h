@@ -93,6 +93,10 @@ private:
 
 
 
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	TMap<FName, TSubclassOf<class AActor_Effect>> EffectMap;
+
 	// 쿨타임
 	float RMBSkillCoolTime = 0.0f;		// 쿨타임 5초
 	float FlyCoolTime = 0.0f;		// 쿨타임 5초

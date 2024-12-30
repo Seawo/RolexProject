@@ -2,21 +2,22 @@
 
 
 #include "Character_Phase.h"
+
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Camera/CameraComponent.h"
+
 #include "AnimInstance_Phase.h"
 #include "Animation/AnimMontage.h"
-#include "Actor_Effect.h"
+
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
-#include "Camera/CameraComponent.h"
 
 #include "AudioComponent_Phase.h"
 
-#include "Actor_Effect_Orb.h"
-#include "Actor_Effect_Orb.h"
-#include "Actor_Effect_Orb.h"
+#include "Actor_Effect.h"
+#include "Actor_Effect_Phase_Orb.h"
 
 #include "UI/UI_InGame.h"
 #include "Components/ProgressBar.h"

@@ -4,43 +4,38 @@
 
 #include "CoreMinimal.h"
 #include "LSH/Actor/Actor_Effect.h"
-#include "Actor_Effect_Q.generated.h"
+#include "Actor_Effect_Muriel_Orb.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ROLEXPROJECT_API AActor_Effect_Q : public AActor_Effect
+class ROLEXPROJECT_API AActor_Effect_Muriel_Orb : public AActor_Effect
 {
 	GENERATED_BODY()
 
-	AActor_Effect_Q();
+	AActor_Effect_Muriel_Orb();
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void UpdateLocation(float DeltaTime) override;
 
-
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	UFUNCTION()
-	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	void TakeDamageToCharacter();
-
-	void DrawLineTrace();
+	void UpdateScale(float DeltaTime);
 
 private:
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	class USphereComponent* OrbCollision;
 
 	UPROPERTY(EditAnywhere, Category = "Effect")
-	class UBoxComponent* BeamCollision;
+	class UNiagaraSystem* HitNiagaraSystem;
 
-	UPROPERTY(EditAnywhere, Category = "Effect")
-	TArray<class ABaseCharacter*> OverlappedActors;
+	FVector HitLocation1;
 
-	FTimerHandle DamageTimer;
+	class ACharacter_Muriel* Muriel;
 
-	float LineTraceDistance = 10000.0f;
-	bool bIsOverlap = false;
+	float OrbScale = 0.3f;
+	bool bIsFire = false;
 };

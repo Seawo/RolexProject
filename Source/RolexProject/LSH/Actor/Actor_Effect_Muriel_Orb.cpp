@@ -1,44 +1,68 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "LSH/Actor/Actor_Effect_Orb.h"
+#include "LSH/Actor/Actor_Effect_Muriel_Orb.h"
+
 #include "Components/SphereComponent.h"
 #include "Character_Phase.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Character_Muriel.h"
+#include "Camera/CameraComponent.h"
 
-AActor_Effect_Orb::AActor_Effect_Orb()
+AActor_Effect_Muriel_Orb::AActor_Effect_Muriel_Orb()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	OrbCollision = CreateDefaultSubobject<USphereComponent>(TEXT("OrbCollision"));
 	OrbCollision->SetupAttachment(RootComponent);
 
-	HitNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("HitNiagaraComponent"));
-	HitNiagaraComponent->SetupAttachment(ColComp);
+	Speed = 1000.0f;
 }
 
-void AActor_Effect_Orb::BeginPlay()
+void AActor_Effect_Muriel_Orb::BeginPlay()
 {
 	Super::BeginPlay();
 
-	OrbCollision->OnComponentBeginOverlap.AddDynamic(this, &AActor_Effect_Orb::OnOverlapBegin);
+	Muriel = Cast<ACharacter_Muriel>(GetOwner());
 
-	// 각각의 생성시간에 따른 Timer 설정
-	SetLifeSpan(Phase->LRSkillDuration);
+	OrbCollision->OnComponentBeginOverlap.AddDynamic(this, &AActor_Effect_Muriel_Orb::OnOverlapBegin);
 
-	//FTimerHandle deathTimer;
-	//GetWorld()->GetTimerManager().SetTimer(deathTimer,
-	//	FTimerDelegate::CreateLambda([this]() {NiagaraComponent->Deactivate(); Destroy(); }), Phase->LRSkillDuration, false);
+	OrbScale = 0.3f;
+	SetActorScale3D(FVector(OrbScale));
+
+
+	UE_LOG(LogTemp, Log, TEXT("bIsLMB : %d"), bIsLMB);
+	if (bIsLMB)
+	{
+		SetLifeSpan(3.0f);
+	}
+	else
+	{
+		SetLifeSpan(6.0f);
+	}
 }
 
-void AActor_Effect_Orb::Tick(float DeltaTime)
+void AActor_Effect_Muriel_Orb::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (Muriel->GetIsRMBCharging())
+	{
+		if (bIsFire) return;
+
+		UpdateScale(DeltaTime);
+		//return;
+	}
+	else
+	{
+		bIsFire = true;
+		UpdateLocation(DeltaTime);
+	}
 }
 
-void AActor_Effect_Orb::UpdateLocation(float DeltaTime)
+void AActor_Effect_Muriel_Orb::UpdateLocation(float DeltaTime)
 {
 	SetActorLocation(GetActorLocation() + GetActorForwardVector() * Speed * DeltaTime);
 
@@ -53,7 +77,26 @@ void AActor_Effect_Orb::UpdateLocation(float DeltaTime)
 	}
 }
 
-void AActor_Effect_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AActor_Effect_Muriel_Orb::UpdateScale(float DeltaTime)
+{
+	FVector newLoc = Muriel->GetMesh()->GetSocketLocation("Muzzle_01");
+
+	SetActorLocation(newLoc);
+	SetActorRotation(Muriel->TpsCamComp->GetForwardVector().Rotation());
+
+	if (NiagaraComponent)
+	{
+		OrbScale +=  0.3f * DeltaTime;
+		if (OrbScale >= 1.0f)
+		{
+			OrbScale = 1.0f;
+		}
+
+		SetActorScale3D(FVector(OrbScale));
+	}
+}
+
+void AActor_Effect_Muriel_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor == this)
 	{
@@ -87,7 +130,7 @@ void AActor_Effect_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 	ABaseCharacter* onwer = Cast<ABaseCharacter>(GetOwner());
 
 	// 캐릭터 이면서 다른 팀이라면
-	if (character && character->Data.Team != onwer ->Data.Team)
+	if (character && character->Data.Team != onwer->Data.Team)
 	{
 		character->ModifyHP(-1);
 	}
@@ -95,3 +138,5 @@ void AActor_Effect_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 
 	Destroy();
 }
+
+

@@ -24,7 +24,7 @@ void UAnimInstance_Muriel::NativeUpdateAnimation(float DeltaSeconds)
 
 void UAnimInstance_Muriel::AnimNotify_RMBCharge()
 {
-	UE_LOG(LogTemp, Warning, TEXT("AnimNotify_RMBCharge"));
+	//UE_LOG(LogTemp, Warning, TEXT("AnimNotify_RMBCharge"));
 	if (Muriel->GetIsRMBCharging())
 	{
 		//Montage_Pause();
@@ -34,4 +34,9 @@ void UAnimInstance_Muriel::AnimNotify_RMBCharge()
 void UAnimInstance_Muriel::AnimNotify_QSkillReadyPause()
 {
 	//Montage_Pause();
+}
+
+void UAnimInstance_Muriel::AnimNotify_LMBAttack()
+{
+	Muriel->SpawnEffect("Muzzle_01", "LMB");
 }

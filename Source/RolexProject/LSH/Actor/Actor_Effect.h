@@ -27,7 +27,7 @@ public:
 
 	void SetDirection(FVector dir) { Direction = dir; }
 	void SetSpeed(float speed) { Speed = speed; }
-
+	void SetIsLMB(bool isLMB) { bIsLMB = isLMB; }
 
 
 
@@ -53,4 +53,6 @@ protected:
 
 	UPROPERTY()
 	class ACharacter_Phase* Phase;
+
+	bool bIsLMB = false;		// true : LMB, false : RMB
 };
