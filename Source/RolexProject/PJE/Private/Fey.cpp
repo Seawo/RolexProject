@@ -4,7 +4,11 @@
 #include "Fey.h"
 
 #include "EnhancedInputComponent.h"
+#include "UltimateBall.h"
+#include "Components/BoxComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
 AFey::AFey()
@@ -20,6 +24,22 @@ AFey::AFey()
 	Data.Shield = 0.0f;
 	Data.Speed = 400.0f;
 	Data.Power = 10.0f;
+
+	// healing Box
+	HealingBox = CreateDefaultSubobject<UBoxComponent>(TEXT("HealingBox"));
+	HealingBox->SetupAttachment(GetRootComponent());
+	
+	HealingBox->SetBoxExtent(FVector(1000.0f, 500.0f, 500.0f));
+	HealingBox->SetRelativeLocation(FVector(1000.0f, 0.0f, 0.0f));
+
+	// collision settings: ignore all but overlap pawn
+	HealingBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	HealingBox->SetCollisionObjectType(ECC_WorldDynamic);
+	HealingBox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	HealingBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	
+	HealingBox->SetHiddenInGame(false);
+	HealingBox->SetVisibility(true);
 }
 
 // Called when the game starts or when spawned
@@ -95,7 +115,20 @@ void AFey::QAttack()
 		if (IsMontagePlaying(Pair.Value)) return;
 
 	// spawn heal & damage balls
+	for (int32 i=0; i<NumberOfBalls; i++)
+	{
+		FVector SpawnLocation = GetActorLocation() + GetActorForwardVector()*100.0f;
+		FRotator SpawnRotation = FRotator(0.0f, FMath::FRandRange(-SpreadAngle, SpreadAngle), 0.0f);
 
+		AUltimateBall* Ball = GetWorld()->SpawnActor<AUltimateBall>(UltimateBallFactory, SpawnLocation, SpawnRotation);
+		if (Ball)
+		{
+			// TODO: study projectilemovement and increase Z velocity, enable floor collision
+			Ball->ProjectileMovement->SetVelocityInLocalSpace(FVector(1000.0f, 0.0f, 500.0f));
+			Ball->ProjectileMovement->Activate();
+		}
+	}
+	
 	SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
 	PlayAnimMontage(AttackMontages[AttackName], 1.0f);
 	SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
@@ -110,7 +143,33 @@ void AFey::EAttack()
 	for (const TPair<FString, UAnimMontage*>& Pair : AttackMontages)
 		if (IsMontagePlaying(Pair.Value)) return;	
 
-	// heal friends within 100 units in front of the character
+	// // debug
+	// FTimerHandle TimerHandle;
+	// GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+	// {
+	// 	HealingBox->SetVisibility(true);
+	// 	HealingBox->ShapeColor = FColor::Green;
+	// },
+	// 	1.0f,
+	// 	false
+	// 	);
+	
+	// heal characters within 100 units in front of Fey
+	TArray<AActor*> OverlappingActors;
+	HealingBox->GetOverlappingActors(OverlappingActors);
+
+	for (AActor* Actor : OverlappingActors)
+	{
+		ABaseCharacter* TargetCharacter = Cast<ABaseCharacter>(Actor);
+		if (TargetCharacter && TargetCharacter->Data.Team == Data.Team)
+		{
+			if (TargetCharacter == this) continue;
+			UE_LOG(LogTemp, Warning, TEXT("TargetCharacter Name: %s"), *TargetCharacter->GetName());
+			TargetCharacter->Data.Hp += EAttackHealAmount;
+			if (TargetCharacter->Data.Hp > TargetCharacter->Data.MaxHp)
+				TargetCharacter->Data.Hp = TargetCharacter->Data.MaxHp;
+		}
+	}
 	
 	SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
 	PlayAnimMontage(AttackMontages[AttackName], 1.0f);
@@ -149,21 +208,27 @@ void AFey::LMBAttack()
 		if (IsMontagePlaying(Pair.Value)) return;	
 
 	FHitResult HitResult;
+	FVector Start = GetActorLocation();
+	FVector End = Start + GetActorForwardVector()*1000.0f;
+	float Radius = 50.0f;
+	float HalfHeight = 100.0f;
+	
 	// TODO: make float values as a variable
 	bool bHit = GetWorld()->SweepSingleByChannel(
 		HitResult,
-		GetActorLocation(),
-		GetActorLocation() + 10.0f,
+		Start,
+		End,
 		FQuat::Identity,
 		ECC_Pawn,
-		FCollisionShape::MakeCapsule(1.0f, 5.0f)
+		FCollisionShape::MakeCapsule(Radius, HalfHeight)
 		);
 
+	// collision detection region
 	DrawDebugCapsule(
 		GetWorld(),
-		(GetActorLocation()+GetActorLocation() + 10.0f)*0.5f,
-		5.0f,
-		1.0f,
+		(Start + End)*0.5f,
+		HalfHeight,
+		Radius,
 		FQuat::Identity,
 		bHit ? FColor::Red : FColor::Green,
 		false,

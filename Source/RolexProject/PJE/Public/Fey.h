@@ -33,7 +33,22 @@ public:
 public:
 	EAttackState CurrentAttackState;
 
+	UPROPERTY(EditAnywhere)
+	int32 NumberOfBalls = 15;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AUltimateBall> UltimateBallFactory;
+	
+	UPROPERTY(EditAnywhere)
+	float SpreadAngle = 45.0f;
+	
 	void QAttack();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UBoxComponent* HealingBox;
+
+	int32 EAttackHealAmount = 10;
+	
 	void EAttack();
 	
 	void LMBAttackStart();

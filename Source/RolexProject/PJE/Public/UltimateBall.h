@@ -24,7 +24,27 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* Ball;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite);
+	class USphereComponent* Sphere;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite);
+	UStaticMeshComponent* MeshComponent;
 	
+	// to bounce easily
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UProjectileMovementComponent* ProjectileMovement;
+
+	UFUNCTION()
+	void OnHit(
+		UPrimitiveComponent* HitComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent*OtherComp,
+		FVector NormalImpulse,
+		const FHitResult& Hit
+		);
+	
+	FTimerHandle DestroyTimerHandle;
+	
+	UFUNCTION()
+	void DestroyBall();
 };
