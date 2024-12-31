@@ -32,13 +32,27 @@ public:
 	*/
 	EAttackState CurrAttackState;
 
+	// arrow
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AEffectActor> ArrowClass;
+	TMap<FName, TSubclassOf<class AEffectActor>> ArrowClass;
 
-	class AEffectActor* Arrow;
+	// charge
+	UPROPERTY(EditAnywhere)
+	TMap<FName, TSubclassOf<class AEffectActor>> ChargingClass;
+
+	// Q
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AEffectActor> QEffectActorclass;
+
+	class AEffectActor* EffectActor;
+	class AEffectActor* QEffectActor;
+
+
 
 	void AimOffsetLBM();
 	void ShootingArrowLBM();
+	void AimOffsetRBM();
+	void ShootingArrowRBM();
 	void AimOffsetQ();
 	void ShootingArrowQ();
 
@@ -46,17 +60,29 @@ private:
 	// 애니메이션 가져오기
 	class USparrowAnimInstance* anim;
 
+	// 데칼 
+	class UDecalComponent* AimIndicator;
+
 	// Jump
 	bool bIsRun = false;
 
 	// LBM
-	bool bIsCharging = false;
+	bool bLBMIsCharging = false;
+	
+	// Q
+	FVector SelectPos;
+	bool bQIsCharging = false;
 
+	// RBM
+	bool bRBMIsCharging = false;
+	
 	// E
 
 	// 조준점을 위한 핸들러
 	FTimerHandle LBMAimTimerHandle;
 	FTimerHandle QAimTimerHandle;
+	FTimerHandle RBMAimTimerHandle;
+
 
 	// attackstate 
 	void InputJump();
@@ -67,4 +93,7 @@ private:
 	void QAttack();
 	void EAttack();
 
+	// spawnArrow
+	void SpawnArrow(FName arrowName);
+	void SpawnCharge(FName chargeName);
 };
