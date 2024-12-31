@@ -81,7 +81,7 @@ void AActor_Effect_Muriel_Orb::UpdateScale(float DeltaTime)
 {
 	FVector newLoc = Muriel->GetMesh()->GetSocketLocation("Muzzle_01");
 
-	SetActorLocation(newLoc);
+	SetActorLocation(newLoc + FVector(0, -0.3f * DeltaTime, 0));
 	SetActorRotation(Muriel->TpsCamComp->GetForwardVector().Rotation());
 
 	if (NiagaraComponent)

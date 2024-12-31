@@ -69,6 +69,7 @@ public:
 /**변수들*/
 private:
 	class UAnimInstance_Muriel* AnimInstance;			// 에니메이션 인스턴스
+	class ABaseCharacter* NearTeamCharacter;			// 가까운 팀 캐릭터
 
 	float SlopeForwardAngle = 0.0f;
 	float FlyingTime = 7.0f;							// 공중에 떠있는 시간 (5초)

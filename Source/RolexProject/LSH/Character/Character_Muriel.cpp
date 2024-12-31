@@ -6,6 +6,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 #include "AnimInstance_Muriel.h"
@@ -49,7 +51,7 @@ void ACharacter_Muriel::Tick(float DeltaTime)
 		{
 			bIsPushSpaceBar = false;
 			FlyCoolTime = 10.0f;
-			GetCharacterMovement()->GravityScale = DefaultGravityScale;
+			GetCharacterMovement()->GravityScale = 1.0f;
 			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 		}
 	}
@@ -123,7 +125,47 @@ void ACharacter_Muriel::ChangeAttackState(EAttackState state)
 		//ESkillCoolTime = 20.0f;
 		
 		bIsESkillCharge = true;
+
+		NearTeamCharacter = nullptr;
+
+		// 월드 상 캐릭터 탐색
+		TArray<AActor*> characters;
+		float distance = 100000.0f;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), characters);
+		for (AActor* character : characters)
+		{
+			ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(character);
+			if (baseCharacter and baseCharacter->Data.Team == Data.Team and baseCharacter != this)
+			{
+				float dist = FVector::Dist(GetActorLocation(), baseCharacter->GetActorLocation());
+
+				// 최대 사거리가 1000.0f일때
+				if (dist <= 1000.0f)
+				{
+					// 가장 가까운 캐릭터 찾기
+					if (dist <= distance)
+					{
+						distance = dist;
+						NearTeamCharacter = baseCharacter;
+					}
+				}
+			}
+		}
+		if (NearTeamCharacter)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("NearTeamCharacter : %s"), *NearTeamCharacter->GetName());
+
+			// 캐릭터의 방향을 Target쪽으로 변경하기
+			FRotator rot = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), NearTeamCharacter->GetActorLocation());
+			SetActorRotation(rot);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("NearTeamCharacter is nullptr"));
+		}
+
 		
+
 		// Montage
 		PlayAttackMontage("E", 1.0f, "ESkillStart");
 
@@ -235,7 +277,7 @@ void ACharacter_Muriel::MurielJump()
 
 
 	// 중력 초기값 저장
-	DefaultGravityScale = GetCharacterMovement()->GravityScale;
+	//DefaultGravityScale = GetCharacterMovement()->GravityScale;
 
 	bIsPushSpaceBar = true;
 	FlyingTime = 5.0f;
@@ -281,7 +323,7 @@ void ACharacter_Muriel::MurielQSkillComplete()
 	// QSkill 몽타주를 Tick에서 플레이어의 이동처리 해주기 위한 bool값 true로 변경
 	bStartQSkill = true;
 	// 중력의 초기값 담아주기
-	DefaultGravityScale = GetCharacterMovement()->GravityScale;
+	//DefaultGravityScale = GetCharacterMovement()->GravityScale;
 	// QSkill 이동 상태를 시작단계로 변경
 	QSkillMovement = EQkillMovement::Ascending;
 	//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
