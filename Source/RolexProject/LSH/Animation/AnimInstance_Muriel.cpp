@@ -1,5 +1,42 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "LSH/Animation/AnimInstance_Muriel.h"
 
+#include "Character_Muriel.h"
+
+void UAnimInstance_Muriel::NativeInitializeAnimation()
+{
+	Super::NativeInitializeAnimation();
+	Muriel = Cast<ACharacter_Muriel>(TryGetPawnOwner());
+}
+
+void UAnimInstance_Muriel::NativeUpdateAnimation(float DeltaSeconds)
+{
+	Super::NativeUpdateAnimation(DeltaSeconds);
+
+	if (Muriel)
+	{
+		SlopeForwardAngle = Muriel->GetSlopeForwrdAngle();
+		bIsPlayingQSkill = Muriel->GetIsPlayingQSkill();
+	}
+}
+
+void UAnimInstance_Muriel::AnimNotify_RMBCharge()
+{
+	//UE_LOG(LogTemp, Warning, TEXT("AnimNotify_RMBCharge"));
+	if (Muriel->GetIsRMBCharging())
+	{
+		//Montage_Pause();
+	}
+}
+
+void UAnimInstance_Muriel::AnimNotify_QSkillReadyPause()
+{
+	//Montage_Pause();
+}
+
+void UAnimInstance_Muriel::AnimNotify_LMBAttack()
+{
+	Muriel->SpawnEffect("Muzzle_01", "LMB");
+}

@@ -135,4 +135,6 @@ public:
 
 	void ModifyHP(int Value);
 	void ModifyShield(int shield);
+
+	FRotator SetAimDirection(ABaseCharacter* character, FVector& targetLocation, FVector startLocation = FVector::ZeroVector);
 };

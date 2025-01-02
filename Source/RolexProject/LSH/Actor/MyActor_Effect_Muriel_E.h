@@ -1,0 +1,34 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "LSH/Actor/Actor_Effect.h"
+#include "MyActor_Effect_Muriel_E.generated.h"
+
+/**
+ * 
+ */
+UCLASS()
+class ROLEXPROJECT_API AMyActor_Effect_Muriel_E : public AActor_Effect
+{
+	GENERATED_BODY()
+	
+
+	AMyActor_Effect_Muriel_E();
+
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+	virtual void UpdateLocation(float DeltaTime) override;
+
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+private:
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	class UBoxComponent* BoxCollision;
+
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	class UNiagaraComponent* HitNiagaraComponent;
+
+};
