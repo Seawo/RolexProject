@@ -34,6 +34,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UProjectileMovementComponent* ProjectileMovement;
 
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool Type = true;		// true: Heal ball, false: Attack ball
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UMaterialInstanceDynamic* HealBallMaterial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UMaterialInstanceDynamic* AttackBallMaterial;
+	
+public:
+	class ABaseCharacter* OwnCharacter;
+	
 	UFUNCTION()
 	void OnHit(
 		UPrimitiveComponent* HitComponent,
@@ -43,8 +56,4 @@ public:
 		const FHitResult& Hit
 		);
 	
-	FTimerHandle DestroyTimerHandle;
-	
-	UFUNCTION()
-	void DestroyBall();
 };

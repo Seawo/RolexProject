@@ -118,13 +118,19 @@ void AFey::QAttack()
 	for (int32 i=0; i<NumberOfBalls; i++)
 	{
 		FVector SpawnLocation = GetActorLocation() + GetActorForwardVector()*100.0f;
-		FRotator SpawnRotation = FRotator(0.0f, FMath::FRandRange(-SpreadAngle, SpreadAngle), 0.0f);
-
-		AUltimateBall* Ball = GetWorld()->SpawnActor<AUltimateBall>(UltimateBallFactory, SpawnLocation, SpawnRotation);
+		FRotator SpawnRotation = FRotator(0.0f, FMath::FRandRange(0, 360.0f), 0.0f);
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.Owner = this;
+		
+		AUltimateBall* Ball = GetWorld()->SpawnActor<AUltimateBall>(UltimateBallFactory, SpawnLocation, SpawnRotation, SpawnParameters);
 		if (Ball)
 		{
-			// TODO: study projectilemovement and increase Z velocity, enable floor collision
-			Ball->ProjectileMovement->SetVelocityInLocalSpace(FVector(1000.0f, 0.0f, 500.0f));
+			Ball->ProjectileMovement->SetVelocityInLocalSpace(
+				FVector(
+					FMath::FRandRange(MinVelocity, MaxVelocity),
+					FMath::FRandRange(MinVelocity, MaxVelocity),
+					FMath::FRandRange(MinVelocity, MaxVelocity))
+					);
 			Ball->ProjectileMovement->Activate();
 		}
 	}
@@ -142,17 +148,6 @@ void AFey::EAttack()
 	// block montage being overlapped
 	for (const TPair<FString, UAnimMontage*>& Pair : AttackMontages)
 		if (IsMontagePlaying(Pair.Value)) return;	
-
-	// // debug
-	// FTimerHandle TimerHandle;
-	// GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
-	// {
-	// 	HealingBox->SetVisibility(true);
-	// 	HealingBox->ShapeColor = FColor::Green;
-	// },
-	// 	1.0f,
-	// 	false
-	// 	);
 	
 	// heal characters within 100 units in front of Fey
 	TArray<AActor*> OverlappingActors;
@@ -166,8 +161,8 @@ void AFey::EAttack()
 			if (TargetCharacter == this) continue;
 			UE_LOG(LogTemp, Warning, TEXT("TargetCharacter Name: %s"), *TargetCharacter->GetName());
 			TargetCharacter->Data.Hp += EAttackHealAmount;
-			if (TargetCharacter->Data.Hp > TargetCharacter->Data.MaxHp)
-				TargetCharacter->Data.Hp = TargetCharacter->Data.MaxHp;
+			// if (TargetCharacter->Data.Hp > TargetCharacter->Data.MaxHp)
+			// 	TargetCharacter->Data.Hp = TargetCharacter->Data.MaxHp;
 		}
 	}
 	
@@ -186,13 +181,14 @@ void AFey::LMBAttackStart()
 
 void AFey::StackHeal()
 {
-	HealTime += 1;
-	HealValue += 5;
+	// set heal and heal time limit
+	if (HealTime < StackTimeLimit)
+	{
+		HealTime += 1;
+		HealValue += 5;
 
-	UE_LOG(LogTemp, Warning, TEXT("Heal Stacking"));
-	
-	if (HealTime > StackTimeLimit)
-		LMBAttack();
+		UE_LOG(LogTemp, Warning, TEXT("Heal Stacking"));
+	}
 }
 
 void AFey::LMBAttack()
@@ -207,36 +203,47 @@ void AFey::LMBAttack()
 	for (const TPair<FString, UAnimMontage*>& Pair : AttackMontages)
 		if (IsMontagePlaying(Pair.Value)) return;	
 
+	// collision check
 	FHitResult HitResult;
-	FVector Start = GetActorLocation();
-	FVector End = Start + GetActorForwardVector()*1000.0f;
-	float Radius = 50.0f;
-	float HalfHeight = 100.0f;
+	FVector CameraLocation;
+	FRotator CameraRotation;
+	GetActorEyesViewPoint(CameraLocation, CameraRotation);
+
+	FVector StartLocation = CameraLocation;
+	FVector EndLocation = StartLocation + CameraRotation.Vector() * 1000.0f;
 	
-	// TODO: make float values as a variable
+	float Radius = 50.0f;
+
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+	
 	bool bHit = GetWorld()->SweepSingleByChannel(
 		HitResult,
-		Start,
-		End,
+		StartLocation,
+		EndLocation,
 		FQuat::Identity,
 		ECC_Pawn,
-		FCollisionShape::MakeCapsule(Radius, HalfHeight)
+		FCollisionShape::MakeSphere(Radius),
+		QueryParams
 		);
 
 	// collision detection region
-	DrawDebugCapsule(
-		GetWorld(),
-		(Start + End)*0.5f,
-		HalfHeight,
-		Radius,
-		FQuat::Identity,
-		bHit ? FColor::Red : FColor::Green,
-		false,
-		2.0f
-		);
-
+	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Green, false, 2.0f);
+	DrawDebugSphere(GetWorld(), StartLocation, Radius, 10, FColor::Blue, false, 2.0f);
+	
 	if (bHit)
+	{
+		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, Radius, 10, FColor::Red, false, 2.0f);
 		UE_LOG(LogTemp, Warning, TEXT("Heal Value: %d"), HealValue);
+		
+		ABaseCharacter* Opponent = Cast<ABaseCharacter>(HitResult.GetActor());
+		if (Opponent && Opponent->Data.Team == Data.Team)
+		{
+			Opponent->Data.Hp += HealValue;
+			// if (Opponent->Data.Hp > Opponent->Data.MaxHp)
+			// 	Opponent->Data.Hp = Opponent->Data.MaxHp;
+		}
+	}
 	
 	SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
 	PlayAnimMontage(AttackMontages[AttackName], 1.0f);
@@ -268,6 +275,46 @@ void AFey::RMBAttack()
 	for (const TPair<FString, UAnimMontage*>& Pair : AttackMontages)
 		if (IsMontagePlaying(Pair.Value)) return;	
 
+	// collision check
+	FHitResult HitResult;
+	FVector CameraLocation;
+	FRotator CameraRotation;
+	GetActorEyesViewPoint(CameraLocation, CameraRotation);
+
+	FVector StartLocation = CameraLocation;
+	FVector EndLocation = StartLocation + CameraRotation.Vector() * 1000.0f;
+	
+	float Radius = 50.0f;
+
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+	
+	bool bHit = GetWorld()->SweepSingleByChannel(
+		HitResult,
+		StartLocation,
+		EndLocation,
+		FQuat::Identity,
+		ECC_Pawn,
+		FCollisionShape::MakeSphere(Radius),
+		QueryParams
+		);
+
+	// collision detection region
+	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Green, false, 2.0f);
+	DrawDebugSphere(GetWorld(), StartLocation, Radius, 10, FColor::Blue, false, 2.0f);
+	
+	if (bHit)
+	{
+		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, Radius, 10, FColor::Red, false, 2.0f);
+		UE_LOG(LogTemp, Warning, TEXT("Attack Value: %d"), AttackValue);
+		
+		ABaseCharacter* Opponent = Cast<ABaseCharacter>(HitResult.GetActor());
+		if (Opponent && Opponent->Data.Team != Data.Team)
+		{
+			Opponent->Data.Hp -= AttackValue;
+		}
+	}
+	
 	SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
 	PlayAnimMontage(AttackMontages[AttackName], 1.0f);
 	SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));

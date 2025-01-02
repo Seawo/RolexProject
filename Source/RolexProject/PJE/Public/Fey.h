@@ -38,9 +38,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AUltimateBall> UltimateBallFactory;
+
+	UPROPERTY(EditAnywhere)
+	float MinVelocity =1000.0f;
 	
 	UPROPERTY(EditAnywhere)
-	float SpreadAngle = 45.0f;
+	float MaxVelocity =5000.0f;
 	
 	void QAttack();
 	
