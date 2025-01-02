@@ -36,6 +36,7 @@ public:
 	
 	class AEffectActor* Stone;
 
+	// Q 
 	void CreateStone();
 	void ThrowStone();
 

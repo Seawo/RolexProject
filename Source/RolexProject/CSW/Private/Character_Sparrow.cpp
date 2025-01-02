@@ -16,7 +16,7 @@
 // 데칼 헤더
 #include "Components/DecalComponent.h"
 #include "EffectActor.h"
-
+#include "Components/SphereComponent.h"
 
 ACharacter_Sparrow::ACharacter_Sparrow()
 {
@@ -133,7 +133,7 @@ void ACharacter_Sparrow::AimOffsetLBM()
 		}
 
 		// SpringArm 위치 조정 (선택적)
-		FVector NewLocation = FMath::Lerp(SpringArmComp->GetRelativeLocation(), FVector(-100, 10, 60), 0.05f);
+		FVector NewLocation = FMath::Lerp(SpringArmComp->GetRelativeLocation(), FVector(-100, 10, 60), 0.05f);	
 		SpringArmComp->SetRelativeLocation(NewLocation);
 	}
 }
@@ -156,7 +156,8 @@ void ACharacter_Sparrow::ShootingArrowLBM()
 			{
 				anim->CameraRot = FRotator(0, 0, 0);
 				SpringArmComp->SetRelativeLocation(FVector(0, 10, 40));
-				
+				SpringArmComp->TargetArmLength = 160.0f;
+
 			}),
 			0.5f, false);
 	}
@@ -288,11 +289,39 @@ void ACharacter_Sparrow::ShootingArrowQ()
 
 				// 쏘는 곳 위치 알아오기
 				FVector TargetLocation = AimIndicator->GetComponentLocation();
-				
+	
 				FActorSpawnParameters SpawnParams;
 				SpawnParams.Owner = this;
 				QEffectActor = GetWorld()->SpawnActor<AEffectActor>(QEffectActorclass, TargetLocation, FRotator::ZeroRotator, SpawnParams);
 				
+				USphereComponent* sphereComp = QEffectActor->FindComponentByClass<USphereComponent>();
+
+				if (sphereComp)
+				{
+					sphereComp->SetWorldScale3D(FVector(4, 4, 10));
+
+					FVector CurrentScale = sphereComp->GetComponentScale();
+					float ScaledRadius = sphereComp->GetScaledSphereRadius(); // 스케일 반영된 반지름
+					float CapsuleHalfHeight = ScaledRadius * 5.0f;           // 캡슐 길이 (적절히 조정 가능)
+
+					/* // 디버그용
+					UE_LOG(LogTemp, Log, TEXT("SphereComponent Scale: X=%f, Y=%f, Z=%f"), CurrentScale.X, CurrentScale.Y, CurrentScale.Z);
+					UE_LOG(LogTemp, Log, TEXT("Capsule Radius: %f, HalfHeight: %f"), ScaledRadius, CapsuleHalfHeight);
+
+					// DrawDebugCapsule로 길게 표시
+					DrawDebugCapsule(
+						GetWorld(),
+						QEffectActor->GetActorLocation(),       // 캡슐 중심 위치
+						CapsuleHalfHeight,                     // 캡슐의 절반 높이
+						ScaledRadius,                          // 캡슐 반지름
+						FRotationMatrix::MakeFromZ(FVector(0, 0, 1)).ToQuat(),            // 기본 회전값
+						FColor::Green,                        // 디버그 색상
+						true,                                 // 지속 표시
+						5.0f                                  // 지속 시간 (초)
+					);
+					*/
+				}
+
 				// 다시 원래대로 돌아온다
 				// 모션을 다 한뒤 마지막 함수 호출로 다시할 예정
 				GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
@@ -477,7 +506,6 @@ void ACharacter_Sparrow::SpawnCharge(FName chargeName)
 		FRotator soketRot = skeletalMesh->GetSocketRotation(TEXT("BowEmitterSocket"));
 
 		EffectActor = GetWorld()->SpawnActor<AEffectActor>(ArrowClass[chargeName], soketPos, soketRot, SpawnParams);
-
 
 	}
 }

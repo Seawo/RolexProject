@@ -49,6 +49,11 @@ void AEffectActor::BeginPlay()
 	}
 	
 
+	if (bIsContinuousDamage)
+	{
+		GetWorld()->GetTimerManager().SetTimer(ContinuousDamageTimerHandle, this, &AEffectActor::CheckOverlapAndApplyDamage, 0.5f, true);
+	}
+
 	SetLifeSpan(DestroyTime);
 }
 
@@ -115,6 +120,8 @@ void AEffectActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 		ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
 		if (character)
 		{
+			
+
 			character->ModifyHP(-Damage);
 			
 			UE_LOG(LogTemp, Log, TEXT("character : %s Hp : %d"), *OtherActor->GetName(), character->Data.Hp);
@@ -142,6 +149,45 @@ void AEffectActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 					Destroy();
 				}),
 				0.2f, false);
+		}
+	}
+}
+
+void AEffectActor::CheckOverlapAndApplyDamage()
+{
+	TArray<AActor*> OverlappingActors;
+	CollisionComp->GetOverlappingActors(OverlappingActors);
+
+	// 오버랩된 첫 번째 액터에 대해서 로그 찍기
+	if (OverlappingActors.Num() > 0)
+	{
+		if (!OverlappingActors[0] || OverlappingActors[0] == this || OverlappingActors[0] == GetOwner() || OverlappingActors[0]->IsA(AEffectActor::StaticClass()))
+		{
+			return;
+		}
+
+		// 첫 번째 오버랩된 액터 로그
+		UE_LOG(LogTemp, Log, TEXT("Overlapping Actor: %s"), *OverlappingActors[0]->GetName());
+	}
+
+	for (AActor* Actor : OverlappingActors)
+	{
+		if (!Actor || Actor == this || Actor == GetOwner() || Actor->IsA(AEffectActor::StaticClass()))
+		{
+			return;
+		}
+
+
+		if (Actor && Actor->CanBeDamaged())
+		{
+			UGameplayStatics::ApplyDamage(Actor, Damage, GetInstigatorController(), this, nullptr);
+			
+			ABaseCharacter* character = Cast<ABaseCharacter>(Actor);
+			if (character)
+			{
+				character->ModifyHP(-Damage);
+			}
+
 		}
 	}
 }
