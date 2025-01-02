@@ -33,12 +33,49 @@ public:
 public:
 	EAttackState CurrentAttackState;
 
+	UPROPERTY(EditAnywhere)
+	int32 NumberOfBalls = 15;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AUltimateBall> UltimateBallFactory;
+
+	UPROPERTY(EditAnywhere)
+	float MinVelocity =1000.0f;
+	
+	UPROPERTY(EditAnywhere)
+	float MaxVelocity =5000.0f;
+	
 	void QAttack();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UBoxComponent* HealingBox;
+
+	int32 EAttackHealAmount = 10;
+	
 	void EAttack();
-	void LMBAttack();
+	
+	void LMBAttackStart();
+	void StackHeal();
+	void  LMBAttack();
+
+	UPROPERTY(EditAnywhere)
+	int32 HealValue = 0;
+	int32 HealTime = 0;
+	FTimerHandle StackHealTimer;
+	
+	void RMBAttackStart();
+	void StackAttack();
 	void RMBAttack();
 
+	UPROPERTY(EditAnywhere)
+	int32 AttackValue = 0;
+	int32 AttackTime = 0;
+	FTimerHandle StackAttackTimer;
+
+	int32 StackTimeLimit = 5;
+	
 	bool IsMontagePlaying(UAnimMontage* Montage);
+	
 public:
  
 	
