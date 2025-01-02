@@ -31,7 +31,7 @@ ACharacter_Phase::ACharacter_Phase()
 	Data.Name = "Phase";
 	Data.Team = false;
 	Data.MaxHp = 250.0f;
-	Data.Hp = 250.0f;
+	Data.Hp = 200.0f;
 	Data.Shield = 0.0f;
 	Data.Speed = 400.0f;
 	Data.Power = 20.0f;
@@ -53,7 +53,7 @@ ACharacter_Phase::ACharacter_Phase()
 void ACharacter_Phase::BeginPlay()
 {
 	Super::BeginPlay();
-
+	/*Data.Hp = 200.0f;*/
 	AnimInstance = Cast<UAnimInstance_Phase>(GetMesh()->GetAnimInstance());
 	
 	if (UI_InGameClass)
@@ -322,13 +322,12 @@ void ACharacter_Phase::SpawnEffect(FName socketName, FName key)
 				// 소켓 위치에 생성시키기
 				socketLocation = GetMesh()->GetSocketLocation(socketName);
 			}
-			
 
-			// FVector를 FRotator로 변환
-			TpsCamComp->GetForwardVector();
+
+			/** 에임 방향으로 Orb 날리기*/
+			FRotator rot = SetAimDirection(this, socketLocation);
 
 			// AActor_Effect생성하기
-			FRotator rot = TpsCamComp->GetForwardVector().Rotation();
 			//AActor_Effect* ef = GetWorld()->SpawnActor<AActor_Effect>(effect, socketLocation, rot);
 			AActor_Effect* effect = GetWorld()->SpawnActorDeferred<AActor_Effect>(
 									effectClass,

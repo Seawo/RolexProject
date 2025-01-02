@@ -42,6 +42,8 @@ void AActor_Effect_Muriel_Orb::BeginPlay()
 	{
 		SetLifeSpan(6.0f);
 	}
+
+	UE_LOG(LogTemp, Log, TEXT("[Orb] GetActorForwardVector : %s"), *GetActorForwardVector().ToString());
 }
 
 void AActor_Effect_Muriel_Orb::Tick(float DeltaTime)
@@ -53,10 +55,17 @@ void AActor_Effect_Muriel_Orb::Tick(float DeltaTime)
 		if (bIsFire) return;
 
 		UpdateScale(DeltaTime);
+
 		//return;
 	}
 	else
 	{
+		if (not bIsGetRotator)
+		{
+			UpdateRotation();
+			bIsGetRotator = true;
+		}
+
 		bIsFire = true;
 		UpdateLocation(DeltaTime);
 	}
@@ -82,7 +91,8 @@ void AActor_Effect_Muriel_Orb::UpdateScale(float DeltaTime)
 	FVector newLoc = Muriel->GetMesh()->GetSocketLocation("Muzzle_01");
 
 	SetActorLocation(newLoc + FVector(0, -0.3f * DeltaTime, 0));
-	SetActorRotation(Muriel->TpsCamComp->GetForwardVector().Rotation());
+	//SetActorRotation(Muriel->TpsCamComp->GetForwardVector().Rotation());
+	SetActorRotation(FRotator(GetActorForwardVector().Rotation().Pitch, Muriel->TpsCamComp->GetForwardVector().Rotation().Yaw, Muriel->TpsCamComp->GetForwardVector().Rotation().Roll));
 
 	if (NiagaraComponent)
 	{
@@ -96,16 +106,24 @@ void AActor_Effect_Muriel_Orb::UpdateScale(float DeltaTime)
 	}
 }
 
+void AActor_Effect_Muriel_Orb::UpdateRotation()
+{
+	/** 에임 방향으로 Orb 날리기*/
+	FVector target;
+	FRotator rot = Muriel->SetAimDirection(Muriel, target, GetActorLocation());
+	SetActorRotation(rot);
+}
+
 void AActor_Effect_Muriel_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor == this)
 	{
-		UE_LOG(LogTemp, Log, TEXT("OtherActor Equal This"));
+		//UE_LOG(LogTemp, Log, TEXT("OtherActor Equal This"));
 		return;
 	}
 	if (OtherActor == GetOwner())
 	{
-		UE_LOG(LogTemp, Log, TEXT("OtherActor Equal Owner"));
+		//UE_LOG(LogTemp, Log, TEXT("OtherActor Equal Owner"));
 		return;
 	}
 	AActor_Effect* effect = Cast<AActor_Effect>(OtherActor);
@@ -129,10 +147,29 @@ void AActor_Effect_Muriel_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedCom
 	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
 	ABaseCharacter* onwer = Cast<ABaseCharacter>(GetOwner());
 
-	// 캐릭터 이면서 다른 팀이라면
-	if (character && character->Data.Team != onwer->Data.Team)
+	if (bIsLMB)
 	{
-		character->ModifyHP(-1);
+		// 캐릭터 이면서 다른 팀이라면
+		if (character && character->Data.Team != onwer->Data.Team)
+		{
+			character->ModifyHP(-1);
+		}
+		else if (character && character->Data.Team == onwer->Data.Team)
+		{
+			character->ModifyHP(1);
+		}
+	}
+	else
+	{
+		// 캐릭터 이면서 다른 팀이라면
+		if (character && character->Data.Team != onwer->Data.Team)
+		{
+			character->ModifyHP(-1 * 10 * GetActorScale3D().X);
+		}
+		else if (character && character->Data.Team == onwer->Data.Team)
+		{
+			character->ModifyHP(1 * 10 * GetActorScale3D().X);
+		}
 	}
 
 

@@ -56,6 +56,13 @@ void ACharacter_Muriel::Tick(float DeltaTime)
 		}
 	}
 
+	if (bIsESkillCharge)
+	{
+		ESkillSpawnRotation = SetAimDirection(this, ESkillSpawnLocation);
+
+		//UE_LOG(LogTemp, Warning, TEXT("ESkillSpawnLocation : %s"), *ESkillSpawnLocation.ToString());
+	}
+
 	if (bIsSearchQSkill)
 	{
 		UpdateQSkillSearchPlayer();
@@ -129,41 +136,40 @@ void ACharacter_Muriel::ChangeAttackState(EAttackState state)
 		NearTeamCharacter = nullptr;
 
 		// 월드 상 캐릭터 탐색
-		TArray<AActor*> characters;
-		float distance = 100000.0f;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), characters);
-		for (AActor* character : characters)
-		{
-			ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(character);
-			if (baseCharacter and baseCharacter->Data.Team == Data.Team and baseCharacter != this)
-			{
-				float dist = FVector::Dist(GetActorLocation(), baseCharacter->GetActorLocation());
-
-				// 최대 사거리가 1000.0f일때
-				if (dist <= 1000.0f)
-				{
-					// 가장 가까운 캐릭터 찾기
-					if (dist <= distance)
-					{
-						distance = dist;
-						NearTeamCharacter = baseCharacter;
-					}
-				}
-			}
-		}
-		if (NearTeamCharacter)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("NearTeamCharacter : %s"), *NearTeamCharacter->GetName());
-
-			// 캐릭터의 방향을 Target쪽으로 변경하기
-			FRotator rot = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), NearTeamCharacter->GetActorLocation());
-			SetActorRotation(rot);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("NearTeamCharacter is nullptr"));
-		}
-
+		//TArray<AActor*> characters;
+		//float distance = 100000.0f;
+		//UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), characters);
+		//for (AActor* character : characters)
+		//{
+		//	ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(character);
+		//	if (baseCharacter and baseCharacter->Data.Team == Data.Team and baseCharacter != this)
+		//	{
+		//		float dist = FVector::Dist(GetActorLocation(), baseCharacter->GetActorLocation());
+		//
+		//		// 최대 사거리가 1000.0f일때
+		//		if (dist <= 1000.0f)
+		//		{
+		//			// 가장 가까운 캐릭터 찾기
+		//			if (dist <= distance)
+		//			{
+		//				distance = dist;
+		//				NearTeamCharacter = baseCharacter;
+		//			}
+		//		}
+		//	}
+		//}
+		//if (NearTeamCharacter)
+		//{
+		//	UE_LOG(LogTemp, Warning, TEXT("NearTeamCharacter : %s"), *NearTeamCharacter->GetName());
+		//
+		//	// 캐릭터의 방향을 Target쪽으로 변경하기
+		//	FRotator rot = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), NearTeamCharacter->GetActorLocation());
+		//	SetActorRotation(rot);
+		//}
+		//else
+		//{
+		//	UE_LOG(LogTemp, Warning, TEXT("NearTeamCharacter is nullptr"));
+		//}
 		
 
 		// Montage
@@ -338,6 +344,7 @@ void ACharacter_Muriel::MurielESkillComplete()
 
 	// Montage 실행
 	PlayAttackMontage("E", 1.0f, "ESkillFire");
+	SpawnEffect("None", "ESkill");
 }
 
 void ACharacter_Muriel::PlayAttackMontage(FString Key, float InPlayRate, FName StartSectionName)
@@ -396,39 +403,51 @@ void ACharacter_Muriel::SpawnEffect(FName socketName, FName key)
 		if (effectClass)
 		{
 			FVector socketLocation;
-			if (socketName == "None")
+			FRotator rot;
+			AActor_Effect* effect;
+
+
+			if (key == "ESkill")
 			{
-				socketLocation = GetActorLocation();
+				socketLocation = ESkillSpawnLocation;
+				rot = ESkillSpawnRotation;
 			}
-			else
+			else if (key == "QSkill")
 			{
-				// 소켓 위치에 생성시키기
+
+			}
+			else // LMB RMB
+			{
 				socketLocation = GetMesh()->GetSocketLocation(socketName);
+
+				if (key == "RMB")
+				{
+					rot = FRotator::ZeroRotator;
+				}
+				else if (key == "LMB")
+				{
+					/** 에임 방향으로 Orb 날리기*/
+					FVector target;
+					rot = SetAimDirection(this, target, socketLocation);
+				}
 			}
+			
 
-
-			// FVector를 FRotator로 변환
-			TpsCamComp->GetForwardVector();
-
-			// AActor_Effect생성하기
-			FRotator rot = TpsCamComp->GetForwardVector().Rotation();
-			//AActor_Effect* ef = GetWorld()->SpawnActor<AActor_Effect>(effect, socketLocation, rot);
-			AActor_Effect* effect = GetWorld()->SpawnActorDeferred<AActor_Effect>(
+			effect = GetWorld()->SpawnActorDeferred<AActor_Effect>(
 				effectClass,
 				FTransform(rot, socketLocation),
 				this);
-			if (key == "LMB")
-			{
-				effect->SetIsLMB(true);
-			}
-			else if (key == "RMB")
-			{
-				effect->SetIsLMB(false);
-			}
-
-			
 			if (effect)
 			{
+				if (key == "LMB")
+				{
+					effect->SetIsLMB(true);
+				}
+				else if (key == "RMB")
+				{
+					effect->SetIsLMB(false);
+				}
+
 				effect->FinishSpawning(FTransform(rot, socketLocation));
 			}
 		}
@@ -506,27 +525,54 @@ void ACharacter_Muriel::UpdateQSkillMovement(float DeltaTime)
 void ACharacter_Muriel::UpdateQSkillSearchPlayer()
 {
 	QSkillTargetLocation = FVector::ZeroVector;
-
+	//FVector target;
+	//SetAimDirection(this, target);
 
 	// LineTrace 쏘기
-	FVector start = GetActorLocation();
-	FVector end = start + GetActorForwardVector() * 100000.0f;
+	// 카메라 rotator값 가져오기
+	FVector camRotation = TpsCamComp->GetForwardVector();
+
+	FVector start = TpsCamComp->GetComponentLocation();
+	FVector end = start + camRotation * 10000.0f;
 	FCollisionQueryParams params;
 	params.AddIgnoredActor(this);
 
 	FHitResult hitResult;
+	FVector target;
 
-	if (GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_WorldStatic, params))
+	TArray<FHitResult> hitResults;
+	if (GetWorld()->LineTraceMultiByChannel(hitResults, start, end, ECollisionChannel::ECC_Pawn, params))
+	{
+		for (auto& hit : hitResults)
+		{
+			ABaseCharacter* character = Cast<ABaseCharacter>(hit.GetActor());
+			if (character and character->Data.Team == Data.Team)
+			{
+				target = hit.ImpactPoint;
+
+				QSkillStartLocation = GetActorLocation();
+				QSkillTargetLocation = character->GetActorLocation();
+			}
+		}
+	}
+
+
+	/*if (GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_Pawn, params))
 	{
 		ABaseCharacter* character = Cast<ABaseCharacter>(hitResult.GetActor());
 		if (character and character->Data.Team == Data.Team)
 		{
+			target = hitResult.ImpactPoint;
+
 			QSkillStartLocation = GetActorLocation();
 			QSkillTargetLocation = character->GetActorLocation();
 		}
-	}
+	}*/
 
-	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 0.2f, 0, 1.0f);
+	UE_LOG(LogTemp, Warning, TEXT("QSkillTargetLocation : %s"), *QSkillTargetLocation.ToString());
+
+	DrawDebugPoint(GetWorld(), target, 5.0f, FColor::Green, false, 0.1f);
+	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 5.0f, 0, 1.0f);
 }
 
 bool ACharacter_Muriel::IsMurielPlayingMontage(FName state) const

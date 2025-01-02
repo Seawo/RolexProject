@@ -84,6 +84,9 @@ private:
 	bool bStartQSkill = false;							// Q스킬 시작했는지
 	bool bStartESkill = false;							// E스킬 시작했는지
 
+	FVector ESkillSpawnLocation;						// E스킬 생성 위치
+	FRotator ESkillSpawnRotation;						// E스킬 생성 회전값
+
 	// QSkill 이동할 위치값
 	EQkillMovement QSkillMovement = EQkillMovement::Idle;	// Q스킬 이동 상태
 	FVector QSkillStartLocation;							// 시작 지점

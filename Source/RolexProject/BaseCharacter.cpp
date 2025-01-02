@@ -96,6 +96,59 @@ void ABaseCharacter::ModifyShield(int shield)
 	Data.Shield += shield;
 }
 
+FRotator ABaseCharacter::SetAimDirection(ABaseCharacter* character, FVector& targetLocation, FVector startLocation)
+{
+	if (startLocation == FVector::ZeroVector)
+	{
+		startLocation = character->GetActorLocation();
+	}
+
+	APlayerController* playerController = Cast<APlayerController>(character->GetController());
+
+	FVector camLocation;
+	FRotator camRotation;
+	playerController->GetPlayerViewPoint(camLocation, camRotation);
+
+	FVector start = camLocation;
+	FVector end = camLocation + camRotation.Vector() * 10000.0f;
+
+	FHitResult hitResult;
+	FCollisionQueryParams params;
+	params.AddIgnoredActor(this);
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_Pawn, params);
+	if (!bHit)
+	{
+		bHit = GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_Visibility, params);
+	}
+
+	//DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 1.0f, 0, 1.0f);
+
+	// 발사 방향 설정
+	FVector shotDirection = camRotation.Vector();
+	targetLocation = end;
+
+	if (bHit)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("Hit : %s"), *hitResult.ImpactPoint.ToString());
+		targetLocation = hitResult.ImpactPoint;
+		DrawDebugPoint(GetWorld(), hitResult.ImpactPoint, 5.0f, FColor::Green, false, 1.0f);
+	}
+	else
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("Not Hit"));
+		//shotDirection = (targetLocation - startLocation).GetSafeNormal();
+	}
+		shotDirection = (targetLocation - startLocation).GetSafeNormal(); // 목표 방향 보정
+
+	// FVector를 FRotator로 변환
+	FRotator rot = shotDirection.Rotation();
+
+
+
+	return rot;
+}
+
 void ABaseCharacter::ChangeState(EMoveState newState, UAnimMontage* montage)
 {
 	switch (newState)
