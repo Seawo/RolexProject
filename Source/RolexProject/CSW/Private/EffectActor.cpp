@@ -185,6 +185,21 @@ void AEffectActor::CheckOverlapAndApplyDamage()
 			ABaseCharacter* character = Cast<ABaseCharacter>(Actor);
 			if (character)
 			{
+				if (NiagaraCollusionEffect)
+				{
+
+				}
+				else if (ParticleCollusionEffect)
+				{
+					UGameplayStatics::SpawnEmitterAtLocation(
+						GetWorld(),
+						ParticleCollusionEffect,
+						character->GetActorLocation(),
+						FRotator::ZeroRotator,
+						true // 자동 크기 조정
+					);
+				}
+
 				character->ModifyHP(-Damage);
 			}
 

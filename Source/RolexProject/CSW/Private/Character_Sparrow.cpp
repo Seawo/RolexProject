@@ -33,10 +33,10 @@ ACharacter_Sparrow::ACharacter_Sparrow()
 
 	SpringArmComp->SetRelativeLocation(FVector(0, 10, 40));
 
-	AimIndicator = CreateDefaultSubobject<UDecalComponent>(TEXT("AimIndicator"));
-	AimIndicator->SetupAttachment(RootComponent);
-	AimIndicator->SetVisibility(false);
-
+	//AimIndicator = CreateDefaultSubobject<UDecalComponent>(TEXT("AimIndicator"));
+	//AimIndicator->SetupAttachment(RootComponent);
+	//AimIndicator->SetVisibility(false);
+	JumpMaxCount = 2;
 }
 
 void ACharacter_Sparrow::BeginPlay()
@@ -45,6 +45,10 @@ void ACharacter_Sparrow::BeginPlay()
 
 	ChangeState(EMoveState::Start, stateMontages[TEXT("Start")]);
 
+
+	// 데칼
+	AimIndicator = FindComponentByClass<UDecalComponent>();
+	AimIndicator->SetVisibility(false);
 }
 
 void ACharacter_Sparrow::Tick(float DeltaTime)
@@ -248,6 +252,7 @@ void ACharacter_Sparrow::AimOffsetQ()
 				{
 					AimIndicator->SetWorldLocation(HitResult.ImpactPoint);
 					AimIndicator->SetWorldRotation(HitResult.ImpactNormal.Rotation());
+
 				}
 
 				// 디버그용으로 트레이스를 그려서 확인 (개발 중에만 사용)
@@ -298,13 +303,14 @@ void ACharacter_Sparrow::ShootingArrowQ()
 
 				if (sphereComp)
 				{
-					sphereComp->SetWorldScale3D(FVector(4, 4, 10));
+					sphereComp->SetWorldScale3D(FVector(5, 5, 10));
+					
 
+					/*
+					// 디버그용
 					FVector CurrentScale = sphereComp->GetComponentScale();
 					float ScaledRadius = sphereComp->GetScaledSphereRadius(); // 스케일 반영된 반지름
 					float CapsuleHalfHeight = ScaledRadius * 5.0f;           // 캡슐 길이 (적절히 조정 가능)
-
-					/* // 디버그용
 					UE_LOG(LogTemp, Log, TEXT("SphereComponent Scale: X=%f, Y=%f, Z=%f"), CurrentScale.X, CurrentScale.Y, CurrentScale.Z);
 					UE_LOG(LogTemp, Log, TEXT("Capsule Radius: %f, HalfHeight: %f"), ScaledRadius, CapsuleHalfHeight);
 

@@ -44,6 +44,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AEffectActor> QEffectActorclass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decal")
+	UMaterialInterface* DecalMaterial;
+
 	class AEffectActor* EffectActor;
 	class AEffectActor* QEffectActor;
 
