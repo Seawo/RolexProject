@@ -574,31 +574,3 @@ void ACharacter_Muriel::UpdateQSkillSearchPlayer()
 	DrawDebugPoint(GetWorld(), target, 5.0f, FColor::Green, false, 0.1f);
 	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 5.0f, 0, 1.0f);
 }
-
-bool ACharacter_Muriel::IsMurielPlayingMontage(FName state) const
-{
-	if (state == "Attack")
-	{
-		for (auto& mon : AttackMontages)
-		{
-			if (AnimInstance->Montage_IsPlaying(mon.Value))
-			{
-				return true;
-			}
-		}
-	}
-	else if (state == "State")
-	{
-		for (auto& mon : stateMontages)
-		{
-			if (AnimInstance->Montage_IsPlaying(mon.Value))
-			{
-				return true;
-			}
-		}
-	}
-
-
-
-	return false;
-}

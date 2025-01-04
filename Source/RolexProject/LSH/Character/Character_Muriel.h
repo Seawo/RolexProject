@@ -50,15 +50,14 @@ class ROLEXPROJECT_API ACharacter_Muriel : public ABaseCharacter
 	void PlayAttackMontage(FString Key, float InPlayRate = 1.0f, FName StartSectionName = NAME_None);
 	void PlayStateMontage(FString Key, float InPlayRate = 1.0f, FName StartSectionName = NAME_None);
 
-	void UpdateCoolTime(float DeltaTime);		// 쿨타임 업데이트 함수(Tick)
 
+	void UpdateCoolTime(float DeltaTime);		// 쿨타임 업데이트 함수(Tick)
 	void UpdateQSkillMovement(float DeltaTime);	// Q스킬 이동 업데이트 함수(Tick)
 	void UpdateQSkillSearchPlayer();			// Q스킬 플레이어 찾기
+
+
 public:
 	void SpawnEffect(FName socketName, FName key);
-
-
-	bool IsMurielPlayingMontage(FName state) const;		// 몽타주 실행중인지 여부 반환
 
 	bool GetIsRMBCharging() { return bIsRMBCharging; }	// RMB 충전중인지 여부 반환
 	bool GetIsPlayingQSkill() { return bStartQSkill; }	// Q스킬 찾는중인지 여부 반환
