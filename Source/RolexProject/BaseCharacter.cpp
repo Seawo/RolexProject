@@ -14,6 +14,8 @@
 #include "Animation\AnimMontage.h"
 #include "GameFramework\CharacterMovementComponent.h"
 
+#include "Net/UnrealNetwork.h"
+
 // Sets default values
 ABaseCharacter::ABaseCharacter()
 {
@@ -40,6 +42,9 @@ ABaseCharacter::ABaseCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
+
+	bReplicates = true;
+
 
 }
 
@@ -73,6 +78,8 @@ void ABaseCharacter::Tick(float DeltaTime)
 
 void ABaseCharacter::ModifyHP(int Value)
 {
+	if (Data.Hp <= 0) return;
+
 	Data.Hp += Value;
 	// Value > 0 : 힐, Value < 0 : 데미지
 	if (Data.Hp >= Data.MaxHp)

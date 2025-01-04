@@ -83,3 +83,7 @@ Content/ParagonFey
 Content/ParagonMuriel
 Content/ParagonSparrow
 Content/EffectAsset
+
+# Include
+!Content/ParagonFey/Characters/Heroes/Fey/Animations/Montage/
+!Content/ParagonFey/Characters/Heroes/Fey/Animations/Montage/**
