@@ -16,5 +16,25 @@ class ROLEXPROJECT_API ULobbyUI : public UUserWidget
 
 	virtual void NativeConstruct() override;
 
+public:
+	class URolexGameInstance* RolexGameInstace;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UButton* CreateSessionBtn;
+
+	UFUNCTION()
+	void CreateSession();
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* FindSessionBtn;
+
+	UFUNCTION()
+	void FindSession();
+
+	UPROPERTY(meta = (BindWidget))
+	class UScrollBox* SessionScrollBox;
+
+	UFUNCTION()
+	void AddSession();
 	
 };

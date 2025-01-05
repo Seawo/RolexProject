@@ -13,5 +13,7 @@ UCLASS()
 class ROLEXPROJECT_API USessionItemUI : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* SessionJoinBtn;
 };
