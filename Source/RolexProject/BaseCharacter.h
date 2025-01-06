@@ -24,7 +24,11 @@ enum class EAttackState : uint8
 	QSkill,
 	ESkill,
 	LMB,
-	RMB
+	RMB,
+	QSkill_Completed,
+	ESkill_Completed,
+	LMB_Completed,
+	RMB_Completed,
 };
 
 UENUM(BlueprintType)
@@ -92,11 +96,13 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 
 	UPROPERTY(EditAnywhere)
 	FCharacterData Data;				// 캐릭터 데이터를 가지고있을 구조체
+	
+	UPROPERTY(ReplicatedUsing = OnRep_MoveState)
 	EMoveState MoveState;				// 이동 상태
 	EAttackState AttackState;			// 공격 상태
 
@@ -107,6 +113,8 @@ public:
 
 	bool bIsShield = false;
 	float ShieldTime = 5.0f;
+
+
 
 /*Input*/
 public:
@@ -149,4 +157,10 @@ public:
 	void ModifyShield(int shield);
 
 	FRotator SetAimDirection(ABaseCharacter* character, FVector& targetLocation, FVector startLocation = FVector::ZeroVector);
+
+
+	UFUNCTION()
+	void OnRep_MoveState();
+
+
 };

@@ -212,8 +212,39 @@ FRotator ABaseCharacter::SetAimDirection(ABaseCharacter* character, FVector& tar
 	return rot;
 }
 
+void ABaseCharacter::OnRep_MoveState()
+{
+	switch (MoveState)
+	{
+	case EMoveState::Idle:
+		break;
+	case EMoveState::Stun:
+		if (stateMontages["Stun"])
+		{
+			Die(stateMontages["Stun"]);
+		}
+		break;
+	case EMoveState::Die:
+		if (stateMontages["Die"])
+		{
+			Die(stateMontages["Die"]);
+		}
+		break;
+	case EMoveState::Start:
+		if (stateMontages["Start"])
+		{
+			Start(stateMontages["Start"]);
+		}
+		break;
+	default:
+		break;
+	}
+}
+
 void ABaseCharacter::ChangeState(EMoveState newState, UAnimMontage* montage)
 {
+	MoveState = newState;
+
 	switch (newState)
 	{
 	case EMoveState::Stun:
@@ -262,6 +293,16 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		characterInput->BindAction(IA_Rotation, ETriggerEvent::Triggered, this, &ABaseCharacter::InputRotation);
 
 	}
+}
+
+void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// 동기화를 해준다?? 
+	DOREPLIFETIME(ABaseCharacter, MoveState);
+	
+
 }
 
 void ABaseCharacter::InputMove(const FInputActionValue& inputValue)

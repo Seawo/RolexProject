@@ -183,7 +183,7 @@ void ACharacter_Rampage::LBMAttack()
 	{
 		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(AttackMontages[TEXT("LBM")]))
 		{
-			return; // 공격 애니메이션이 재생 중이라면 더 이상 공격을 받지 않음
+			return; // 공격 애니메이션이 재생 중이라면 더 이상 애니메이션을 받지 않음
 		}
 
 

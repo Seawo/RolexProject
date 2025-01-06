@@ -9,6 +9,9 @@
 /**
  * 
  */
+
+
+
 UCLASS()
 class ROLEXPROJECT_API ACharacter_Sparrow : public ABaseCharacter
 {
@@ -26,11 +29,15 @@ class ROLEXPROJECT_API ACharacter_Sparrow : public ABaseCharacter
 	//virtual void ChangeState(EMoveState state) override;
 	virtual void InputAttack(const struct FInputActionValue& inputValue) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 public:
 	/*
 	LBM, RBM, Q, E
 	*/
+	UPROPERTY(ReplicatedUsing = OnRep_ChangeAttackState)
 	EAttackState CurrAttackState;
+
 
 	// arrow
 	UPROPERTY(EditAnywhere)
@@ -58,6 +65,9 @@ public:
 	void ShootingArrowRBM();
 	void AimOffsetQ();
 	void ShootingArrowQ();
+
+	UFUNCTION()
+	void OnRep_ChangeAttackState();
 
 private:
 	// 애니메이션 가져오기
