@@ -25,11 +25,11 @@ ACharacter_Sparrow::ACharacter_Sparrow()
 	Data.RoleType = ERoleType::Dealer;
 	Data.Name = "Sparrow";
 	Data.Team = true;
-	Data.MaxHp = 250.0f;
-	Data.Hp = 250.0f;
-	Data.Shield = 0.0f;
+	Data.MaxHp = 250;
+	Data.Hp = 250;
+	Data.Shield = 0;
 	Data.Speed = 400.0f;
-	Data.Power = 20.0f;
+	Data.Power = 20;
 
 	SpringArmComp->SetRelativeLocation(FVector(0, 10, 40));
 

@@ -44,14 +44,25 @@ public:
 	ERoleType RoleType;		// 역할
 
 	FString Name;			// 캐릭터 이름
+	UPROPERTY(EditAnywhere)
 	bool Team;				// 팀 여부 (true = Red , false = Blue)
 
 	// Stat
+	UPROPERTY(EditAnywhere)
 	int MaxHp;				// 최대 체력
+	UPROPERTY(EditAnywhere)
 	int Hp;					// 현재 체력
-	int Shield;				// 쉴드
+	UPROPERTY(EditAnywhere)
+	int Shield = -1;		// 쉴드
+	UPROPERTY(EditAnywhere)
 	float Speed;			// 이동속도
+	UPROPERTY(EditAnywhere)
 	int Power;				// 공격력
+
+	// CoolTime
+	float RMBCoolTime = 0.0f;		// 우클릭 쿨타임
+	float ESkillCoolTime = 0.0f;	// E스킬 쿨타임
+	float QSkillCoolTime = 0.0f;	// Q스킬 쿨타임
 };
 
 UCLASS()
@@ -71,6 +82,7 @@ protected:
 	virtual void InputAttack(const struct FInputActionValue& inputValue) PURE_VIRTUAL(ABaseCharacter::InputAttack,);
 
 	void ChangeState(EMoveState newState, UAnimMontage* montage);
+	void UpdateCoolTime(float DeltaTime);		// 쿨타임 업데이트 함수(Tick)
 
 
 public:	
@@ -93,8 +105,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	TMap<FString, UAnimMontage*> stateMontages;
 
-
-
+	bool bIsShield = false;
+	float ShieldTime = 5.0f;
 
 /*Input*/
 public:

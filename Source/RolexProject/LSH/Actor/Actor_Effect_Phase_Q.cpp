@@ -37,8 +37,7 @@ void AActor_Effect_Phase_Q::BeginPlay()
 			Destroy(); 
 			NiagaraComponent->Deactivate();
 			OverlappedActors.Empty();
-			}), 100, false);
-		// Phase->QSkillDuration
+			}), Phase->QSkillDuration, false);
 
 
 	// 라인트레이스
@@ -125,7 +124,7 @@ void AActor_Effect_Phase_Q::TakeDamageToCharacter()
 	{
 		for (ABaseCharacter* character : OverlappedActors)
 		{
-			if (character)
+			if (character and character->Data.Team != Phase->Data.Team)
 			{
 				character->ModifyHP(-1);
 			}
@@ -148,7 +147,6 @@ void AActor_Effect_Phase_Q::DrawLineTrace()
 
 	if (GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_Visibility, params))
 	{
-		//UE_LOG(LogTemp, Log, TEXT("Hit : %s"), *hitResult.GetActor()->GetName());
 		ABaseCharacter* characer = Cast<ABaseCharacter>(hitResult.GetActor());
 		if (characer)
 		{
@@ -167,13 +165,9 @@ void AActor_Effect_Phase_Q::DrawLineTrace()
 	}
 	else
 	{
-		//UE_LOG(LogTemp, Log, TEXT("Hit false"));
-
 		LineTraceDistance = 1800.0f;
 		BeamCollision->SetRelativeLocation(pivot);
 	}
-
-	//UE_LOG(LogTemp, Log, TEXT("LineTraceDistance : %f"), LineTraceDistance);
 
 	// 1 : 1650
 
@@ -183,9 +177,4 @@ void AActor_Effect_Phase_Q::DrawLineTrace()
 	// 라인트레이스 길이에 따라 나이아가라와 충돌체 크기 조절
 	NiagaraComponent->SetRelativeScale3D(FVector(NiagaraScaleX, 1,1));
 	BeamCollision->SetRelativeScale3D(FVector(ColScaleX, 2,2));
-	
-
-
-	//UE_LOG(LogTemp, Log, TEXT("ColScaleX : %f"), ColScaleX);
-	//DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 0.2f, 0, 1.0f);
 }

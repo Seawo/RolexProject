@@ -21,11 +21,11 @@ ACharacter_Muriel::ACharacter_Muriel()
 	Data.RoleType = ERoleType::Healer;
 	Data.Name = "Muriel";
 	Data.Team = false;
-	Data.MaxHp = 200.0f;
-	Data.Hp = 200.0f;
-	Data.Shield = 0.0f;
+	Data.MaxHp = 200;
+	Data.Hp = 200;
+	Data.Shield = 0;
 	Data.Speed = 400.0f;
-	Data.Power = 15.0f;
+	Data.Power = 15;
 }
 
 void ACharacter_Muriel::BeginPlay()
@@ -39,7 +39,7 @@ void ACharacter_Muriel::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UpdateCoolTime(DeltaTime);
+	UpdateFlyCoolTime(DeltaTime);
 
 	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("gravity : %.2f"), GetCharacterMovement()->GravityScale));
 	if (bIsPushSpaceBar)
@@ -249,6 +249,9 @@ void ACharacter_Muriel::MurielFly()
 {
 	if(not bIsPushSpaceBar) return;
 
+	//if (FlyCoolTime > 0) return;
+	//FlyCoolTime = FlyRefillTiem;
+
 	FVector FlyDirection = GetActorUpVector() * 1.0f;
 
 	// 충돌 감지 후 이동처리
@@ -279,11 +282,6 @@ void ACharacter_Muriel::MurielJump()
 	}
 	//if (FlyCoolTime > 0) return;
 
-
-
-
-	// 중력 초기값 저장
-	//DefaultGravityScale = GetCharacterMovement()->GravityScale;
 
 	bIsPushSpaceBar = true;
 	FlyingTime = 5.0f;
@@ -456,7 +454,7 @@ void ACharacter_Muriel::SpawnEffect(FName socketName, FName key)
 
 
 
-void ACharacter_Muriel::UpdateCoolTime(float DeltaTime)
+void ACharacter_Muriel::UpdateFlyCoolTime(float DeltaTime)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("FlyCoolTime : %.2f"), FlyCoolTime));
 	FlyCoolTime -= DeltaTime;
@@ -572,5 +570,5 @@ void ACharacter_Muriel::UpdateQSkillSearchPlayer()
 	UE_LOG(LogTemp, Warning, TEXT("QSkillTargetLocation : %s"), *QSkillTargetLocation.ToString());
 
 	DrawDebugPoint(GetWorld(), target, 5.0f, FColor::Green, false, 0.1f);
-	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 5.0f, 0, 1.0f);
+	//DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 5.0f, 0, 1.0f);
 }

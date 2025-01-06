@@ -53,8 +53,8 @@ void AActor_Effect_Phase_E::OnOverlapBegin(UPrimitiveComponent* OverlappedCompon
 		return;
 	}
 
-	//if (bIsOverlap) return;	// 중복 방지
-	//bIsOverlap = true;
+	if (bIsOverlap) return;	// 중복 방지
+	bIsOverlap = true;
 
 
 	UE_LOG(LogTemp, Warning, TEXT("[E] Other : %s, Owner : %s"),
@@ -71,6 +71,6 @@ void AActor_Effect_Phase_E::OnOverlapBegin(UPrimitiveComponent* OverlappedCompon
 		FVector dir = (targetLoc - myLoc).GetSafeNormal();
 
 		// 힘적용
-		character->LaunchCharacter(dir * 1000, true, true);
+		character->LaunchCharacter(dir * 2000, true, true);
 	}
 }

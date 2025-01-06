@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Fey.h"
@@ -19,11 +19,11 @@ AFey::AFey()
 	Data.RoleType = ERoleType::Healer;
 	Data.Name = "Fey";
 	Data.Team = true;
-	Data.MaxHp = 250.0f;
+	Data.MaxHp = 250;
 	Data.Hp = Data.MaxHp;
-	Data.Shield = 0.0f;
+	Data.Shield = 0;
 	Data.Speed = 400.0f;
-	Data.Power = 10.0f;
+	Data.Power = 10;
 
 	// healing Box
 	HealingBox = CreateDefaultSubobject<UBoxComponent>(TEXT("HealingBox"));

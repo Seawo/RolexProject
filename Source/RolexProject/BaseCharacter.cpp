@@ -73,6 +73,22 @@ void ABaseCharacter::Tick(float DeltaTime)
 
 	// 캐릭터에 hp 달아주기
 	DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 70), FString::Printf(TEXT("HP : %d"), Data.Hp), nullptr, FColor::Green, DeltaTime);
+	// 캐릴터에 shield 달아주기
+	DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 80), FString::Printf(TEXT("Shield : %d"), Data.Shield), nullptr, FColor::Green, DeltaTime);
+
+	// 쿨타임 업데이트
+	UpdateCoolTime(DeltaTime);
+
+	// 실드 5초간 활성화, 5초 후 비활성화
+	if (bIsShield)
+	{
+		ShieldTime -= DeltaTime;
+
+		if (ShieldTime <= 0.0f)
+		{
+			bIsShield = false;
+		}
+	}
 }
 
 
@@ -80,26 +96,66 @@ void ABaseCharacter::ModifyHP(int Value)
 {
 	if (Data.Hp <= 0) return;
 
-	Data.Hp += Value;
-	// Value > 0 : 힐, Value < 0 : 데미지
-	if (Data.Hp >= Data.MaxHp)
+	// 힐이 들어올 경우
+	if (Value > 0)
 	{
-		Data.Hp = Data.MaxHp;
-	}
-	else if (Data.Hp <= 0)
-	{
-		Data.Hp = 0;
-		if (stateMontages.Contains("Die"))
+		Data.Hp += Value;
+		if (Data.Hp >= Data.MaxHp)
 		{
-			ChangeState(EMoveState::Die, stateMontages["Die"]);
+			Data.Hp = Data.MaxHp;
+		}
+	}
+
+	// 데미지가 들어올 경우
+	else if (Value < 0)
+	{
+		// 실드가 있는 경우
+		if (Data.Shield > 0)
+		{
+			// 실드가 데미지보다 크거나 같을 경우
+			if (Data.Shield + Value >= 0)
+			{
+				// 실드 차감하기
+				Data.Shield += Value;
+			}
+			// 실드가 데미지보다 작을 경우
+			// 실드는 0이 되고 HP에서 나머지 데미지가 차감된다.
+			else if (Data.Shield + Value < 0)
+			{
+				// Value가 음수이기에 +해준다.
+				Value += Data.Shield;
+				Data.Shield = 0;
+				bIsShield = false;
+			}
+		}
+
+		// 실드가 없으면서 차감될 데미지는 있는 경우
+		// 실드가 있지만 들어오는 데미지보다 실드가 작을 경우 차감할 데미지를 실드만큼 차감 시켜주고 HP에게 다시 데미지를 준다.
+		if (Data.Shield == 0 and Value < 0) // 실드가 0이 될수도있기때문에 음수로 잡아준다.
+		{
+			Data.Hp += Value;
+			if (Data.Hp <= 0)
+			{
+				Data.Hp = 0;
+
+				if (stateMontages.Contains("Die"))
+				{
+					ChangeState(EMoveState::Die, stateMontages["Die"]);
+				}
+			}
 		}
 	}
 }
 
 void ABaseCharacter::ModifyShield(int shield)
 {
+	// 실드가 0 이하라면 리턴
 	if(shield < 0) return;
+	// 비활성화 중일때 리턴
+	if (not bIsShield) return;
 
+	bIsShield = true;
+	ShieldTime = 5.0f;
 	Data.Shield += shield;
 }
 
@@ -171,6 +227,25 @@ void ABaseCharacter::ChangeState(EMoveState newState, UAnimMontage* montage)
 		break;
 	default:
 		break;
+	}
+}
+
+void ABaseCharacter::UpdateCoolTime(float DeltaTime)
+{
+	Data.RMBCoolTime -= DeltaTime;
+	if (Data.RMBCoolTime < 0)
+	{
+		Data.RMBCoolTime = 0.0f;
+	}
+	Data.ESkillCoolTime -= DeltaTime;
+	if (Data.ESkillCoolTime < 0)
+	{
+		Data.ESkillCoolTime = 0.0f;
+	}
+	Data.QSkillCoolTime -= DeltaTime;
+	if (Data.QSkillCoolTime < 0)
+	{
+		Data.QSkillCoolTime = 0.0f;
 	}
 }
 
@@ -274,4 +349,3 @@ void ABaseCharacter::Start(UAnimMontage* montage)
 		montageDelay, false);
 	
 }
-

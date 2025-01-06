@@ -30,11 +30,11 @@ ACharacter_Phase::ACharacter_Phase()
 	Data.RoleType = ERoleType::Dealer;
 	Data.Name = "Phase";
 	Data.Team = false;
-	Data.MaxHp = 250.0f;
-	Data.Hp = 200.0f;
-	Data.Shield = 0.0f;
+	Data.MaxHp = 250;
+	Data.Hp = 200;
+	Data.Shield = 0;
 	Data.Speed = 400.0f;
-	Data.Power = 20.0f;
+	Data.Power = 20;
 
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> mesh(TEXT("/Script/Engine.SkeletalMesh'/Game/ParagonPhase/Characters/Heroes/Phase/Meshes/Phase_GDC.Phase_GDC'"));
 	if (mesh.Succeeded())
@@ -44,10 +44,6 @@ ACharacter_Phase::ACharacter_Phase()
 
 
 	AudioComponent = CreateDefaultSubobject<UAudioComponent_Phase>(TEXT("AudioComponent"));
-
-	//EffectMap.Add(TEXT("LMBRMB"), AActor_Effect_Orb::StaticClass());
-	//EffectMap.Add(TEXT("E"), AActor_Effect_E::StaticClass());
-	//EffectMap.Add(TEXT("Q"), AActor_Effect_Q::StaticClass());
 }
 
 void ACharacter_Phase::BeginPlay()
@@ -73,14 +69,14 @@ void ACharacter_Phase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//// 화면에 출력하기
-	//GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("RMBSkillCoolTime : %.2f"), RMBSkillCoolTime));
-	//GEngine->AddOnScreenDebugMessage(0, 0.0f, FColor::Red, FString::Printf(TEXT("ESkillCoolTime : %.2f"), ESkillCoolTime));
-	//GEngine->AddOnScreenDebugMessage(1, 0.0f, FColor::Red, FString::Printf(TEXT("QSkillCoolTime : %.2f"), QSkillCoolTime));
+	// 화면에 출력하기
+	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("RMBSkillCoolTime : %.2f"), Data.RMBCoolTime));
+	GEngine->AddOnScreenDebugMessage(0, 0.0f, FColor::Red, FString::Printf(TEXT("ESkillCoolTime : %.2f"), Data.ESkillCoolTime));
+	GEngine->AddOnScreenDebugMessage(1, 0.0f, FColor::Red, FString::Printf(TEXT("QSkillCoolTime : %.2f"), Data.QSkillCoolTime));
 
 
 	// 쿨타임 돌리기
-	UpdateCoolTime(DeltaTime);
+	//UpdateCoolTime(DeltaTime);
 
 
 
@@ -115,90 +111,25 @@ void ACharacter_Phase::ChangeAttackState(EAttackState state)
 	switch (state)
 	{
 	case EAttackState::QSkill:
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("QSkill"));
-		// 쿨타임
-		if (QSkillCoolTime > 0)
-		{
-			return;
-		}
-		QSkillCoolTime = 60.0f;
-		// Montage
-		PlayMontage("Q", 1.0f);
-		// Effect
+		QAttack();
 		break;
 	case EAttackState::ESkill:
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("ESkill"));
-		// 쿨타임
-		if (ESkillCoolTime > 0)
-		{
-			return;
-		}
-		ESkillCoolTime = 20.0f;
-		// Montage
-		PlayMontage("E", 1.0f);
-		GetCharacterMovement()->GravityScale = 0.7f;
-		//Jump();
-		// Effect
+		EAttack();
 		break;
 	case EAttackState::LMB:
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("LMB"));
-		// Montage
-		PlayMontage("LMB",1.0f);
-		//SpawnEffect("FX_Hand_R4");
-		
-		// Effect
+		LBMAttack();
 		break;
 	case EAttackState::RMB:
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("RMB"));
-		// 쿨타임
-		if (RMBSkillCoolTime > 0)
-		{
-			return;
-		}
-		RMBSkillCoolTime = 5.0f;
-
-
-		// Montage
-		PlayMontage("RMB", 1.0f);
-		// Effect
+		RBMAttack();
 		break;
 	default:
 		break;
 	}
 }
+/** 플레이어 스킬 및 공격 함수들*/
 
-void ACharacter_Phase::ChangeState(EMoveState state)
-{
-	APlayerController* playerController = Cast<APlayerController>(GetController());
 
-	switch (state)
-	{
-	case EMoveState::Idle:
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-		break;
-	case EMoveState::Move:
-		break;
-	case EMoveState::Run:
-		break;
-	case EMoveState::Jump:
-		break;
-	case EMoveState::Stun:
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-		PlayMontage("Stun", 1.0f);
-		break;
-	case EMoveState::Die:
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-		PlayMontage("Die", 1.0f);
-		break;
-	case EMoveState::Start:
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-		PlayMontage("Select", 1.0f);
-		break;
-	default:
-		break;
-	}
-}
-
+/** 플레이어 Input함수들*/
 void ACharacter_Phase::InputAttack(const FInputActionValue& inputValue)
 {
 	for (auto& mon : AttackMontages)
@@ -215,7 +146,6 @@ void ACharacter_Phase::InputAttack(const FInputActionValue& inputValue)
 	AttackState = static_cast<EAttackState>(inputVector);
 	ChangeAttackState(AttackState);
 }
-
 void ACharacter_Phase::PhaseJump()
 {
 	if (GetCharacterMovement()->IsMovingOnGround())
@@ -224,7 +154,6 @@ void ACharacter_Phase::PhaseJump()
 	}
 	Jump();
 }
-
 void ACharacter_Phase::InputLShift()
 {
 	if (bLShift)
@@ -241,11 +170,60 @@ void ACharacter_Phase::InputLShift()
 	}
 }
 
+
+/** 플레이어 공격 함수들*/
+void ACharacter_Phase::LBMAttack()
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("LMB"));
+
+	// Montage
+	PlayMontage("LMB", 1.0f);
+}
+void ACharacter_Phase::RBMAttack()
+{
+	// 쿨타임
+	if (Data.RMBCoolTime > 0)
+	{
+		return;
+	}
+	Data.RMBCoolTime = RMBRefillTime;
+
+
+	// Montage
+	PlayMontage("RMB", 1.0f);
+}
+void ACharacter_Phase::EAttack()
+{
+	// 쿨타임
+	if (Data.ESkillCoolTime > 0)
+	{
+		return;
+	}
+	Data.ESkillCoolTime = ESkillRefillTime;
+
+	// Montage
+	PlayMontage("E", 1.0f);
+	GetCharacterMovement()->GravityScale = 0.7f;
+}
+void ACharacter_Phase::QAttack()
+{
+	// 쿨타임
+	if (Data.QSkillCoolTime > 0)
+	{
+		return;
+	}
+	Data.QSkillCoolTime = QSkillRefillTime;
+
+	// Montage
+	PlayMontage("Q", 1.0f);
+}
+
+
+/** 몽타주 재생 및 스킬 액터 스폰 함수들*/
 void ACharacter_Phase::PlayMontage(FString Key, float InPlayRate, FName StartSectionName)
 {
 	if (AttackMontages.Contains(Key))
 	{
-
 		for (auto & mon : AttackMontages)
 		{
 			if (AnimInstance->Montage_IsPlaying(mon.Value))
@@ -253,56 +231,11 @@ void ACharacter_Phase::PlayMontage(FString Key, float InPlayRate, FName StartSec
 				return;
 			}
 		}
-		
-
 
 		UAnimMontage* montage = AttackMontages[Key];
-		// 화면에 Key값 출력하기
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, Key);
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, StartSectionName.ToString());
-
 		PlayAnimMontage(montage, InPlayRate);
-
-		if (Key == "Stun")
-		{
-			FTimerHandle stunTimerHandle;
-			GetWorld()->GetTimerManager().SetTimer(stunTimerHandle, FTimerDelegate::CreateLambda([this]() {MoveState = EMoveState::Idle; ChangeState(MoveState); }), montage->GetPlayLength(), false);
-		}
-
 	}
 }
-
-void ACharacter_Phase::UpdateUI()
-{
-	UI_InGame->PB_HPBar->SetPercent(Data.Hp / Data.MaxHp);
-	int rmb = RMBSkillCoolTime;
-	int e = ESkillCoolTime;
-	int q = QSkillCoolTime;
-
-	UI_InGame->Text_RMBCooltime->SetText(FText::AsNumber(rmb));
-	UI_InGame->Text_ESkillCooltime->SetText(FText::AsNumber(e));
-	UI_InGame->Text_QSkillCooltime->SetText(FText::AsNumber(q));
-}
-
-void ACharacter_Phase::UpdateCoolTime(float DeltaTime)
-{
-	RMBSkillCoolTime -= DeltaTime;
-	if (RMBSkillCoolTime < 0)
-	{
-		RMBSkillCoolTime = 0.0f;
-	}
-	ESkillCoolTime -= DeltaTime;
-	if (ESkillCoolTime < 0)
-	{
-		ESkillCoolTime = 0.0f;
-	}
-	QSkillCoolTime -= DeltaTime;
-	if (QSkillCoolTime < 0)
-	{
-		QSkillCoolTime = 0.0f;
-	}
-}
-
 void ACharacter_Phase::SpawnEffect(FName socketName, FName key)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("SpawnEffect"));
@@ -331,9 +264,9 @@ void ACharacter_Phase::SpawnEffect(FName socketName, FName key)
 			// AActor_Effect생성하기
 			//AActor_Effect* ef = GetWorld()->SpawnActor<AActor_Effect>(effect, socketLocation, rot);
 			AActor_Effect* effect = GetWorld()->SpawnActorDeferred<AActor_Effect>(
-									effectClass,
-									FTransform(rot, socketLocation),
-									this);
+				effectClass,
+				FTransform(rot, socketLocation),
+				this);
 
 			if (effect)
 			{
@@ -341,4 +274,18 @@ void ACharacter_Phase::SpawnEffect(FName socketName, FName key)
 			}
 		}
 	}
+}
+
+
+/**Tick 함수에서 계속 돌아가야할 함수들*/
+void ACharacter_Phase::UpdateUI()
+{
+	UI_InGame->PB_HPBar->SetPercent(Data.Hp / Data.MaxHp);
+	int rmb = RMBSkillCoolTime;
+	int e = ESkillCoolTime;
+	int q = QSkillCoolTime;
+
+	UI_InGame->Text_RMBCooltime->SetText(FText::AsNumber(rmb));
+	UI_InGame->Text_ESkillCooltime->SetText(FText::AsNumber(e));
+	UI_InGame->Text_QSkillCooltime->SetText(FText::AsNumber(q));
 }

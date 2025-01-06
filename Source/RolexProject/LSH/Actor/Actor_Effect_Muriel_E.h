@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "LSH/Actor/Actor_Effect.h"
-#include "MyActor_Effect_Muriel_E.generated.h"
+#include "Actor_Effect_Muriel_E.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ROLEXPROJECT_API AMyActor_Effect_Muriel_E : public AActor_Effect
+class ROLEXPROJECT_API AActor_Effect_Muriel_E : public AActor_Effect
 {
 	GENERATED_BODY()
 	
 
-	AMyActor_Effect_Muriel_E();
+	AActor_Effect_Muriel_E();
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
