@@ -3,3 +3,20 @@
 
 #include "PJE/Public/SessionItemUI.h"
 
+#include "RolexGameInstance.h"
+#include "Components/Button.h"
+
+void USessionItemUI::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	SessionJoinBtn->OnClicked.AddDynamic(this, &USessionItemUI::JoinSession);
+}
+
+void USessionItemUI::JoinSession()
+{
+	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetWorld()->GetGameInstance());
+
+	if (RolexGameInstance)
+		RolexGameInstance->JoinSession(SessionIndex);
+}

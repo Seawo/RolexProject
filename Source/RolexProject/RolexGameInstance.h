@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "OnlineSubsystem.h"
+#include "OnlineSessionSettings.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "RolexGameInstance.generated.h"
 
 /**
@@ -14,7 +17,21 @@ class ROLEXPROJECT_API URolexGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 
-public:
+	URolexGameInstance();
 	
+public:
+	IOnlineSubsystem* OnlineSubsystem;
+	
+	IOnlineSessionPtr SessionInterface;
+
+	
+public:
 	void CreateSession();
+	void OnCreateSession(FName SessionName, bool bWasSuccessful);
+
+	void FindSession();
+	void OnFindSession(bool bWasSuccessful);
+
+	void JoinSession(int32 SessionIndex);
+	void OnJoinSession(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 };

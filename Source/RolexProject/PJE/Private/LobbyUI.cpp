@@ -25,8 +25,10 @@ void ULobbyUI::CreateSession()
 
 void ULobbyUI::FindSession()
 {
+	RolexGameInstace->FindSession();
 }
 
 void ULobbyUI::AddSession()
 {
+	
 }

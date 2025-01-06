@@ -14,6 +14,14 @@ class ROLEXPROJECT_API USessionItemUI : public UUserWidget
 {
 	GENERATED_BODY()
 
+	virtual void NativeConstruct() override;
+	
 	UPROPERTY(meta = (BindWidget))
 	class UButton* SessionJoinBtn;
+
+	UPROPERTY()
+	int32 SessionIndex;
+	
+	UFUNCTION()
+	void JoinSession();
 };
