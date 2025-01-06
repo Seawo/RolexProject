@@ -170,6 +170,11 @@ void ACharacter_Sparrow::ShootingArrowLBM()
 	if (bLBMIsCharging)
 	{
 		CurrAttackState = EAttackState::LMB_Completed;
+		if (!HasAuthority())
+		{
+			Server_ChangeAttackState(CurrAttackState);
+		}
+
 
 		FName sectionName = FName("fire");
 		bLBMIsCharging = false;
@@ -343,6 +348,7 @@ void ACharacter_Sparrow::ShootingArrowQ()
 	}
 }
 
+// 서버 -> 클라로
 void ACharacter_Sparrow::OnRep_ChangeAttackState()
 {
 	FName sectionName;
@@ -353,8 +359,7 @@ void ACharacter_Sparrow::OnRep_ChangeAttackState()
 	{
 		EnumValue = EnumPtr->GetNameStringByValue(static_cast<int64>(CurrAttackState));
 		UE_LOG(LogTemp, Warning, TEXT("Attack State: %s"), *EnumValue);
-		
-	
+
 	}
 
 	switch (CurrAttackState)
@@ -392,6 +397,61 @@ void ACharacter_Sparrow::OnRep_ChangeAttackState()
 		break;
 	}
 
+}
+
+void ACharacter_Sparrow::Multi_ChangeAttackState_Implementation(EAttackState attackState)
+{
+	FName sectionName;
+	FString EnumValue;
+
+	const UEnum* EnumPtr = StaticEnum<EAttackState>();
+	if (EnumPtr)
+	{
+		EnumValue = EnumPtr->GetNameStringByValue(static_cast<int64>(attackState));
+		UE_LOG(LogTemp, Warning, TEXT("Attack State: %s"), *EnumValue);
+
+	}
+
+	switch (attackState)
+	{
+	case EAttackState::QSkill:
+		sectionName = FName("start");
+		PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());
+		break;
+	case EAttackState::ESkill:
+		PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f);
+		break;
+	case EAttackState::LMB:
+		sectionName = FName("start");
+		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, *sectionName.ToString());
+		break;
+	case EAttackState::RMB:
+		sectionName = FName("start");
+		PlayAnimMontage(AttackMontages[TEXT("RBM")], 1.0f, *sectionName.ToString());
+		break;
+	case EAttackState::QSkill_Completed:
+		sectionName = FName("fire");
+		PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());
+		break;
+	case EAttackState::ESkill_Completed:
+		break;
+	case EAttackState::LMB_Completed:
+		sectionName = FName("fire");
+		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, *sectionName.ToString());
+		break;
+	case EAttackState::RMB_Completed:
+		sectionName = FName("fire");
+		PlayAnimMontage(AttackMontages[TEXT("RBM")], 1.0f, *sectionName.ToString());
+		break;
+	default:
+		break;
+	}
+}
+
+// 클라에서 서버
+void ACharacter_Sparrow::Server_ChangeAttackState_Implementation(EAttackState attackState)
+{
+	Multi_ChangeAttackState(attackState);
 }
 
 void ACharacter_Sparrow::InputJump()
@@ -446,6 +506,10 @@ void ACharacter_Sparrow::LBMAttack()
 		
 		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, *sectionName.ToString());
 
+		if (!HasAuthority())
+		{
+			Server_ChangeAttackState(CurrAttackState);
+		}
 	}
 }
 
@@ -470,6 +534,8 @@ void ACharacter_Sparrow::RBMAttack()
 		bRBMIsCharging = true;
 
 		PlayAnimMontage(AttackMontages[TEXT("RBM")], 1.0f, *sectionName.ToString());
+
+
 	}
 }
 
@@ -505,6 +571,7 @@ void ACharacter_Sparrow::QAttack()
 			// 데칼 트루
 			AimIndicator->SetVisibility(true);
 
+
 		}
 	}
 
@@ -521,6 +588,8 @@ void ACharacter_Sparrow::EAttack()
 	}
 
 	PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f);
+
+
 }
 
 void ACharacter_Sparrow::SpawnArrow(FName arrowName)

@@ -69,6 +69,11 @@ public:
 	UFUNCTION()
 	void OnRep_ChangeAttackState();
 
+	UFUNCTION(Server, Reliable)
+	void Server_ChangeAttackState(EAttackState attackState);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multi_ChangeAttackState(EAttackState attackState);
+
 private:
 	// 애니메이션 가져오기
 	class USparrowAnimInstance* anim;
