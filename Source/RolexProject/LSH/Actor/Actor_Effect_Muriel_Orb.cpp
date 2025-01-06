@@ -152,7 +152,7 @@ void AActor_Effect_Muriel_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedCom
 		// 캐릭터 이면서 다른 팀이라면
 		if (character && character->Data.Team != onwer->Data.Team)
 		{
-			character->ModifyHP(-1);
+			character->ModifyHP(-2);
 		}
 		else if (character && character->Data.Team == onwer->Data.Team)
 		{

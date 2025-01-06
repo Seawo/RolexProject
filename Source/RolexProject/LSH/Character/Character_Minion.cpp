@@ -1,7 +1,11 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "LSH/Character/Character_Minion.h"
+#include "Character_Minion.h"
+
+ACharacter_Minion::ACharacter_Minion()
+{
+}
 
 void ACharacter_Minion::BeginPlay()
 {
