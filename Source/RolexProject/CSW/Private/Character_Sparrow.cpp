@@ -18,6 +18,8 @@
 #include "EffectActor.h"
 #include "Components/SphereComponent.h"
 
+#include "Net/UnrealNetwork.h"
+
 ACharacter_Sparrow::ACharacter_Sparrow()
 {
 
@@ -87,6 +89,8 @@ void ACharacter_Sparrow::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 void ACharacter_Sparrow::ChangeAttackState(EAttackState state)
 {
+	//if (!HasAuthority())return;
+
 	switch (state)
 	{
 	case EAttackState::QSkill:
@@ -113,13 +117,33 @@ void ACharacter_Sparrow::ChangeAttackState(EAttackState state)
 
 void ACharacter_Sparrow::InputAttack(const FInputActionValue& inputValue)
 {
+	for (const TPair<FString, UAnimMontage*>& Pair : AttackMontages)
+	{
+		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(Pair.Value))
+		{
+			return;
+		}
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("attack in"));
 
 	int inputVector = inputValue.Get<float>();
 	inputVector--;
 	CurrAttackState = static_cast<EAttackState>(inputVector);
 	ChangeAttackState(CurrAttackState);
+
+	if (!HasAuthority())
+	{
+		Server_ChangeAttackState(CurrAttackState);
+	}
+	else
+	{
+		Server_ChangeAttackState(CurrAttackState);
+	}
+
 }
+
+
 
 void ACharacter_Sparrow::AimOffsetLBM()
 {
@@ -149,6 +173,17 @@ void ACharacter_Sparrow::ShootingArrowLBM()
 
 	if (bLBMIsCharging)
 	{
+		CurrAttackState = EAttackState::LMB_Completed;
+		if (!HasAuthority())
+		{
+			Server_ChangeAttackState(CurrAttackState);
+		}
+		else
+		{
+			Server_ChangeAttackState(CurrAttackState);
+		}
+
+
 		FName sectionName = FName("fire");
 		bLBMIsCharging = false;
 		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, *sectionName.ToString());
@@ -194,6 +229,16 @@ void ACharacter_Sparrow::ShootingArrowRBM()
 
 	if (bRBMIsCharging)
 	{
+		CurrAttackState = EAttackState::RMB_Completed;
+		if (!HasAuthority())
+		{
+			Server_ChangeAttackState(CurrAttackState);
+		}
+		else
+		{
+			Server_ChangeAttackState(CurrAttackState);
+		}
+
 		FName sectionName = FName("fire");
 		bRBMIsCharging = false;
 		PlayAnimMontage(AttackMontages[TEXT("RBM")], 1.0f, *sectionName.ToString());
@@ -272,6 +317,16 @@ void ACharacter_Sparrow::ShootingArrowQ()
 
 	if (bQIsCharging)
 	{
+		CurrAttackState = EAttackState::QSkill_Completed;
+		if (!HasAuthority())
+		{
+			Server_ChangeAttackState(CurrAttackState);
+		}
+		else
+		{
+			Server_ChangeAttackState(CurrAttackState);
+		}
+
 		FName sectionName = FName("fire");
 		bQIsCharging = false;
 		PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());
@@ -294,8 +349,16 @@ void ACharacter_Sparrow::ShootingArrowQ()
 
 				// 쏘는 곳 위치 알아오기
 				FVector TargetLocation = AimIndicator->GetComponentLocation();
-	
-				FActorSpawnParameters SpawnParams;
+				
+				if (HasAuthority())
+				{
+					Server_SpawnQEffect(TargetLocation);
+				}
+				else
+				{
+					Server_SpawnQEffect(TargetLocation);
+				}
+				/*FActorSpawnParameters SpawnParams;
 				SpawnParams.Owner = this;
 				QEffectActor = GetWorld()->SpawnActor<AEffectActor>(QEffectActorclass, TargetLocation, FRotator::ZeroRotator, SpawnParams);
 				
@@ -304,36 +367,85 @@ void ACharacter_Sparrow::ShootingArrowQ()
 				if (sphereComp)
 				{
 					sphereComp->SetWorldScale3D(FVector(5, 5, 10));
-					
-
-					/*
-					// 디버그용
-					FVector CurrentScale = sphereComp->GetComponentScale();
-					float ScaledRadius = sphereComp->GetScaledSphereRadius(); // 스케일 반영된 반지름
-					float CapsuleHalfHeight = ScaledRadius * 5.0f;           // 캡슐 길이 (적절히 조정 가능)
-					UE_LOG(LogTemp, Log, TEXT("SphereComponent Scale: X=%f, Y=%f, Z=%f"), CurrentScale.X, CurrentScale.Y, CurrentScale.Z);
-					UE_LOG(LogTemp, Log, TEXT("Capsule Radius: %f, HalfHeight: %f"), ScaledRadius, CapsuleHalfHeight);
-
-					// DrawDebugCapsule로 길게 표시
-					DrawDebugCapsule(
-						GetWorld(),
-						QEffectActor->GetActorLocation(),       // 캡슐 중심 위치
-						CapsuleHalfHeight,                     // 캡슐의 절반 높이
-						ScaledRadius,                          // 캡슐 반지름
-						FRotationMatrix::MakeFromZ(FVector(0, 0, 1)).ToQuat(),            // 기본 회전값
-						FColor::Green,                        // 디버그 색상
-						true,                                 // 지속 표시
-						5.0f                                  // 지속 시간 (초)
-					);
-					*/
 				}
+				*/
 
 				// 다시 원래대로 돌아온다
 				// 모션을 다 한뒤 마지막 함수 호출로 다시할 예정
 				GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+
 			}),
 			3.0f, false);
 	}
+}
+
+void ACharacter_Sparrow::Server_SpawnQEffect_Implementation(FVector pos)
+{
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	QEffectActor = GetWorld()->SpawnActor<AEffectActor>(QEffectActorclass, pos, FRotator::ZeroRotator, SpawnParams);
+
+	USphereComponent* sphereComp = QEffectActor->FindComponentByClass<USphereComponent>();
+
+	if (sphereComp)
+	{
+		sphereComp->SetWorldScale3D(FVector(5, 5, 10));
+	}
+}
+
+void ACharacter_Sparrow::Multi_ChangeAttackState_Implementation(EAttackState attackState)
+{
+	FName sectionName;
+	FString EnumValue;
+
+	const UEnum* EnumPtr = StaticEnum<EAttackState>();
+	if (EnumPtr)
+	{
+		EnumValue = EnumPtr->GetNameStringByValue(static_cast<int64>(attackState));
+		UE_LOG(LogTemp, Warning, TEXT("Attack State: %s"), *EnumValue);
+
+	}
+
+	switch (attackState)
+	{
+	case EAttackState::QSkill:
+		sectionName = FName("start");
+		PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());
+		break;
+	case EAttackState::ESkill:
+		PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f);
+		break;
+	case EAttackState::LMB:
+		sectionName = FName("start");
+		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, *sectionName.ToString());
+		break;
+	case EAttackState::RMB:
+		sectionName = FName("start");
+		PlayAnimMontage(AttackMontages[TEXT("RBM")], 1.0f, *sectionName.ToString());
+		break;
+	case EAttackState::QSkill_Completed:
+		sectionName = FName("fire");
+		PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());
+		break;
+	case EAttackState::ESkill_Completed:
+		break;
+	case EAttackState::LMB_Completed:
+		sectionName = FName("fire");
+		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, *sectionName.ToString());
+		break;
+	case EAttackState::RMB_Completed:
+		sectionName = FName("fire");
+		PlayAnimMontage(AttackMontages[TEXT("RBM")], 1.0f, *sectionName.ToString());
+		break;
+	default:
+		break;
+	}
+}
+
+// 클라에서 서버
+void ACharacter_Sparrow::Server_ChangeAttackState_Implementation(EAttackState attackState)
+{
+	Multi_ChangeAttackState(attackState);
 }
 
 void ACharacter_Sparrow::InputJump()
@@ -387,8 +499,9 @@ void ACharacter_Sparrow::LBMAttack()
 		bLBMIsCharging = true;
 		
 		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, *sectionName.ToString());
-	}
 
+
+	}
 }
 
 void ACharacter_Sparrow::RBMAttack()
@@ -412,6 +525,8 @@ void ACharacter_Sparrow::RBMAttack()
 		bRBMIsCharging = true;
 
 		PlayAnimMontage(AttackMontages[TEXT("RBM")], 1.0f, *sectionName.ToString());
+
+
 	}
 }
 
@@ -446,6 +561,7 @@ void ACharacter_Sparrow::QAttack()
 
 			// 데칼 트루
 			AimIndicator->SetVisibility(true);
+
 		}
 	}
 
@@ -462,12 +578,13 @@ void ACharacter_Sparrow::EAttack()
 	}
 
 	PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f);
+
 }
 
-void ACharacter_Sparrow::SpawnArrow(FName arrowName)
+void ACharacter_Sparrow::Server_SpawnArrow_Implementation(FName arrowName)
 {
 	USkeletalMeshComponent* skeletalMesh = GetMesh();
-	
+
 	if (skeletalMesh)
 	{
 		FActorSpawnParameters SpawnParams;
@@ -497,6 +614,18 @@ void ACharacter_Sparrow::SpawnArrow(FName arrowName)
 
 			EffectActor->InititalizeThrowStone(throwdir, speed);
 		}
+	}
+}
+
+void ACharacter_Sparrow::SpawnArrow(FName arrowName)
+{
+	if (HasAuthority())
+	{
+		Server_SpawnArrow(arrowName);
+	}
+	else if (IsLocallyControlled())
+	{
+		Server_SpawnArrow(arrowName); // 클라이언트에서 서버로 요청
 	}
 }
 

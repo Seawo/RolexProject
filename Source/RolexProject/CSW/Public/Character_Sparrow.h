@@ -9,6 +9,9 @@
 /**
  * 
  */
+
+
+
 UCLASS()
 class ROLEXPROJECT_API ACharacter_Sparrow : public ABaseCharacter
 {
@@ -31,6 +34,7 @@ public:
 	LBM, RBM, Q, E
 	*/
 	EAttackState CurrAttackState;
+
 
 	// arrow
 	UPROPERTY(EditAnywhere)
@@ -58,6 +62,14 @@ public:
 	void ShootingArrowRBM();
 	void AimOffsetQ();
 	void ShootingArrowQ();
+
+	UFUNCTION(Server, Reliable)
+	void Server_SpawnQEffect(FVector pos);
+
+	UFUNCTION(Server, Reliable)
+	void Server_ChangeAttackState(EAttackState attackState);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multi_ChangeAttackState(EAttackState attackState);
 
 private:
 	// 애니메이션 가져오기
@@ -97,6 +109,9 @@ private:
 	void EAttack();
 
 	// spawnArrow
+	UFUNCTION(Server, Reliable)
+	void Server_SpawnArrow(FName arrowName);
+
 	void SpawnArrow(FName arrowName);
 	void SpawnCharge(FName chargeName);
 };

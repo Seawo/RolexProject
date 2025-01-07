@@ -23,6 +23,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
@@ -71,9 +73,11 @@ public:
 
 	void InititalizeThrowStone(const FVector& dir, float speed);
 
+
 private:
 	FVector MoveDir;
 	float ThrowSpeed;
+
 
 	FTimerHandle ContinuousDamageTimerHandle;
 
@@ -81,5 +85,8 @@ private:
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	void CheckOverlapAndApplyDamage();
+
+
+
 
 };

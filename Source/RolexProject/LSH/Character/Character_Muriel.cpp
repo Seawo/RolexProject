@@ -551,5 +551,5 @@ void ACharacter_Muriel::UpdateQSkillSearchPlayer()
 	UE_LOG(LogTemp, Warning, TEXT("QSkillTargetLocation : %s"), *QSkillTargetLocation.ToString());
 
 	DrawDebugPoint(GetWorld(), target, 5.0f, FColor::Green, false, 0.1f);
-	//DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 5.0f, 0, 1.0f);
+	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 5.0f, 0, 1.0f);
 }

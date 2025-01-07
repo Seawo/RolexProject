@@ -15,6 +15,8 @@
 
 #include "BaseCharacter.h"
 
+#include "Net/UnrealNetwork.h"
+
 // Sets default values
 AEffectActor::AEffectActor()
 {
@@ -36,6 +38,10 @@ AEffectActor::AEffectActor()
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
 	StaticMeshComp->SetupAttachment(RootComponent);
 	StaticMeshComp->SetSimulatePhysics(true);
+
+	bReplicates = true;
+	
+	
 }
 
 // Called when the game starts or when spawned
@@ -43,6 +49,11 @@ void AEffectActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	SetReplicates(true);
+	SetReplicatingMovement(true);
+	
+
+
 	if (bIsDamage)
 	{
 		CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AEffectActor::OnOverlapBegin);
@@ -55,6 +66,7 @@ void AEffectActor::BeginPlay()
 	}
 
 	SetLifeSpan(DestroyTime);
+
 }
 
 // Called every frame
@@ -64,12 +76,20 @@ void AEffectActor::Tick(float DeltaTime)
 
 	if (!MoveDir.IsNearlyZero())
 	{
-		
-		FVector newVector = GetActorLocation() + (MoveDir * ThrowSpeed * DeltaTime);
-		SetActorLocation(newVector);
-
+		FVector NewVector = GetActorLocation() + (MoveDir * ThrowSpeed * DeltaTime);
+		SetActorLocation(NewVector);  // 서버에서 위치 변경
 	}
 }
+
+void AEffectActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+
+}
+
+
+
 
 // 생성될때,
 void AEffectActor::InitializeEffect(UNiagaraSystem* niagaraSystem, FVector scale)
@@ -206,4 +226,6 @@ void AEffectActor::CheckOverlapAndApplyDamage()
 		}
 	}
 }
+
+
 
