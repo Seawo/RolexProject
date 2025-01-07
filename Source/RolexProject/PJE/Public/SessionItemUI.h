@@ -24,4 +24,11 @@ class ROLEXPROJECT_API USessionItemUI : public UUserWidget
 	
 	UFUNCTION()
 	void JoinSession();
+
+	UPROPERTY(meta = (BindWidget))
+	FString OwnerName;
+
+	UPROPERTY(meta = (BindWidget))
+	FString SessionName;
+	
 };

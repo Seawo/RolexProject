@@ -6,6 +6,7 @@
 #include "NavigationSystemTypes.h"
 #include "RolexGameInstance.h"
 #include "Components/Button.h"
+#include "Components/EditableTextBox.h"
 
 void ULobbyUI::NativeConstruct()
 {
@@ -20,7 +21,8 @@ void ULobbyUI::NativeConstruct()
 
 void ULobbyUI::CreateSession()
 {
-	RolexGameInstace->CreateSession();
+	if (RoomName->GetText().IsEmpty()) return;
+	RolexGameInstace->CreateSession(*RoomName->GetText().ToString());
 }
 
 void ULobbyUI::FindSession()

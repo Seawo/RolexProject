@@ -24,9 +24,12 @@ public:
 	
 	IOnlineSessionPtr SessionInterface;
 
+	TSharedPtr<FOnlineSessionSettings> SessionSettings;
+	
+	TSharedPtr<FOnlineSessionSearch> SearchSettings;
 	
 public:
-	void CreateSession();
+	void CreateSession(FName Name);
 	void OnCreateSession(FName SessionName, bool bWasSuccessful);
 
 	void FindSession();

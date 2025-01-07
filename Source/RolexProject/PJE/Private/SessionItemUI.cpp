@@ -10,7 +10,8 @@ void USessionItemUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	SessionJoinBtn->OnClicked.AddDynamic(this, &USessionItemUI::JoinSession);
+	if (SessionJoinBtn)
+		SessionJoinBtn->OnClicked.AddDynamic(this, &USessionItemUI::JoinSession);
 }
 
 void USessionItemUI::JoinSession()

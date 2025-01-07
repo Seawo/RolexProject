@@ -18,27 +18,43 @@ URolexGameInstance::URolexGameInstance()
 	SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &URolexGameInstance::OnJoinSession);
 }
 
-void URolexGameInstance::CreateSession()
+void URolexGameInstance::CreateSession(FName Name)
 {
 	if (OnlineSubsystem)
 	{
 		if (SessionInterface.IsValid())
 		{
-			FOnlineSessionSettings SessionSettings;
-			SessionSettings.bIsLANMatch = false;
-			SessionSettings.bUsesPresence = true;
-			SessionSettings.NumPublicConnections = 5;
-			SessionSettings.bShouldAdvertise = true;
-			SessionSettings.bAllowJoinInProgress = true;
-			SessionSettings.bAllowJoinViaPresence = false;
+			SessionSettings = MakeShareable(new FOnlineSessionSettings());
+			SessionSettings->bIsLANMatch = false;
+			SessionSettings->bUsesPresence = true;
+			SessionSettings->NumPublicConnections = 5;
+			SessionSettings->bShouldAdvertise = true;
+			SessionSettings->bAllowJoinInProgress = true;
+			SessionSettings->bAllowJoinViaPresence = false;
+
+			// custom information
+			//SessionSettings.Set(TEXT("RoomName"), Name.ToString(), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 			
-			SessionInterface->CreateSession(0, FName("SessinonName"), SessionSettings);
+			ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
+			FUniqueNetIdRepl SteamNetId = *LocalPlayer->GetPreferredUniqueNetId();
+			if (SteamNetId.IsValid())
+				SessionInterface->CreateSession(*SteamNetId, Name, *SessionSettings);
+			
 		}
 	}
 }
 
 void URolexGameInstance::OnCreateSession(FName SessionName, bool bWasSuccessful)
 {
+	if (bWasSuccessful)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Create Session Success"));
+		GetWorld()->ServerTravel(TEXT("Game/Rolex/Maps/Main?listen"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Create Session Failed"));
+	}
 }
 
 void URolexGameInstance::FindSession()
@@ -46,12 +62,13 @@ void URolexGameInstance::FindSession()
 	if (OnlineSubsystem)
 	{
 		if (SessionInterface.IsValid())
-		{
-			TArray<FOnlineSessionSearchResult> SessionSearchResults;
+		{			
+			SearchSettings = MakeShared<FOnlineSessionSearch>();
+			SearchSettings->bIsLanQuery = false;
+			SearchSettings->MaxSearchResults = 100;
+			SearchSettings->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 			
-			FOnlineSessionSearch SearchSettings;
-			SearchSettings.MaxSearchResults = 5;
-			SearchSettings.QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+			SessionInterface->FindSessions(0, SearchSettings.ToSharedRef());
 		}
 	}
 }
@@ -60,6 +77,15 @@ void URolexGameInstance::OnFindSession(bool bWasSuccessful)
 {
 	if (bWasSuccessful)
 	{
+		auto results = SearchSettings->SearchResults;
+
+		for (int32 i = 0; i < results.Num(); i++)
+		{
+			FOnlineSessionSearchResult SearchResult = results[i];
+			FString OwnerName = SearchResult.Session.OwningUserName;
+			//FString SessionName = SearchResult.Session.
+				
+		}
 		
 	}
 }

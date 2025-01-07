@@ -18,6 +18,9 @@ class ROLEXPROJECT_API ULobbyUI : public UUserWidget
 
 public:
 	class URolexGameInstance* RolexGameInstace;
+
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* RoomName;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UButton* CreateSessionBtn;
