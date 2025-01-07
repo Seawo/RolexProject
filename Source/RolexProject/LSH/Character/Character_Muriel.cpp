@@ -58,7 +58,7 @@ void ACharacter_Muriel::Tick(float DeltaTime)
 
 	if (bIsESkillCharge)
 	{
-		ESkillSpawnRotation = SetAimDirection(this, ESkillSpawnLocation);
+		ESkillSpawnRotation = FRotator(0.0f, SetAimDirection(this, ESkillSpawnLocation).Yaw,0.0f);
 
 		//UE_LOG(LogTemp, Warning, TEXT("ESkillSpawnLocation : %s"), *ESkillSpawnLocation.ToString());
 	}
@@ -106,11 +106,11 @@ void ACharacter_Muriel::ChangeAttackState(EAttackState state)
 
 		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("QSkill"));
 		// 쿨타임
-		//if (QSkillCoolTime > 0)
+		//if (Data.QSkillCoolTime > 0)
 		//{
 		//	return;
 		//}
-		//QSkillCoolTime = 60.0f;
+		//Data.QSkillCoolTime = QSkillRefillTiem;
 
 		bIsSearchQSkill = true;
 		
@@ -125,51 +125,15 @@ void ACharacter_Muriel::ChangeAttackState(EAttackState state)
 
 		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("ESkill"));
 		// 쿨타임
-		//if (ESkillCoolTime > 0)
+		//if (Data.ESkillCoolTime > 0)
 		//{
 		//	return;
 		//}
-		//ESkillCoolTime = 20.0f;
+		//Data.ESkillCoolTime = ESkillRefillTiem;
 		
 		bIsESkillCharge = true;
 
 		NearTeamCharacter = nullptr;
-
-		// 월드 상 캐릭터 탐색
-		//TArray<AActor*> characters;
-		//float distance = 100000.0f;
-		//UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), characters);
-		//for (AActor* character : characters)
-		//{
-		//	ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(character);
-		//	if (baseCharacter and baseCharacter->Data.Team == Data.Team and baseCharacter != this)
-		//	{
-		//		float dist = FVector::Dist(GetActorLocation(), baseCharacter->GetActorLocation());
-		//
-		//		// 최대 사거리가 1000.0f일때
-		//		if (dist <= 1000.0f)
-		//		{
-		//			// 가장 가까운 캐릭터 찾기
-		//			if (dist <= distance)
-		//			{
-		//				distance = dist;
-		//				NearTeamCharacter = baseCharacter;
-		//			}
-		//		}
-		//	}
-		//}
-		//if (NearTeamCharacter)
-		//{
-		//	UE_LOG(LogTemp, Warning, TEXT("NearTeamCharacter : %s"), *NearTeamCharacter->GetName());
-		//
-		//	// 캐릭터의 방향을 Target쪽으로 변경하기
-		//	FRotator rot = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), NearTeamCharacter->GetActorLocation());
-		//	SetActorRotation(rot);
-		//}
-		//else
-		//{
-		//	UE_LOG(LogTemp, Warning, TEXT("NearTeamCharacter is nullptr"));
-		//}
 		
 
 		// Montage
@@ -192,11 +156,11 @@ void ACharacter_Muriel::ChangeAttackState(EAttackState state)
 		if (bIsRMBCharging) return;
 		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("RMB"));
 		// 쿨타임
-		//if (RMBSkillCoolTime > 0)
+		//if (Data.RMBCoolTime > 0)
 		//{
 		//	return;
 		//}
-		//RMBSkillCoolTime = 5.0f;
+		//Data.RMBCoolTime = RMBRefillTiem;
 		bIsRMBCharging = true;
 		// Montage
 		PlayAttackMontage("RMB", 1.0f, "RMBStart");
@@ -468,7 +432,7 @@ void ACharacter_Muriel::UpdateQSkillMovement(float DeltaTime)
 {
 	FVector currentLocation = GetActorLocation();
 	//UE_LOG(LogTemp, Warning, TEXT("AttackState : %d"), static_cast<int>(AttackState));
-	
+
 	if (QSkillMovement == EQkillMovement::Ascending)
 	{
 		//GetCharacterMovement()->GravityScale = 0.0f;
@@ -494,12 +458,12 @@ void ACharacter_Muriel::UpdateQSkillMovement(float DeltaTime)
 		{
 			currentLocation = horizontalTargetLocation;
 			QSkillMovement = EQkillMovement::Descending;
-			
+
 		}
 	}
 	else if (QSkillMovement == EQkillMovement::Descending)
 	{
-		currentLocation.Z -= QSkillVerticalSpeed *2.0f * DeltaTime;
+		currentLocation.Z -= QSkillVerticalSpeed * 2.0f * DeltaTime;
 		if (currentLocation.Z <= QSkillTargetLocation.Z)
 		{
 			currentLocation.Z = QSkillTargetLocation.Z;
@@ -538,8 +502,11 @@ void ACharacter_Muriel::UpdateQSkillSearchPlayer()
 	FHitResult hitResult;
 	FVector target;
 
+	TArray<TEnumAsByte<EObjectTypeQuery>> objectTypes;
+	objectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+
 	TArray<FHitResult> hitResults;
-	if (GetWorld()->LineTraceMultiByChannel(hitResults, start, end, ECollisionChannel::ECC_Pawn, params))
+	if (GetWorld()->LineTraceMultiByObjectType(hitResults, start, end, FCollisionObjectQueryParams(objectTypes), params))
 	{
 		for (auto& hit : hitResults)
 		{
@@ -553,6 +520,20 @@ void ACharacter_Muriel::UpdateQSkillSearchPlayer()
 			}
 		}
 	}
+	//if (GetWorld()->LineTraceMultiByChannel(hitResults, start, end, ECollisionChannel::ECC_Pawn, params))
+	//{
+	//	for (auto& hit : hitResults)
+	//	{
+	//		ABaseCharacter* character = Cast<ABaseCharacter>(hit.GetActor());
+	//		if (character and character->Data.Team == Data.Team)
+	//		{
+	//			target = hit.ImpactPoint;
+
+	//			QSkillStartLocation = GetActorLocation();
+	//			QSkillTargetLocation = character->GetActorLocation();
+	//		}
+	//	}
+	//}
 
 
 	/*if (GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_Pawn, params))

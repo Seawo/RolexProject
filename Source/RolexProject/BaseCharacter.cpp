@@ -79,6 +79,7 @@ void ABaseCharacter::Tick(float DeltaTime)
 	// 쿨타임 업데이트
 	UpdateCoolTime(DeltaTime);
 
+
 	// 실드 5초간 활성화, 5초 후 비활성화
 	if (bIsShield)
 	{
