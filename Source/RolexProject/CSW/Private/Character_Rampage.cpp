@@ -14,6 +14,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "Net/UnrealNetwork.h"
+
 ACharacter_Rampage::ACharacter_Rampage()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -36,6 +38,7 @@ ACharacter_Rampage::ACharacter_Rampage()
 	MaxCnt = 5;
 	ComboCnt = 0;
 	ComboResetDelay = 1.5f;
+	
 
 }
 
@@ -107,6 +110,12 @@ void ACharacter_Rampage::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		characterInput->BindAction(IA_E, ETriggerEvent::Started, this, &ACharacter_Rampage::InputAttack);
 		characterInput->BindAction(IA_LBM, ETriggerEvent::Started, this, &ACharacter_Rampage::InputAttack);
 		characterInput->BindAction(IA_RBM, ETriggerEvent::Started, this, &ACharacter_Rampage::InputAttack);
+
+		// Completed
+		characterInput->BindAction(IA_Q, ETriggerEvent::Completed, this, &ACharacter_Rampage::OutputNone);
+		characterInput->BindAction(IA_E, ETriggerEvent::Completed, this, &ACharacter_Rampage::OutputNone);
+		characterInput->BindAction(IA_LBM, ETriggerEvent::Completed, this, &ACharacter_Rampage::OutputNone);
+		characterInput->BindAction(IA_RBM, ETriggerEvent::Completed, this, &ACharacter_Rampage::OutputNone);
 	}
 }
 
@@ -136,13 +145,79 @@ void ACharacter_Rampage::ChangeAttackState(EAttackState state)
 }
 
 
+void ACharacter_Rampage::Server_ChangeAttackState_Implementation(EAttackState attackState)
+{
+	Multi_ChangeAttackState(attackState);
+
+}
+
+void ACharacter_Rampage::Multi_ChangeAttackState_Implementation(EAttackState attackState)
+{
+	switch (attackState)
+	{
+	case EAttackState::QSkill:
+		PlayAnimMontage(AttackMontages[TEXT("Q")], 0.8f);
+		break;
+	case EAttackState::ESkill:
+		PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f);
+		break;
+	case EAttackState::LMB:
+		break;
+	case EAttackState::RMB:
+		PlayAnimMontage(AttackMontages[TEXT("RBM")], 0.8f);
+		break;
+	case EAttackState::QSkill_Completed:
+		break;
+	case EAttackState::ESkill_Completed:
+		break;
+	case EAttackState::LMB_Completed:
+		break;
+	case EAttackState::RMB_Completed:
+		break;
+	case EAttackState::Combo1:
+		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, FName("Attack_1"));
+		break;
+	case EAttackState::Combo2:
+		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, FName("Attack_2"));
+		break;
+	case EAttackState::Combo3:
+		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, FName("Attack_3"));
+		break;
+	case EAttackState::Combo4:
+		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, FName("Attack_4"));
+		break;
+	default:
+		break;
+	}
+}
+
 void ACharacter_Rampage::InputAttack(const FInputActionValue& inputValue)
 {
+	for (const TPair<FString, UAnimMontage*>& Pair : AttackMontages)
+	{
+		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(Pair.Value))
+		{
+			return;
+		}
+	}
+
 	int inputVector = inputValue.Get<float>();
 	inputVector--;
 	CurrAttackState = static_cast<EAttackState>(inputVector);
 	ChangeAttackState(CurrAttackState);
+
+	if (HasAuthority())
+	{
+		Server_ChangeAttackState(CurrAttackState);
+	}
+	else
+	{
+		Server_ChangeAttackState(CurrAttackState);
+	}
+
 }
+
+
 
 void ACharacter_Rampage::InputJump()
 {
@@ -186,12 +261,17 @@ void ACharacter_Rampage::LBMAttack()
 			return; // 공격 애니메이션이 재생 중이라면 더 이상 애니메이션을 받지 않음
 		}
 
+		int32 index = ComboCnt + static_cast<int32>(EAttackState::Combo1);
+		CurrAttackState = static_cast<EAttackState>(index);
 
 		ComboCnt++;
+
 
 		FName sectionName = FName("Attack_" + FString::FromInt(ComboCnt));
 		// AttackMontages
 		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, *sectionName.ToString());
+
+
 
 		//UE_LOG(LogTemp, Warning, TEXT("Playing section : %s"), *sectionName.ToString());
 
@@ -259,6 +339,39 @@ void ACharacter_Rampage::EAttack()
 		return; 
 
 	bIsDashing = true;
+
+	if (HasAuthority())
+	{
+		Server_DashCheck(bIsDashing);
+	}
+	else
+	{
+		Server_DashCheck(bIsDashing);
+	}
+
+}
+
+void ACharacter_Rampage::OutputNone(const struct FInputActionValue& inputValue)
+{
+	int inputVector = inputValue.Get<float>();
+	inputVector = 4; // Completed를 위한 아무 숫자 ( 4, 5, 6, 7 중 하나 )
+	CurrAttackState = static_cast<EAttackState>(inputVector);
+	ChangeAttackState(CurrAttackState);
+
+	if (!HasAuthority())
+	{
+		Server_ChangeAttackState(CurrAttackState);
+	}
+}
+
+void ACharacter_Rampage::Server_DashCheck_Implementation(bool bIsDash)
+{
+	Multi_DashCheck(bIsDash);
+}
+
+void ACharacter_Rampage::Multi_DashCheck_Implementation(bool bIsDash)
+{
+	bIsDashing = bIsDash;
 	ElapsedTime = 0.0f;
 
 	// Record the starting position and direction
@@ -271,20 +384,52 @@ void ACharacter_Rampage::EAttack()
 	// Set a timer to end the dash
 	GetWorld()->GetTimerManager().SetTimer(DashTimerHandle, FTimerDelegate::CreateLambda(
 		[this]()
-		{ 
+		{
 			bIsDashing = false;
+
 
 			SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
 
 			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-		}), 
+		}),
 		DashDuration, false);
-
 }
 
 void ACharacter_Rampage::CreateStone()
 {
 	if (!StoneClass) return;
+
+
+	if (HasAuthority())
+	{
+		Server_CreateStone();
+	}
+	else
+	{
+		Server_CreateStone();
+	}
+
+}
+
+void ACharacter_Rampage::ThrowStone()
+{
+
+	if (Stone)
+	{
+		// 소켓에서 불리
+		Stone->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+		// 던지기
+		FVector throwdir = GetActorForwardVector();
+		Stone->InititalizeThrowStone(throwdir, 3000.0f);
+
+		SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
+
+	}
+}
+
+void ACharacter_Rampage::Server_CreateStone_Implementation()
+{
 
 	USkeletalMeshComponent* skeletalMesh = GetMesh();
 
@@ -305,37 +450,6 @@ void ACharacter_Rampage::CreateStone()
 	{
 		// 소켓의 부착
 		Stone->AttachToComponent(skeletalMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_r"));
-	}
-
-}
-
-void ACharacter_Rampage::ThrowStone()
-{
-
-	if (Stone)
-	{
-		// 소켓에서 불리
-		Stone->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-
-		// 던지기
-		FVector throwdir = GetActorForwardVector();
-		Stone->InititalizeThrowStone(throwdir, 3000.0f);
-
-		SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
-
-
-		/*
-		FVector throwDir = GetActorForwardVector() * 3000.0f;
-		UStaticMeshComponent* meshComp = Stone->FindComponentByClass< UStaticMeshComponent>();
-		if (meshComp && meshComp->IsSimulatingPhysics())
-		{
-			meshComp->AddImpulse(throwDir, NAME_None, true);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("MeshComp is not simulating physics!"));
-		}
-		*/
 	}
 
 }

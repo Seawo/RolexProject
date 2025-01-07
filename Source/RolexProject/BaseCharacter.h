@@ -29,6 +29,10 @@ enum class EAttackState : uint8
 	ESkill_Completed,
 	LMB_Completed,
 	RMB_Completed,
+	Combo1,
+	Combo2,
+	Combo3,
+	Combo4
 };
 
 UENUM(BlueprintType)

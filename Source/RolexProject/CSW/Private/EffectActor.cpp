@@ -51,6 +51,8 @@ void AEffectActor::BeginPlay()
 	
 	SetReplicates(true);
 	SetReplicatingMovement(true);
+	
+
 
 	if (bIsDamage)
 	{

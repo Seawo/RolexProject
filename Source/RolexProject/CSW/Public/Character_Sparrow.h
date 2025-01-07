@@ -29,13 +29,10 @@ class ROLEXPROJECT_API ACharacter_Sparrow : public ABaseCharacter
 	//virtual void ChangeState(EMoveState state) override;
 	virtual void InputAttack(const struct FInputActionValue& inputValue) override;
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
 public:
 	/*
 	LBM, RBM, Q, E
 	*/
-	UPROPERTY(ReplicatedUsing = OnRep_ChangeAttackState)
 	EAttackState CurrAttackState;
 
 
@@ -66,8 +63,8 @@ public:
 	void AimOffsetQ();
 	void ShootingArrowQ();
 
-	UFUNCTION()
-	void OnRep_ChangeAttackState();
+	UFUNCTION(Server, Reliable)
+	void Server_SpawnQEffect(FVector pos);
 
 	UFUNCTION(Server, Reliable)
 	void Server_ChangeAttackState(EAttackState attackState);
@@ -112,6 +109,9 @@ private:
 	void EAttack();
 
 	// spawnArrow
+	UFUNCTION(Server, Reliable)
+	void Server_SpawnArrow(FName arrowName);
+
 	void SpawnArrow(FName arrowName);
 	void SpawnCharge(FName chargeName);
 };

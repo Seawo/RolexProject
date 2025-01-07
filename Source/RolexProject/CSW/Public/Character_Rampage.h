@@ -24,11 +24,16 @@ class ROLEXPROJECT_API ACharacter_Rampage : public ABaseCharacter
 	virtual void ChangeAttackState(EAttackState state) override;
 	//virtual void ChangeState(EMoveState state) override;
 	virtual void InputAttack(const struct FInputActionValue& inputValue) override;
+	
+	//virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	
 
 public:
 	/*
 	LBM, RBM, Q, E 
 	*/
+	/*UPROPERTY(ReplicatedUsing = OnRep_ChangeAttackState)*/
 	EAttackState CurrAttackState;
 
 	UPROPERTY(EditAnywhere)
@@ -36,9 +41,21 @@ public:
 	
 	class AEffectActor* Stone;
 
+
+	UFUNCTION(Server, Reliable)
+	void Server_ChangeAttackState(EAttackState attackState);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multi_ChangeAttackState(EAttackState attackState);
+
+
 	// Q 
 	void CreateStone();
 	void ThrowStone();
+
+
+	UFUNCTION(Server, Reliable)
+	void Server_CreateStone();
+
 
 private:
 	bool bIsRun = true;
@@ -68,6 +85,13 @@ private:
 	void RBMAttack();
 	void QAttack();
 	void EAttack();
+	void OutputNone(const struct FInputActionValue& inputValue);
+
+	UFUNCTION(Server, Reliable)
+	void Server_DashCheck(bool bIsDash);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multi_DashCheck(bool bIsDash);
+
 
 
 };
