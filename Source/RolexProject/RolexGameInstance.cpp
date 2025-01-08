@@ -33,15 +33,19 @@ void URolexGameInstance::CreateSession(FName Name)
 {
 	if (OnlineSubsystem)
 	{
+		FName SubsystemName = OnlineSubsystem->GetSubsystemName();
+		UE_LOG(LogTemp, Warning, TEXT("Subsystem Name: %s"), *SubsystemName.ToString());
+		
 		if (SessionInterface.IsValid())
 		{
 			SessionSettings = MakeShareable(new FOnlineSessionSettings());
 			SessionSettings->bIsLANMatch = false;
-			SessionSettings->bUsesPresence = true; 
-			SessionSettings->NumPublicConnections = 5;
+			SessionSettings->bUseLobbiesIfAvailable = true;
+			//SessionSettings->bUsesPresence = true; 
+			SessionSettings->NumPublicConnections = 4;
 			SessionSettings->bShouldAdvertise = true;
 			SessionSettings->bAllowJoinInProgress = true;
-			SessionSettings->bAllowJoinViaPresence = false;
+			//SessionSettings->bAllowJoinViaPresence = false;
 
 			// custom information
 			SessionSettings->Set(TEXT("RoomName"), Name.ToString(), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
@@ -88,6 +92,8 @@ void URolexGameInstance::OnFindSession(bool bWasSuccessful)
 {
 	if (bWasSuccessful)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("FindSession Succeed"));
+		UE_LOG(LogTemp, Warning, TEXT("Number of search results: %d"), SessionSearched->SearchResults.Num());
 		auto results = SessionSearched->SearchResults;
 
 		for (int32 i = 0; i < results.Num(); i++)
@@ -105,6 +111,10 @@ void URolexGameInstance::OnFindSession(bool bWasSuccessful)
 			
 			AddSession.ExecuteIfBound(i, OwnerName, SessionName);
 		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("FindSession Failed"));
 	}
 }
 
