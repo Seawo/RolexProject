@@ -153,7 +153,7 @@ void ABaseCharacter::ModifyShield(int shield)
 	// 실드가 0 이하라면 리턴
 	if(shield < 0) return;
 	// 비활성화 중일때 리턴
-	if (not bIsShield) return;
+	//if (not bIsShield) return;
 
 	bIsShield = true;
 	ShieldTime = 5.0f;

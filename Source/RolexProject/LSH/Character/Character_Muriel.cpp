@@ -56,12 +56,10 @@ void ACharacter_Muriel::Tick(float DeltaTime)
 		}
 	}
 
-	if (bIsESkillCharge)
-	{
-		ESkillSpawnRotation = FRotator(0.0f, SetAimDirection(this, ESkillSpawnLocation).Yaw,0.0f);
-
-		//UE_LOG(LogTemp, Warning, TEXT("ESkillSpawnLocation : %s"), *ESkillSpawnLocation.ToString());
-	}
+	//if (bIsESkillCharge)
+	//{
+	//	ESkillSpawnRotation = FRotator(0.0f, SetAimDirection(this, ESkillSpawnLocation).Yaw,0.0f);
+	//}
 
 	if (bIsSearchQSkill)
 	{
@@ -91,6 +89,7 @@ void ACharacter_Muriel::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		characterInput->BindAction(IA_Q, ETriggerEvent::Started, this, &ACharacter_Muriel::InputAttack);
 		characterInput->BindAction(IA_Q, ETriggerEvent::Completed, this, &ACharacter_Muriel::MurielQSkillComplete);
 		characterInput->BindAction(IA_E, ETriggerEvent::Started, this, &ACharacter_Muriel::InputAttack);
+		characterInput->BindAction(IA_ERotate, ETriggerEvent::Started, this, &ACharacter_Muriel::MurielESkillRotate);
 		characterInput->BindAction(IA_E, ETriggerEvent::Completed, this, &ACharacter_Muriel::MurielESkillComplete);
 		characterInput->BindAction(IA_LBM, ETriggerEvent::Started, this, &ACharacter_Muriel::InputAttack);
 		characterInput->BindAction(IA_RBM, ETriggerEvent::Started, this, &ACharacter_Muriel::InputAttack);
@@ -256,7 +255,7 @@ void ACharacter_Muriel::MurielJump()
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
 
 	// Fly몽타주 재생
-	PlayStateMontage("Fly", 1.0f);
+	//PlayStateMontage("Fly", 1.0f);
 }
 
 void ACharacter_Muriel::MurielRMBEnd()
@@ -281,20 +280,13 @@ void ACharacter_Muriel::MurielQSkillComplete()
 		return;
 	}
 
-	// 멈춰놨던 몽타주 다시 실행하기
+	// 몽타주 실행하기
 	PlayAttackMontage("Q", 1.0f, "QSkillFire");
-	//AnimInstance->Montage_Resume(AttackMontages["Q"]);
-
-	//Jump(); // 땅에서 떨어뜨리기 위해
-	//SetActorLocation(GetActorLocation() + FVector(0, 0, 100.0f));
 
 	// QSkill 몽타주를 Tick에서 플레이어의 이동처리 해주기 위한 bool값 true로 변경
 	bStartQSkill = true;
-	// 중력의 초기값 담아주기
-	//DefaultGravityScale = GetCharacterMovement()->GravityScale;
 	// QSkill 이동 상태를 시작단계로 변경
 	QSkillMovement = EQkillMovement::Ascending;
-	//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
 }
 
 void ACharacter_Muriel::MurielESkillComplete()
@@ -306,7 +298,29 @@ void ACharacter_Muriel::MurielESkillComplete()
 
 	// Montage 실행
 	PlayAttackMontage("E", 1.0f, "ESkillFire");
+
+	ESkillSpawnRotation = FRotator(0.0f, SetAimDirection(this, ESkillSpawnLocation).Yaw + ESkillRotationYaw, 0.0f);
 	SpawnEffect("None", "ESkill");
+}
+
+void ACharacter_Muriel::MurielESkillRotate()
+{
+	// T키 Input함수
+	// E스킬 차징중에 벽의 Rotation을 90도씩 변경시키기 위한 함수
+	
+	// E스킬 차징중이 아니라면 리턴
+	if (not bIsESkillCharge) return;
+
+	bIsESkillRotate = !bIsESkillRotate;
+
+	if (bIsESkillRotate)
+	{
+		ESkillRotationYaw += 90.0f;
+	}
+	else
+	{
+		ESkillRotationYaw -= 90.0f;
+	}
 }
 
 void ACharacter_Muriel::PlayAttackMontage(FString Key, float InPlayRate, FName StartSectionName)
@@ -339,24 +353,6 @@ void ACharacter_Muriel::PlayAttackMontage(FString Key, float InPlayRate, FName S
 	}
 }
 
-void ACharacter_Muriel::PlayStateMontage(FString Key, float InPlayRate, FName StartSectionName)
-{
-	if (stateMontages.Contains(Key))
-	{
-		// stateMontages에 있는 몽타주가 실행중이라면 리턴
-		for (auto& mon : stateMontages)
-		{
-			if (AnimInstance->Montage_IsPlaying(mon.Value))
-			{
-				return;
-			}
-		}
-
-		UAnimMontage* montage = stateMontages[Key];
-		PlayAnimMontage(montage, InPlayRate);
-	}
-}
-
 void ACharacter_Muriel::SpawnEffect(FName socketName, FName key)
 {
 	if (EffectMap.Contains(key))
@@ -368,7 +364,7 @@ void ACharacter_Muriel::SpawnEffect(FName socketName, FName key)
 			FRotator rot;
 			AActor_Effect* effect;
 
-
+			// 각 스킬마다의 위치값과 회전값을 설정
 			if (key == "ESkill")
 			{
 				socketLocation = ESkillSpawnLocation;
@@ -376,7 +372,8 @@ void ACharacter_Muriel::SpawnEffect(FName socketName, FName key)
 			}
 			else if (key == "QSkill")
 			{
-
+				socketLocation = GetActorLocation();
+				rot = FRotator::ZeroRotator;
 			}
 			else // LMB RMB
 			{
@@ -395,12 +392,14 @@ void ACharacter_Muriel::SpawnEffect(FName socketName, FName key)
 			}
 			
 
+			// 각 설정된 위치값과 회전값을 바탕으로 이펙스 생성
 			effect = GetWorld()->SpawnActorDeferred<AActor_Effect>(
 				effectClass,
 				FTransform(rot, socketLocation),
 				this);
 			if (effect)
 			{
+				// 좌클릭 우클릭일 경우에는 무슨 스킬인지 확인하기 위한 조건문
 				if (key == "LMB")
 				{
 					effect->SetIsLMB(true);
@@ -431,21 +430,20 @@ void ACharacter_Muriel::UpdateFlyCoolTime(float DeltaTime)
 void ACharacter_Muriel::UpdateQSkillMovement(float DeltaTime)
 {
 	FVector currentLocation = GetActorLocation();
-	//UE_LOG(LogTemp, Warning, TEXT("AttackState : %d"), static_cast<int>(AttackState));
 
+	// 수직 상승 중일때
 	if (QSkillMovement == EQkillMovement::Ascending)
 	{
-		//GetCharacterMovement()->GravityScale = 0.0f;
-
 		currentLocation.Z += QSkillVerticalSpeed * DeltaTime;
 
-		if (currentLocation.Z >= ZHeight)		//	currentLocation.Z가 ZHeight에 도달하면
+		if (currentLocation.Z >= ZHeight)		//	수직 상승 중에 수평이동 시작할 위치에 도착했다면
 		{
 			currentLocation.Z = ZHeight;
 			QSkillMovement = EQkillMovement::MovingHorizontally;
 			PlayAttackMontage("Q", 1.0f, "QSkillDescending");
 		}
 	}
+	// 수평 이동 중일때
 	else if (QSkillMovement == EQkillMovement::MovingHorizontally)
 	{
 		FVector horizontalTargetLocation = FVector(QSkillTargetLocation.X + 200.0f, QSkillTargetLocation.Y, ZHeight);
@@ -454,18 +452,22 @@ void ACharacter_Muriel::UpdateQSkillMovement(float DeltaTime)
 
 		currentLocation += horizontalDirection * QSkillHorizontalSpeed * DeltaTime;
 
-		if (FVector::Dist2D(currentLocation, horizontalTargetLocation) <= 300.0f)
+		if (FVector::Dist2D(currentLocation, horizontalTargetLocation) <= 300.0f) // 수평 이동중에 수직 하강 위치에 도착했다면
 		{
 			currentLocation = horizontalTargetLocation;
 			QSkillMovement = EQkillMovement::Descending;
 
 		}
 	}
+	// 수직 하강 중일때
 	else if (QSkillMovement == EQkillMovement::Descending)
 	{
 		currentLocation.Z -= QSkillVerticalSpeed * 2.0f * DeltaTime;
-		if (currentLocation.Z <= QSkillTargetLocation.Z)
+		if (currentLocation.Z <= QSkillTargetLocation.Z) // 착지지점에 도착했다면
 		{
+			SpawnEffect("None", "QSkill");
+
+
 			currentLocation.Z = QSkillTargetLocation.Z;
 			currentLocation = FVector(QSkillTargetLocation.X + 200.0f, QSkillTargetLocation.Y, QSkillTargetLocation.Z);
 
@@ -474,6 +476,7 @@ void ACharacter_Muriel::UpdateQSkillMovement(float DeltaTime)
 			PlayAttackMontage("Q", 1.0f, "QSkillLand");
 		}
 	}
+	// 착지 상태일때
 	else if (QSkillMovement == EQkillMovement::Idle)
 	{
 		bStartQSkill = false;
@@ -487,8 +490,6 @@ void ACharacter_Muriel::UpdateQSkillMovement(float DeltaTime)
 void ACharacter_Muriel::UpdateQSkillSearchPlayer()
 {
 	QSkillTargetLocation = FVector::ZeroVector;
-	//FVector target;
-	//SetAimDirection(this, target);
 
 	// LineTrace 쏘기
 	// 카메라 rotator값 가져오기
@@ -520,36 +521,9 @@ void ACharacter_Muriel::UpdateQSkillSearchPlayer()
 			}
 		}
 	}
-	//if (GetWorld()->LineTraceMultiByChannel(hitResults, start, end, ECollisionChannel::ECC_Pawn, params))
-	//{
-	//	for (auto& hit : hitResults)
-	//	{
-	//		ABaseCharacter* character = Cast<ABaseCharacter>(hit.GetActor());
-	//		if (character and character->Data.Team == Data.Team)
-	//		{
-	//			target = hit.ImpactPoint;
-
-	//			QSkillStartLocation = GetActorLocation();
-	//			QSkillTargetLocation = character->GetActorLocation();
-	//		}
-	//	}
-	//}
-
-
-	/*if (GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_Pawn, params))
-	{
-		ABaseCharacter* character = Cast<ABaseCharacter>(hitResult.GetActor());
-		if (character and character->Data.Team == Data.Team)
-		{
-			target = hitResult.ImpactPoint;
-
-			QSkillStartLocation = GetActorLocation();
-			QSkillTargetLocation = character->GetActorLocation();
-		}
-	}*/
 
 	UE_LOG(LogTemp, Warning, TEXT("QSkillTargetLocation : %s"), *QSkillTargetLocation.ToString());
 
 	DrawDebugPoint(GetWorld(), target, 5.0f, FColor::Green, false, 0.1f);
-	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 5.0f, 0, 1.0f);
+	//DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 5.0f, 0, 1.0f);
 }

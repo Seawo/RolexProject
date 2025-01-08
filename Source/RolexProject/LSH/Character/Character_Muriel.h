@@ -44,11 +44,10 @@ class ROLEXPROJECT_API ACharacter_Muriel : public ABaseCharacter
 	void MurielRMBEnd();								// RMB 입력완료
 	void MurielQSkillComplete();						// Q스킬 입력완료
 	void MurielESkillComplete();						// E스킬 입력완료
-
+	void MurielESkillRotate();							// E스킬 회전
 
 	// 몽타주 실행함수
 	void PlayAttackMontage(FString Key, float InPlayRate = 1.0f, FName StartSectionName = NAME_None);
-	void PlayStateMontage(FString Key, float InPlayRate = 1.0f, FName StartSectionName = NAME_None);
 
 
 	void UpdateFlyCoolTime(float DeltaTime);			// 쿨타임 업데이트 함수(Tick)
@@ -69,16 +68,22 @@ public:
 
 /**변수들*/
 private:
+	UPROPERTY(EditAnywhere, Category = "Input")
+	class UInputAction* IA_ERotate;
+
+
 	class UAnimInstance_Muriel* AnimInstance;				// 에니메이션 인스턴스
 	class ABaseCharacter* NearTeamCharacter;				// 가까운 팀 캐릭터
 
 	float SlopeForwardAngle = 0.0f;
 	float FlyingTime = 7.0f;								// 공중에 떠있는 시간 (5초)
 	float DefaultGravityScale = 1.0f;						// 기본 중력 스케일
+	float ESkillRotationYaw = 0.0f;							// E스킬 Yaw값
 
 	bool bIsRMBCharging = false;							// RMB 충전중인지 여부
 	bool bIsSearchQSkill = false;							// Q스킬 찾는중인지
 	bool bIsESkillCharge = false;							// Q스킬 차징중인지
+	bool bIsESkillRotate = false;							// E스킬 회전중인지
 
 	bool bLShift = true;									// 쉬프트를 눌렀는지
 	bool bIsPushSpaceBar = false;							// 스페이스바를 눌렀는지 ( 눌렀으면 공중에 떠오르기)

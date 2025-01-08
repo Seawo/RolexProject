@@ -4,6 +4,7 @@
 #include "LSH/Actor_StartPoint.h"
 
 #include "Components/BoxComponent.h"
+#include "BaseCharacter.h"
 
 // Sets default values
 AActor_StartPoint::AActor_StartPoint()
@@ -22,6 +23,8 @@ void AActor_StartPoint::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AActor_StartPoint::OnOverlapBegin);
+	BoxComponent->OnComponentEndOverlap.AddDynamic(this, &AActor_StartPoint::OnOverlapEnd);
 }
 
 // Called every frame
@@ -38,5 +41,25 @@ FVector AActor_StartPoint::SpawnPoint()
 	FVector SpawnLocation = GetActorLocation() + FVector(random, random, 0);
 
 	return SpawnLocation;
+}
+
+void AActor_StartPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
+
+	if (character and character->Data.Team == bIsATeam)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[StartPoint] OnOverlapBegin"));
+	}
+}
+
+void AActor_StartPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
+
+	if (character and character->Data.Team == bIsATeam)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[StartPoint] OnOverlapEnd"));
+	}
 }
 

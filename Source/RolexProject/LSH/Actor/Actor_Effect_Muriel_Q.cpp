@@ -4,16 +4,23 @@
 #include "LSH/Actor/Actor_Effect_Muriel_Q.h"
 
 #include "BaseCharacter.h"
+#include "Components/SphereComponent.h"
+
 
 AActor_Effect_Muriel_Q::AActor_Effect_Muriel_Q()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	HitCollision = CreateDefaultSubobject<USphereComponent>(TEXT("HitCollision"));
+	HitCollision->SetupAttachment(RootComponent);
 
 }
 
 void AActor_Effect_Muriel_Q::BeginPlay()
 {
 	Super::BeginPlay();
+
+	HitCollision->OnComponentBeginOverlap.AddDynamic(this, &AActor_Effect_Muriel_Q::OnOverlapBegin);
 }
 
 void AActor_Effect_Muriel_Q::Tick(float DeltaTime)
@@ -31,6 +38,7 @@ void AActor_Effect_Muriel_Q::OnOverlapBegin(UPrimitiveComponent* OverlappedCompo
 	if (OtherActor == this) return;
 
 	if (OtherActor == GetOwner()) return;
+
 	AActor_Effect* effect = Cast<AActor_Effect>(OtherActor);
 	if (effect)
 	{
@@ -54,4 +62,6 @@ void AActor_Effect_Muriel_Q::OnOverlapBegin(UPrimitiveComponent* OverlappedCompo
 			character->ModifyShield(1);
 		}
 	}
+
+	SetLifeSpan(0.5f);
 }
