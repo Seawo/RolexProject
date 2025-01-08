@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CreateSessionUI.h"
 #include "Blueprint/UserWidget.h"
 #include "LobbyUI.generated.h"
 
@@ -18,9 +19,6 @@ class ROLEXPROJECT_API ULobbyUI : public UUserWidget
 
 public:
 	class URolexGameInstance* RolexGameInstace;
-
-	UPROPERTY(meta = (BindWidget))
-	class UEditableTextBox* RoomName;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UButton* CreateSessionBtn;
@@ -28,6 +26,9 @@ public:
 	UFUNCTION()
 	void CreateSession();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UCreateSessionUI> CreateSessionUIFactory;
+	
 	UPROPERTY(meta = (BindWidget))
 	UButton* FindSessionBtn;
 
@@ -38,6 +39,9 @@ public:
 	class UScrollBox* SessionScrollBox;
 
 	UFUNCTION()
-	void AddSession();
+	void AddSession(int32 SessionIndex, const FString& Owner, const FString& Name);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class USessionItemUI> SessionItemUIFactory;
 	
 };

@@ -7,9 +7,20 @@
 #include "Online/OnlineSessionNames.h"
 #include "Engine/Engine.h"
 
-URolexGameInstance::URolexGameInstance()
+
+void URolexGameInstance::Init()
 {
+	Super::Init();
+
 	OnlineSubsystem = IOnlineSubsystem::Get();
+	if (OnlineSubsystem)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("OnlineSubsystem Exists"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("OnlineSubsystem does not Exists"));
+	}
 	
 	SessionInterface = OnlineSubsystem->GetSessionInterface();
 	
@@ -26,14 +37,14 @@ void URolexGameInstance::CreateSession(FName Name)
 		{
 			SessionSettings = MakeShareable(new FOnlineSessionSettings());
 			SessionSettings->bIsLANMatch = false;
-			SessionSettings->bUsesPresence = true;
+			SessionSettings->bUsesPresence = true; 
 			SessionSettings->NumPublicConnections = 5;
 			SessionSettings->bShouldAdvertise = true;
 			SessionSettings->bAllowJoinInProgress = true;
 			SessionSettings->bAllowJoinViaPresence = false;
 
 			// custom information
-			//SessionSettings.Set(TEXT("RoomName"), Name.ToString(), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+			SessionSettings->Set(TEXT("RoomName"), Name.ToString(), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 			
 			ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 			FUniqueNetIdRepl SteamNetId = *LocalPlayer->GetPreferredUniqueNetId();
@@ -49,7 +60,7 @@ void URolexGameInstance::OnCreateSession(FName SessionName, bool bWasSuccessful)
 	if (bWasSuccessful)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Create Session Success"));
-		GetWorld()->ServerTravel(TEXT("Game/Rolex/Maps/Main?listen"));
+		GetWorld()->ServerTravel(TEXT("/Game/Rolex/Map/WaitingRoom?listen"));
 	}
 	else
 	{
@@ -62,13 +73,13 @@ void URolexGameInstance::FindSession()
 	if (OnlineSubsystem)
 	{
 		if (SessionInterface.IsValid())
-		{			
-			SearchSettings = MakeShared<FOnlineSessionSearch>();
-			SearchSettings->bIsLanQuery = false;
-			SearchSettings->MaxSearchResults = 100;
-			SearchSettings->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+		{			 
+			SessionSearched = MakeShared<FOnlineSessionSearch>();
+			SessionSearched->bIsLanQuery = false;
+			SessionSearched->MaxSearchResults = 100;
+			SessionSearched->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 			
-			SessionInterface->FindSessions(0, SearchSettings.ToSharedRef());
+			SessionInterface->FindSessions(0, SessionSearched.ToSharedRef());
 		}
 	}
 }
@@ -77,29 +88,47 @@ void URolexGameInstance::OnFindSession(bool bWasSuccessful)
 {
 	if (bWasSuccessful)
 	{
-		auto results = SearchSettings->SearchResults;
+		auto results = SessionSearched->SearchResults;
 
 		for (int32 i = 0; i < results.Num(); i++)
 		{
 			FOnlineSessionSearchResult SearchResult = results[i];
+
+			FString SessionId = SearchResult.GetSessionIdStr();
+			
 			FString OwnerName = SearchResult.Session.OwningUserName;
-			//FString SessionName = SearchResult.Session.
-				
+
+			FString SessionName;
+			SearchResult.Session.SessionSettings.Get(TEXT("RoomName"), SessionName);
+
+			UE_LOG(LogTemp, Warning, TEXT("Session Found: %s"), *SessionName);
+			
+			AddSession.ExecuteIfBound(i, OwnerName, SessionName);
 		}
-		
 	}
 }
 
-void URolexGameInstance::JoinSession(int32 SessionIndex)
+void URolexGameInstance::JoinOtherSession(int32 Index, FString Name)
 {
 	if (SessionInterface)
 	{
-		TArray<FOnlineSessionSearchResult> SessionSearchResults;
-		SessionInterface->JoinSession(0, FName("SessonName"), SessionSearchResults[SessionIndex]);
+		FOnlineSessionSearchResult SearchResult = SessionSearched->SearchResults[Index];
+		SessionInterface->JoinSession(0, FName(Name), SearchResult);
 	}
 }
 
 void URolexGameInstance::OnJoinSession(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
 {
+	if (Result == EOnJoinSessionCompleteResult::Success)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Join success"));
+
+		FString ConnectInfo;
+		if (SessionInterface->GetResolvedConnectString(SessionName, ConnectInfo))
+		{
+			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+			PlayerController->ClientTravel(ConnectInfo, TRAVEL_Absolute);
+		}
+	}
 }
 

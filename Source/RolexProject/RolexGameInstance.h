@@ -9,15 +9,16 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "RolexGameInstance.generated.h"
 
-/**
- * 
- */
+
+DECLARE_DELEGATE_ThreeParams(FAddSession, int32, const FString&, const FString&);
+
 UCLASS()
 class ROLEXPROJECT_API URolexGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 
-	URolexGameInstance();
+	// called after GameInstance is initialized
+	virtual void Init() override;
 	
 public:
 	IOnlineSubsystem* OnlineSubsystem;
@@ -26,7 +27,7 @@ public:
 
 	TSharedPtr<FOnlineSessionSettings> SessionSettings;
 	
-	TSharedPtr<FOnlineSessionSearch> SearchSettings;
+	TSharedPtr<FOnlineSessionSearch> SessionSearched;
 	
 public:
 	void CreateSession(FName Name);
@@ -35,6 +36,8 @@ public:
 	void FindSession();
 	void OnFindSession(bool bWasSuccessful);
 
-	void JoinSession(int32 SessionIndex);
+	void JoinOtherSession(int32 Index, FString Name);
 	void OnJoinSession(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+
+	FAddSession AddSession;
 };

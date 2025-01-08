@@ -5,6 +5,7 @@
 
 #include "RolexGameInstance.h"
 #include "Components/Button.h"
+#include "Components/TextBlock.h"
 
 void USessionItemUI::NativeConstruct()
 {
@@ -19,5 +20,5 @@ void USessionItemUI::JoinSession()
 	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetWorld()->GetGameInstance());
 
 	if (RolexGameInstance)
-		RolexGameInstance->JoinSession(SessionIndex);
+		RolexGameInstance->JoinOtherSession(SessionIndex, RoomName->GetText().ToString());
 }
