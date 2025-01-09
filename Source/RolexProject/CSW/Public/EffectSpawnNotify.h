@@ -23,7 +23,7 @@ public:
 	class UNiagaraSystem* NiagaraEffect;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
-	class UParticleSystem* ParticleEffect;
+	UParticleSystem* ParticleEffect;
 
 
 	// 스폰 위치( 자신의 위치에서 어느정도로 할지 )

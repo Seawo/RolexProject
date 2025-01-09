@@ -56,7 +56,7 @@ void AActor_Effect_Phase_Q::UpdateLocation(float DeltaTime)
 	FVector newLoc = Phase->GetMesh()->GetSocketLocation("FX_Hand_L4");
 
 	SetActorLocation(newLoc);
-	SetActorRotation(Phase->TpsCamComp->GetForwardVector().Rotation());
+	SetActorRotation(Phase->GetBaseAimRotation());
 }
 
 void AActor_Effect_Phase_Q::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

@@ -198,17 +198,8 @@ void ACharacter_Phase::OutPutAttack(const struct FInputActionValue& inputValue)
 	int inputVector = inputValue.Get<float>();
 	inputVector = 4; // Completed를 위한 아무 숫자 ( 4, 5, 6, 7 중 하나 )
 	AttackState = static_cast<EAttackState>(inputVector);
-	//ChangeAttackState(AttackState);
+	ChangeAttackState(AttackState);
 
-	if (HasAuthority())
-	{
-		Server_ChangeAttackState(AttackState);
-	}
-	else
-	{
-		Server_ChangeAttackState(AttackState);
-		
-	}
 }
 void ACharacter_Phase::PhaseJump()
 {

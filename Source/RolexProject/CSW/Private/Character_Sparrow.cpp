@@ -90,29 +90,78 @@ void ACharacter_Sparrow::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 void ACharacter_Sparrow::ChangeAttackState(EAttackState state)
 {
 	//if (!HasAuthority())return;
-
 	switch (state)
 	{
 	case EAttackState::QSkill:
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("QSkill"));
 		QAttack();
 		break;
 	case EAttackState::ESkill:
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("ESkill"));
 		EAttack();
 		break;
 	case EAttackState::LMB:
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("LMB"));
 		LBMAttack();
 		break;
 	case EAttackState::RMB:
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("RMB"));
 		RBMAttack();
 		break;
 	default:
 		break;
 	}
+}
 
+void ACharacter_Sparrow::Multi_ChangeAttackState_Implementation(EAttackState attackState)
+{
+	FName sectionName;
+	FString EnumValue;
+
+	const UEnum* EnumPtr = StaticEnum<EAttackState>();
+	if (EnumPtr)
+	{
+		EnumValue = EnumPtr->GetNameStringByValue(static_cast<int64>(attackState));
+		UE_LOG(LogTemp, Warning, TEXT("Attack State: %s"), *EnumValue);
+
+	}
+
+	switch (attackState)
+	{
+	case EAttackState::QSkill:
+		sectionName = FName("start");
+		PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());
+		break;
+	case EAttackState::ESkill:
+		PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f);
+		break;
+	case EAttackState::LMB:
+		sectionName = FName("start");
+		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, *sectionName.ToString());
+		break;
+	case EAttackState::RMB:
+		sectionName = FName("start");
+		PlayAnimMontage(AttackMontages[TEXT("RBM")], 1.0f, *sectionName.ToString());
+		break;
+	case EAttackState::QSkill_Completed:
+		sectionName = FName("fire");
+		PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());
+		break;
+	case EAttackState::ESkill_Completed:
+		break;
+	case EAttackState::LMB_Completed:
+		sectionName = FName("fire");
+		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, *sectionName.ToString());
+		break;
+	case EAttackState::RMB_Completed:
+		sectionName = FName("fire");
+		PlayAnimMontage(AttackMontages[TEXT("RBM")], 1.0f, *sectionName.ToString());
+		break;
+	default:
+		break;
+	}
+}
+
+// 클라에서 서버
+void ACharacter_Sparrow::Server_ChangeAttackState_Implementation(EAttackState attackState)
+{
+	Multi_ChangeAttackState(attackState);
 }
 
 void ACharacter_Sparrow::InputAttack(const FInputActionValue& inputValue)
@@ -136,11 +185,7 @@ void ACharacter_Sparrow::InputAttack(const FInputActionValue& inputValue)
 	{
 		Server_ChangeAttackState(CurrAttackState);
 	}
-
-
 }
-
-
 
 void ACharacter_Sparrow::AimOffsetLBM()
 {
@@ -171,14 +216,7 @@ void ACharacter_Sparrow::ShootingArrowLBM()
 	if (bLBMIsCharging)
 	{
 		CurrAttackState = EAttackState::LMB_Completed;
-		if (!HasAuthority())
-		{
-			Server_ChangeAttackState(CurrAttackState);
-		}
-		else
-		{
-			Server_ChangeAttackState(CurrAttackState);
-		}
+		Server_ChangeAttackState(CurrAttackState);
 
 
 		bLBMIsCharging = false;
@@ -227,14 +265,7 @@ void ACharacter_Sparrow::ShootingArrowRBM()
 	if (bRBMIsCharging)
 	{
 		CurrAttackState = EAttackState::RMB_Completed;
-		if (!HasAuthority())
-		{
-			Server_ChangeAttackState(CurrAttackState);
-		}
-		else
-		{
-			Server_ChangeAttackState(CurrAttackState);
-		}
+		Server_ChangeAttackState(CurrAttackState);
 
 		bRBMIsCharging = false;
 		/*FName sectionName = FName("fire");
@@ -315,14 +346,7 @@ void ACharacter_Sparrow::ShootingArrowQ()
 	if (bQIsCharging)
 	{
 		CurrAttackState = EAttackState::QSkill_Completed;
-		if (!HasAuthority())
-		{
-			Server_ChangeAttackState(CurrAttackState);
-		}
-		else
-		{
-			Server_ChangeAttackState(CurrAttackState);
-		}
+		Server_ChangeAttackState(CurrAttackState);
 
 		bQIsCharging = false;
 		/*FName sectionName = FName("fire");
@@ -355,17 +379,6 @@ void ACharacter_Sparrow::ShootingArrowQ()
 				{
 					Server_SpawnQEffect(TargetLocation);
 				}
-				/*FActorSpawnParameters SpawnParams;
-				SpawnParams.Owner = this;
-				QEffectActor = GetWorld()->SpawnActor<AEffectActor>(QEffectActorclass, TargetLocation, FRotator::ZeroRotator, SpawnParams);
-				
-				USphereComponent* sphereComp = QEffectActor->FindComponentByClass<USphereComponent>();
-
-				if (sphereComp)
-				{
-					sphereComp->SetWorldScale3D(FVector(5, 5, 10));
-				}
-				*/
 
 				// 다시 원래대로 돌아온다
 				// 모션을 다 한뒤 마지막 함수 호출로 다시할 예정
@@ -390,60 +403,7 @@ void ACharacter_Sparrow::Server_SpawnQEffect_Implementation(FVector pos)
 	}
 }
 
-void ACharacter_Sparrow::Multi_ChangeAttackState_Implementation(EAttackState attackState)
-{
-	FName sectionName;
-	FString EnumValue;
 
-	const UEnum* EnumPtr = StaticEnum<EAttackState>();
-	if (EnumPtr)
-	{
-		EnumValue = EnumPtr->GetNameStringByValue(static_cast<int64>(attackState));
-		UE_LOG(LogTemp, Warning, TEXT("Attack State: %s"), *EnumValue);
-
-	}
-
-	switch (attackState)
-	{
-	case EAttackState::QSkill:
-		sectionName = FName("start");
-		PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());
-		break;
-	case EAttackState::ESkill:
-		PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f);
-		break;
-	case EAttackState::LMB:
-		sectionName = FName("start");
-		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, *sectionName.ToString());
-		break;
-	case EAttackState::RMB:
-		sectionName = FName("start");
-		PlayAnimMontage(AttackMontages[TEXT("RBM")], 1.0f, *sectionName.ToString());
-		break;
-	case EAttackState::QSkill_Completed:
-		sectionName = FName("fire");
-		PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());
-		break;
-	case EAttackState::ESkill_Completed:
-		break;
-	case EAttackState::LMB_Completed:
-		sectionName = FName("fire");
-		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, *sectionName.ToString());
-		break;
-	case EAttackState::RMB_Completed:
-		sectionName = FName("fire");
-		PlayAnimMontage(AttackMontages[TEXT("RBM")], 1.0f, *sectionName.ToString());
-		break;
-	default:
-		break;
-	}
-}
-
-// 클라에서 서버
-void ACharacter_Sparrow::Server_ChangeAttackState_Implementation(EAttackState attackState)
-{
-	Multi_ChangeAttackState(attackState);
-}
 
 void ACharacter_Sparrow::InputJump()
 {
@@ -496,8 +456,6 @@ void ACharacter_Sparrow::LBMAttack()
 		bLBMIsCharging = true;
 		
 		//PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, *sectionName.ToString());
-
-
 	}
 }
 

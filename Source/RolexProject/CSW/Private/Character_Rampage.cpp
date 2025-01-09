@@ -15,6 +15,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "Net/UnrealNetwork.h"
+#include "Components/SphereComponent.h"
 
 ACharacter_Rampage::ACharacter_Rampage()
 {
@@ -121,34 +122,15 @@ void ACharacter_Rampage::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 void ACharacter_Rampage::ChangeAttackState(EAttackState state)
 {
-	switch (state)
+	if (IsLocallyControlled())
 	{
-	case EAttackState::QSkill:
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("QSkill"));
-		QAttack();
-		break;
-	case EAttackState::ESkill:
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("ESkill"));
-		EAttack();
-		break;
-	case EAttackState::LMB:
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("LMB"));
-		LBMAttack();
-		break;
-	case EAttackState::RMB:
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("RMB"));
-		RBMAttack();
-		break;
-	default:
-		break;
+		Server_ChangeAttackState(state);
 	}
 }
-
 
 void ACharacter_Rampage::Server_ChangeAttackState_Implementation(EAttackState attackState)
 {
 	Multi_ChangeAttackState(attackState);
-
 }
 
 void ACharacter_Rampage::Multi_ChangeAttackState_Implementation(EAttackState attackState)
@@ -156,15 +138,16 @@ void ACharacter_Rampage::Multi_ChangeAttackState_Implementation(EAttackState att
 	switch (attackState)
 	{
 	case EAttackState::QSkill:
-		PlayAnimMontage(AttackMontages[TEXT("Q")], 0.8f);
+		QAttack();
 		break;
 	case EAttackState::ESkill:
-		PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f);
+		EAttack();
 		break;
 	case EAttackState::LMB:
+		LBMAttack();
 		break;
 	case EAttackState::RMB:
-		PlayAnimMontage(AttackMontages[TEXT("RBM")], 0.8f);
+		RBMAttack();
 		break;
 	case EAttackState::QSkill_Completed:
 		break;
@@ -173,18 +156,6 @@ void ACharacter_Rampage::Multi_ChangeAttackState_Implementation(EAttackState att
 	case EAttackState::LMB_Completed:
 		break;
 	case EAttackState::RMB_Completed:
-		break;
-	case EAttackState::Combo1:
-		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, FName("Attack_1"));
-		break;
-	case EAttackState::Combo2:
-		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, FName("Attack_2"));
-		break;
-	case EAttackState::Combo3:
-		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, FName("Attack_3"));
-		break;
-	case EAttackState::Combo4:
-		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, FName("Attack_4"));
 		break;
 	default:
 		break;
@@ -205,15 +176,6 @@ void ACharacter_Rampage::InputAttack(const FInputActionValue& inputValue)
 	inputVector--;
 	CurrAttackState = static_cast<EAttackState>(inputVector);
 	ChangeAttackState(CurrAttackState);
-
-	if (HasAuthority())
-	{
-		Server_ChangeAttackState(CurrAttackState);
-	}
-	else
-	{
-		Server_ChangeAttackState(CurrAttackState);
-	}
 
 }
 
@@ -261,16 +223,11 @@ void ACharacter_Rampage::LBMAttack()
 			return; // 공격 애니메이션이 재생 중이라면 더 이상 애니메이션을 받지 않음
 		}
 
-		int32 index = ComboCnt + static_cast<int32>(EAttackState::Combo1);
-		CurrAttackState = static_cast<EAttackState>(index);
-
 		ComboCnt++;
-
 
 		FName sectionName = FName("Attack_" + FString::FromInt(ComboCnt));
 		// AttackMontages
 		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, *sectionName.ToString());
-
 
 
 		//UE_LOG(LogTemp, Warning, TEXT("Playing section : %s"), *sectionName.ToString());
@@ -297,7 +254,6 @@ void ACharacter_Rampage::RBMAttack()
 		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(Pair.Value))
 			return;
 	}
-
 
 
 	PlayAnimMontage(AttackMontages[TEXT("RBM")], 0.8f);
@@ -340,15 +296,10 @@ void ACharacter_Rampage::EAttack()
 
 	bIsDashing = true;
 
-	if (HasAuthority())
+	if (IsLocallyControlled())
 	{
 		Server_DashCheck(bIsDashing);
 	}
-	else
-	{
-		Server_DashCheck(bIsDashing);
-	}
-
 }
 
 void ACharacter_Rampage::OutputNone(const struct FInputActionValue& inputValue)
@@ -357,11 +308,6 @@ void ACharacter_Rampage::OutputNone(const struct FInputActionValue& inputValue)
 	inputVector = 4; // Completed를 위한 아무 숫자 ( 4, 5, 6, 7 중 하나 )
 	CurrAttackState = static_cast<EAttackState>(inputVector);
 	ChangeAttackState(CurrAttackState);
-
-	if (!HasAuthority())
-	{
-		Server_ChangeAttackState(CurrAttackState);
-	}
 }
 
 void ACharacter_Rampage::Server_DashCheck_Implementation(bool bIsDash)
@@ -399,16 +345,10 @@ void ACharacter_Rampage::CreateStone()
 {
 	if (!StoneClass) return;
 
-
-	if (HasAuthority())
+	if (IsLocallyControlled())
 	{
 		Server_CreateStone();
 	}
-	else
-	{
-		Server_CreateStone();
-	}
-
 }
 
 void ACharacter_Rampage::ThrowStone()
