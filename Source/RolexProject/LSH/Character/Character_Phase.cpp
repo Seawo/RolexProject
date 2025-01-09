@@ -23,6 +23,10 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 
+#include "Net/UnrealNetwork.h"
+
+#include "EngineUtils.h"
+
 ACharacter_Phase::ACharacter_Phase()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -103,12 +107,37 @@ void ACharacter_Phase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		characterInput->BindAction(IA_E, ETriggerEvent::Started, this, &ACharacter_Phase::InputAttack);
 		characterInput->BindAction(IA_LBM, ETriggerEvent::Started, this, &ACharacter_Phase::InputAttack);
 		characterInput->BindAction(IA_RBM, ETriggerEvent::Started, this, &ACharacter_Phase::InputAttack);
+
+		// completed
+		characterInput->BindAction(IA_Q, ETriggerEvent::Completed, this, &ACharacter_Phase::OutPutAttack);
+		characterInput->BindAction(IA_E, ETriggerEvent::Completed, this, &ACharacter_Phase::OutPutAttack);
+		characterInput->BindAction(IA_LBM, ETriggerEvent::Completed, this, &ACharacter_Phase::OutPutAttack);
+		characterInput->BindAction(IA_RBM, ETriggerEvent::Completed, this, &ACharacter_Phase::OutPutAttack);
+
 	}
 }
 
 void ACharacter_Phase::ChangeAttackState(EAttackState state)
+{	
+	if (IsLocallyControlled())
+	{
+		Server_ChangeAttackState(AttackState);
+	}
+}
+
+void ACharacter_Phase::Server_ChangeAttackState_Implementation( EAttackState attackState)
 {
-	switch (state)
+	Multi_ChangeAttackState(attackState);
+}
+
+void ACharacter_Phase::Multi_ChangeAttackState_Implementation( EAttackState attackState)
+{
+	//UE_LOG(LogTemp, Warning, TEXT("GetUniqueID : %d "), GetUniqueID());
+	//UE_LOG(LogTemp, Warning, TEXT("OtherID : %d "), id);
+
+	UE_LOG(LogTemp, Warning, TEXT("Multi_ChangeAttackState called for AttackState: %d"), (int32)AttackState);
+
+	switch (attackState)
 	{
 	case EAttackState::QSkill:
 		QAttack();
@@ -122,10 +151,20 @@ void ACharacter_Phase::ChangeAttackState(EAttackState state)
 	case EAttackState::RMB:
 		RBMAttack();
 		break;
+	case EAttackState::QSkill_Completed:
+		break;
+	case EAttackState::ESkill_Completed:
+		break;
+	case EAttackState::LMB_Completed:
+		break;
+	case EAttackState::RMB_Completed:
+		break;
 	default:
 		break;
 	}
+
 }
+
 /** 플레이어 스킬 및 공격 함수들*/
 
 
@@ -140,11 +179,27 @@ void ACharacter_Phase::InputAttack(const FInputActionValue& inputValue)
 		}
 	}
 
-
 	int inputVector = inputValue.Get<float>();
 	inputVector--;
 	AttackState = static_cast<EAttackState>(inputVector);
 	ChangeAttackState(AttackState);
+
+}
+void ACharacter_Phase::OutPutAttack(const struct FInputActionValue& inputValue)
+{
+	for (auto& mon : AttackMontages)
+	{
+		if (AnimInstance->Montage_IsPlaying(mon.Value))
+		{
+			return;
+		}
+	}
+
+	int inputVector = inputValue.Get<float>();
+	inputVector = 4; // Completed를 위한 아무 숫자 ( 4, 5, 6, 7 중 하나 )
+	AttackState = static_cast<EAttackState>(inputVector);
+	ChangeAttackState(AttackState);
+
 }
 void ACharacter_Phase::PhaseJump()
 {
@@ -236,9 +291,18 @@ void ACharacter_Phase::PlayMontage(FString Key, float InPlayRate, FName StartSec
 		PlayAnimMontage(montage, InPlayRate);
 	}
 }
+
 void ACharacter_Phase::SpawnEffect(FName socketName, FName key)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("SpawnEffect"));
+	if (IsLocallyControlled())
+	{
+		Server_SpawnEffect(socketName, key);
+	}
+}
+
+
+void ACharacter_Phase::Server_SpawnEffect_Implementation(FName socketName, FName key)
+{
 
 	if (EffectMap.Contains(key))
 	{
@@ -261,20 +325,14 @@ void ACharacter_Phase::SpawnEffect(FName socketName, FName key)
 			FVector target;
 			FRotator rot = SetAimDirection(this, target, socketLocation);
 
-			// AActor_Effect생성하기
-			//AActor_Effect* ef = GetWorld()->SpawnActor<AActor_Effect>(effect, socketLocation, rot);
-			AActor_Effect* effect = GetWorld()->SpawnActorDeferred<AActor_Effect>(
-				effectClass,
-				FTransform(rot, socketLocation),
-				this);
-
-			if (effect)
-			{
-				effect->FinishSpawning(FTransform(rot, socketLocation));
-			}
+			FActorSpawnParameters spawnParams;
+			spawnParams.Owner = this;
+			AActor_Effect* effect = GetWorld()->SpawnActor<AActor_Effect>(effectClass, socketLocation, rot, spawnParams);
 		}
 	}
 }
+
+
 
 
 /**Tick 함수에서 계속 돌아가야할 함수들*/

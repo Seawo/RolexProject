@@ -88,15 +88,11 @@ void AEffectActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 
 }
 
-
-
-
 // 생성될때,
 void AEffectActor::InitializeEffect(UNiagaraSystem* niagaraSystem, FVector scale)
 {
 	if (niagaraSystem)
 	{
-		// niagara system setting
 		NiagaraComp->SetAsset(niagaraSystem);
 		NiagaraComp->SetWorldScale3D(scale);
 		NiagaraComp->Activate(true);

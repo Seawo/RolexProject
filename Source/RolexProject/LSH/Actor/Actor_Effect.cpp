@@ -10,6 +10,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Character_Phase.h"
 
+#include "Net/UnrealNetwork.h"
 // Sets default values
 AActor_Effect::AActor_Effect()
 {
@@ -22,6 +23,9 @@ AActor_Effect::AActor_Effect()
 
 	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
 	NiagaraComponent->SetupAttachment(ColComp);
+
+	bReplicates = true;
+
 }
 
 // Called when the game starts or when spawned
@@ -29,8 +33,11 @@ void AActor_Effect::BeginPlay()
 {
 	Super::BeginPlay();
 
+
+
+
 	// 나중에 변경해야할수도있음
-	Phase = Cast<ACharacter_Phase>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	Phase = Cast<ACharacter_Phase>(GetOwner());
 
 	if (NiagaraComponent)
 	{

@@ -27,9 +27,16 @@ class ROLEXPROJECT_API ACharacter_Phase : public ABaseCharacter
 	// 상태 변화 함수들
 	virtual void ChangeAttackState(EAttackState state) override;
 
+	UFUNCTION(Server, Reliable)
+	void Server_ChangeAttackState(EAttackState attackState);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multi_ChangeAttackState(EAttackState attackState);
 
 	// Input 함수들
 	virtual void InputAttack(const struct FInputActionValue& inputValue) override;
+	// OutPut 함수 None
+	void OutPutAttack(const struct FInputActionValue& inputValue);
+
 	void PhaseJump();
 	void InputLShift();							// 쉬프트 입력 
 
@@ -41,12 +48,13 @@ class ROLEXPROJECT_API ACharacter_Phase : public ABaseCharacter
 	void EAttack();
 
 
-
-
 	// 몽타주 실행 및 이펙트 생성 함수
 	void PlayMontage(FString Key, float InPlayRate = 1.0f, FName StartSectionName = NAME_None);
 public:
 	void SpawnEffect(FName socketName, FName key);
+
+	UFUNCTION(Server, Reliable)
+	void Server_SpawnEffect(FName socketName, FName key);
 
 private:
 	// Tick에서 계속 돌아가야하는 함수들
