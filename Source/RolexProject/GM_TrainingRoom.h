@@ -20,6 +20,16 @@ class ROLEXPROJECT_API AGM_TrainingRoom : public AGameModeBase
 	virtual void Tick(float DeltaTime) override;
 
 
+	UFUNCTION(NetMulticast, Reliable)
+	void Multi_SetPlayTimer(float DeltaTime);
+
+public:
+	void SetPlayTime(float time) { PlayTime += time; }
+	float GetPlayTime() { return PlayTime; }
+
+private:
+
+
 
 	bool IsActiveBsePoint = false;
 
@@ -27,6 +37,7 @@ class ROLEXPROJECT_API AGM_TrainingRoom : public AGameModeBase
 	float BasePoint = 0.0f;
 
 public:
+
 
 	UPROPERTY(VisibleAnywhere, Category = "Info")
 	TArray<class ABaseCharacter*> ATeamChracters;		// Team == true
