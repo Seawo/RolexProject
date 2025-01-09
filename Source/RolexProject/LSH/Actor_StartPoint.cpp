@@ -11,20 +11,12 @@ AActor_StartPoint::AActor_StartPoint()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-
-	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
-	RootComponent = BoxComponent;
-	BoxComponent->SetRelativeScale3D(FVector(20.0f, 20.0f, 4.0f));
 }
 
 // Called when the game starts or when spawned
 void AActor_StartPoint::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AActor_StartPoint::OnOverlapBegin);
-	BoxComponent->OnComponentEndOverlap.AddDynamic(this, &AActor_StartPoint::OnOverlapEnd);
 }
 
 // Called every frame
@@ -45,21 +37,13 @@ FVector AActor_StartPoint::SpawnPoint()
 
 void AActor_StartPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
-
-	if (character and character->Data.Team == bIsATeam)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("[StartPoint] OnOverlapBegin"));
-	}
+	Super::OnOverlapBegin(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+	UE_LOG(LogTemp, Warning, TEXT("[StartPoint] OnOverlapBegin"));
 }
 
 void AActor_StartPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
-
-	if (character and character->Data.Team == bIsATeam)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("[StartPoint] OnOverlapEnd"));
-	}
+	Super::OnOverlapEnd(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
+	UE_LOG(LogTemp, Warning, TEXT("[StartPoint] OnOverlapEnd"));
 }
 

@@ -39,34 +39,25 @@ void ACharacter_Muriel::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UpdateFlyCoolTime(DeltaTime);
+	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Blue, FString::Printf(TEXT("[Muriel] FlyGauge : %.1f"), FlyGauge));
+	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Blue, FString::Printf(TEXT("[Muriel] MovementMode : %s"), *GetCharacterMovement()->GetMovementName()));
 
-	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("gravity : %.2f"), GetCharacterMovement()->GravityScale));
-	if (bIsPushSpaceBar)
+	//UpdateFlyCoolTime(DeltaTime);
+	// 캐릭이 땅에 닿아 있을때만 FlyGauge를 채울 수 있도록 설정
+	if (GetCharacterMovement()->IsMovingOnGround())
 	{
-		FlyingTime -= DeltaTime;
-		GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("FlyingTime : %.2f"), FlyingTime));
-
-		if(FlyingTime <= 0)
+		FlyGauge += DeltaTime;
+		if (FlyGauge > 5.0f)
 		{
-			bIsPushSpaceBar = false;
-			FlyCoolTime = 10.0f;
-			GetCharacterMovement()->GravityScale = 1.0f;
-			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+			FlyGauge = 5.0f;
 		}
 	}
-
-	//if (bIsESkillCharge)
-	//{
-	//	ESkillSpawnRotation = FRotator(0.0f, SetAimDirection(this, ESkillSpawnLocation).Yaw,0.0f);
-	//}
 
 	if (bIsSearchQSkill)
 	{
 		UpdateQSkillSearchPlayer();
 	}
 
-	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("QSkillMovement : %d"), static_cast<int>(QSkillMovement)));
 	if (bStartQSkill)
 	{
 		UpdateQSkillMovement(DeltaTime);
@@ -81,17 +72,20 @@ void ACharacter_Muriel::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	{
 		characterInput->BindAction(IA_Spacebar, ETriggerEvent::Started, this, &ACharacter_Muriel::MurielJump);
 		characterInput->BindAction(IA_Spacebar, ETriggerEvent::Triggered, this, &ACharacter_Muriel::MurielFly);
-		characterInput->BindAction(IA_Spacebar, ETriggerEvent::Completed, this, &ACharacter_Muriel::StopJumping);
+		characterInput->BindAction(IA_Spacebar, ETriggerEvent::Completed, this, &ACharacter_Muriel::MurielFlyComplete);
 		
 		characterInput->BindAction(IA_LShift, ETriggerEvent::Started, this, &ACharacter_Muriel::MurielLShift);
 		characterInput->BindAction(IA_LShift, ETriggerEvent::Completed, this, &ACharacter_Muriel::MurielLShift);
 
 		characterInput->BindAction(IA_Q, ETriggerEvent::Started, this, &ACharacter_Muriel::InputAttack);
 		characterInput->BindAction(IA_Q, ETriggerEvent::Completed, this, &ACharacter_Muriel::MurielQSkillComplete);
+
 		characterInput->BindAction(IA_E, ETriggerEvent::Started, this, &ACharacter_Muriel::InputAttack);
 		characterInput->BindAction(IA_ERotate, ETriggerEvent::Started, this, &ACharacter_Muriel::MurielESkillRotate);
 		characterInput->BindAction(IA_E, ETriggerEvent::Completed, this, &ACharacter_Muriel::MurielESkillComplete);
+
 		characterInput->BindAction(IA_LBM, ETriggerEvent::Started, this, &ACharacter_Muriel::InputAttack);
+
 		characterInput->BindAction(IA_RBM, ETriggerEvent::Started, this, &ACharacter_Muriel::InputAttack);
 		characterInput->BindAction(IA_RBM, ETriggerEvent::Completed, this, &ACharacter_Muriel::MurielRMBEnd);
 	}
@@ -102,7 +96,6 @@ void ACharacter_Muriel::ChangeAttackState(EAttackState state)
 	if (state == EAttackState::QSkill)
 	{
 		if (bIsSearchQSkill) return;
-
 		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("QSkill"));
 		// 쿨타임
 		//if (Data.QSkillCoolTime > 0)
@@ -110,18 +103,13 @@ void ACharacter_Muriel::ChangeAttackState(EAttackState state)
 		//	return;
 		//}
 		//Data.QSkillCoolTime = QSkillRefillTiem;
-
 		bIsSearchQSkill = true;
-		
-
 		// Montage
 		PlayAttackMontage("Q", 1.0f, "QSkillStart");
-		// Effect
 	}
 	else if (state == EAttackState::ESkill)
 	{
 		if (bStartESkill) return;
-
 		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("ESkill"));
 		// 쿨타임
 		//if (Data.ESkillCoolTime > 0)
@@ -129,26 +117,15 @@ void ACharacter_Muriel::ChangeAttackState(EAttackState state)
 		//	return;
 		//}
 		//Data.ESkillCoolTime = ESkillRefillTiem;
-		
 		bIsESkillCharge = true;
-
 		NearTeamCharacter = nullptr;
-		
-
 		// Montage
 		PlayAttackMontage("E", 1.0f, "ESkillStart");
-
-		// Effect
 	}
 	else if (state == EAttackState::LMB)
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("LMB"));
-
 		// Montage
 		PlayAttackMontage("LMB", 1.0f);
-		//SpawnEffect("FX_Hand_R4");
-
-		// Effect
 	}
 	else if (state == EAttackState::RMB)
 	{
@@ -171,10 +148,10 @@ void ACharacter_Muriel::ChangeAttackState(EAttackState state)
 		return;
 	}
 }
-
 void ACharacter_Muriel::ChangeState(EMoveState state)
 {
 }
+
 
 void ACharacter_Muriel::InputAttack(const FInputActionValue& inputValue)
 {
@@ -191,7 +168,6 @@ void ACharacter_Muriel::InputAttack(const FInputActionValue& inputValue)
 	AttackState = static_cast<EAttackState>(inputVector);
 	ChangeAttackState(AttackState);
 }
-
 void ACharacter_Muriel::MurielLShift()
 {
 	if (bLShift)
@@ -208,18 +184,46 @@ void ACharacter_Muriel::MurielLShift()
 	}
 }
 
+
 void ACharacter_Muriel::MurielFly()
 {
-	if(not bIsPushSpaceBar) return;
+	SpacebarHoldTime += GetWorld()->GetDeltaSeconds();
+	// 스페이스바를 0.5초 이상 누르고 있지않다면 리턴
+	if (SpacebarHoldTime < FlyThreshold)
+	{
+		return;
+	}
+	// FlyGauge가 없다면 리턴
+	if (FlyGauge <= 0.0f)
+	{
+		MurielFlyComplete();
+		return;
+	}
+	// 움직이지 못하는 상황일때 (스턴 죽음 Q스킬 등) 리턴시켜주기
+	if (GetCharacterMovement()->GetMovementName() == "NULL")
+	{
+		return;
+	}
+	// 캐릭터가 바닥에 닿아있다면 리턴 -> 한번 딸깍 눌렀을 때 점프를 사용해주기 위한 코드
+	if (GetCharacterMovement()->IsMovingOnGround())
+	{
+		return;
+	}
 
-	//if (FlyCoolTime > 0) return;
-	//FlyCoolTime = FlyRefillTiem;
 
+	// FlyGauge 초당 1씩 차감
+	FlyGauge -= GetWorld()->GetDeltaSeconds();
+
+	// Fly중일때 중력값은 0.2f, 이동 모드는 MOVE_Flying으로 변경
+	GetCharacterMovement()->GravityScale = 0.2f;
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+
+
+	// 위방향값 가져오기
 	FVector FlyDirection = GetActorUpVector() * 1.0f;
-
 	// 충돌 감지 후 이동처리
 	FHitResult hitResult;
-	AddMovementInput(FlyDirection, 1.0f, false); // Move입력 (우선 시도)
+	AddMovementInput(FlyDirection, 1.0f, false); // 위 방향으로 이동하기
 
 	// 앞으로 이동 시 충돌 감지 (벽에 부딪혔는지 확인)
 	FVector start = GetActorLocation();
@@ -235,28 +239,28 @@ void ACharacter_Muriel::MurielFly()
 		}
 	}
 }
-
+void ACharacter_Muriel::MurielFlyComplete()
+{
+	if (SpacebarHoldTime < FlyThreshold)
+	{
+		SpacebarHoldTime = 0.0f;
+		StopJumping();
+	}
+	else
+	{
+		GetCharacterMovement()->GravityScale = 1.0f;
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
+	}
+}
 void ACharacter_Muriel::MurielJump()
 {
-	if (bIsPushSpaceBar or FlyCoolTime > 0)
+	if (GetCharacterMovement()->IsMovingOnGround())
 	{
+		SpacebarHoldTime = 0.0f;
 		Jump();
-		return;
 	}
-	//if (FlyCoolTime > 0) return;
-
-
-	bIsPushSpaceBar = true;
-	FlyingTime = 5.0f;
-	Jump();
-
-	// 중력 제거
-	GetCharacterMovement()->GravityScale = 0.2f;
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
-
-	// Fly몽타주 재생
-	//PlayStateMontage("Fly", 1.0f);
 }
+
 
 void ACharacter_Muriel::MurielRMBEnd()
 {
@@ -417,16 +421,6 @@ void ACharacter_Muriel::SpawnEffect(FName socketName, FName key)
 
 
 
-void ACharacter_Muriel::UpdateFlyCoolTime(float DeltaTime)
-{
-	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("FlyCoolTime : %.2f"), FlyCoolTime));
-	FlyCoolTime -= DeltaTime;
-	if (FlyCoolTime < 0)
-	{
-		FlyCoolTime = 0;
-	}
-}
-
 void ACharacter_Muriel::UpdateQSkillMovement(float DeltaTime)
 {
 	FVector currentLocation = GetActorLocation();
@@ -435,7 +429,7 @@ void ACharacter_Muriel::UpdateQSkillMovement(float DeltaTime)
 	if (QSkillMovement == EQkillMovement::Ascending)
 	{
 		currentLocation.Z += QSkillVerticalSpeed * DeltaTime;
-
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 		if (currentLocation.Z >= ZHeight)		//	수직 상승 중에 수평이동 시작할 위치에 도착했다면
 		{
 			currentLocation.Z = ZHeight;
@@ -451,7 +445,7 @@ void ACharacter_Muriel::UpdateQSkillMovement(float DeltaTime)
 
 
 		currentLocation += horizontalDirection * QSkillHorizontalSpeed * DeltaTime;
-
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 		if (FVector::Dist2D(currentLocation, horizontalTargetLocation) <= 300.0f) // 수평 이동중에 수직 하강 위치에 도착했다면
 		{
 			currentLocation = horizontalTargetLocation;
@@ -463,6 +457,8 @@ void ACharacter_Muriel::UpdateQSkillMovement(float DeltaTime)
 	else if (QSkillMovement == EQkillMovement::Descending)
 	{
 		currentLocation.Z -= QSkillVerticalSpeed * 2.0f * DeltaTime;
+
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 		if (currentLocation.Z <= QSkillTargetLocation.Z) // 착지지점에 도착했다면
 		{
 			SpawnEffect("None", "QSkill");
@@ -473,6 +469,7 @@ void ACharacter_Muriel::UpdateQSkillMovement(float DeltaTime)
 
 
 			QSkillMovement = EQkillMovement::Idle;
+			//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 			PlayAttackMontage("Q", 1.0f, "QSkillLand");
 		}
 	}
@@ -522,7 +519,7 @@ void ACharacter_Muriel::UpdateQSkillSearchPlayer()
 		}
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("QSkillTargetLocation : %s"), *QSkillTargetLocation.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("QSkillTargetLocation : %s"), *QSkillTargetLocation.ToString());
 
 	DrawDebugPoint(GetWorld(), target, 5.0f, FColor::Green, false, 0.1f);
 	//DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 5.0f, 0, 1.0f);

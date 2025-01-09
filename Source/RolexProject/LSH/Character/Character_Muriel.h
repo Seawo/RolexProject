@@ -40,6 +40,7 @@ class ROLEXPROJECT_API ACharacter_Muriel : public ABaseCharacter
 	/*Input Function*/
 	void MurielLShift();								// 쉬프트 입력
 	void MurielFly();									// 공중에 떠오르기
+	void MurielFlyComplete();							// 공중에 떠오르기 완료
 	void MurielJump();									// 점프 입력
 	void MurielRMBEnd();								// RMB 입력완료
 	void MurielQSkillComplete();						// Q스킬 입력완료
@@ -50,7 +51,6 @@ class ROLEXPROJECT_API ACharacter_Muriel : public ABaseCharacter
 	void PlayAttackMontage(FString Key, float InPlayRate = 1.0f, FName StartSectionName = NAME_None);
 
 
-	void UpdateFlyCoolTime(float DeltaTime);			// 쿨타임 업데이트 함수(Tick)
 	void UpdateQSkillMovement(float DeltaTime);			// Q스킬 이동 업데이트 함수(Tick)
 	void UpdateQSkillSearchPlayer();					// Q스킬 플레이어 찾기
 
@@ -76,9 +76,12 @@ private:
 	class ABaseCharacter* NearTeamCharacter;				// 가까운 팀 캐릭터
 
 	float SlopeForwardAngle = 0.0f;
-	float FlyingTime = 7.0f;								// 공중에 떠있는 시간 (5초)
 	float DefaultGravityScale = 1.0f;						// 기본 중력 스케일
 	float ESkillRotationYaw = 0.0f;							// E스킬 Yaw값
+	float SpacebarHoldTime = 0.0f;							// 스페이스바 누르고 있는 시간
+	const float FlyThreshold = 0.5f;						// Fly로 전환되는 기준 시간 (0.5초)
+	float FlyGauge = 5.0f;									// 공중에 떠있는 게이지
+
 
 	bool bIsRMBCharging = false;							// RMB 충전중인지 여부
 	bool bIsSearchQSkill = false;							// Q스킬 찾는중인지
@@ -106,13 +109,6 @@ private:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	TMap<FName, TSubclassOf<class AActor_Effect>> EffectMap;
-
-	// 쿨타임
-	//float RMBSkillCoolTime = 0.0f;		// 쿨타임 5초
-	float FlyCoolTime = 0.0f;			// 쿨타임 5초
-	//float ESkillCoolTime = 0.0f;		// 쿨타임 20초
-	//float QSkillCoolTime = 0.0f;		// 쿨타임 1분
-
 
 	float RMBRefillTiem = 5.0f;			// 쿨타임 5초
 	float FlyRefillTiem = 10.0f;			// 쿨타임 5초
