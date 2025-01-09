@@ -33,7 +33,7 @@ void AActor_Effect_Muriel_Orb::BeginPlay()
 	SetActorScale3D(FVector(OrbScale));
 
 
-	UE_LOG(LogTemp, Log, TEXT("bIsLMB : %d"), bIsLMB);
+	//UE_LOG(LogTemp, Log, TEXT("bIsLMB : %d"), bIsLMB);
 	if (bIsLMB)
 	{
 		SetLifeSpan(3.0f);
@@ -43,7 +43,7 @@ void AActor_Effect_Muriel_Orb::BeginPlay()
 		SetLifeSpan(6.0f);
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("[Orb] GetActorForwardVector : %s"), *GetActorForwardVector().ToString());
+	//UE_LOG(LogTemp, Log, TEXT("[Orb] GetActorForwardVector : %s"), *GetActorForwardVector().ToString());
 }
 
 void AActor_Effect_Muriel_Orb::Tick(float DeltaTime)

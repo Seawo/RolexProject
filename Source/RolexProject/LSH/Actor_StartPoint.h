@@ -3,11 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Actor_Point.h"
 #include "GameFramework/Actor.h"
 #include "Actor_StartPoint.generated.h"
 
 UCLASS()
-class ROLEXPROJECT_API AActor_StartPoint : public AActor
+class ROLEXPROJECT_API AActor_StartPoint : public AActor_Point
 {
 	GENERATED_BODY()
 	
@@ -26,19 +27,14 @@ public:
 
 	FVector SpawnPoint();
 
-	UFUNCTION()
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	//UFUNCTION()
+	virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 
-	UFUNCTION()
-	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	//UFUNCTION()
+	virtual void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
 
 
 
-	UPROPERTY(EditAnywhere)
-	class UBoxComponent* BoxComponent;
-
-	UPROPERTY(EditAnywhere, category = "Team")
-	bool bIsATeam = true;
 
 	bool bIsComeIntoSpawnPoint = false;
 };

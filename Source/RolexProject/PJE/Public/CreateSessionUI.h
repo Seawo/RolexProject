@@ -14,9 +14,15 @@ class ROLEXPROJECT_API UCreateSessionUI : public UUserWidget
 {
 	GENERATED_BODY()
 
+	void NativeConstruct() override;
+	
+public:
 	UPROPERTY(meta = (BindWidget))
 	class UEditableTextBox* SessionNameBox;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UButton* ConfirmBtn;
+
+	UFUNCTION()
+	void Confrim();
 };
