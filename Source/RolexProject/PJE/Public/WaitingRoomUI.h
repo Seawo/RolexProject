@@ -22,5 +22,7 @@ public:
 
 	TArray<class UVerticalBox*> PlayerSlots;
 
+	int32 NumplayerSlots;
+	
 	void AddPlayer();
 };

@@ -19,11 +19,16 @@ void UWaitingRoomUI::NativeConstruct()
 			if (UVerticalBox* VerticalBox = Cast<UVerticalBox>(Child))
 				PlayerSlots.Add(VerticalBox);
 		}
+		
+		NumplayerSlots = PlayerSlots.Num();
+
+		 UE_LOG(LogTemp, Warning, TEXT("Number of Player Slots: %d"), NumplayerSlots);
 	}
 }
 
 void UWaitingRoomUI::AddPlayer()
 {
+	
 }
 
 

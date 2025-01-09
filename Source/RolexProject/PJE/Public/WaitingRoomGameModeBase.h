@@ -14,14 +14,22 @@ UCLASS()
 class ROLEXPROJECT_API AWaitingRoomGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-
-	virtual void BeginPlay() override;
-
+	
 public:
 	IOnlineSubsystem* OnlineSubsystem;
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UWaitingRoomUI> WaitingRoomUIFactory;
+
+	UWaitingRoomUI* WaitingRoomUI;
+
+	void InitializeUI();
+	
+	int32 CurrentPlayersNum = 0;
 	
 	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
+
+	FString GetSteamID(APlayerController* NewPlayer);
+	
 };
+
