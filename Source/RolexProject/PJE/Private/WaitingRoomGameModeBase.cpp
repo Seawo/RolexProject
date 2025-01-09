@@ -29,6 +29,7 @@ void AWaitingRoomGameModeBase::InitializeUI()
 	}
 }
 
+// called when a new player joins the server
 void AWaitingRoomGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
 {
 	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
@@ -61,6 +62,12 @@ void AWaitingRoomGameModeBase::HandleStartingNewPlayer_Implementation(APlayerCon
 		}
 		CurrentPlayersNum++;
 		UE_LOG(LogTemp, Warning, TEXT("Number of Current Players = %d"), CurrentPlayersNum);
+	}
+
+	// switch to hero selection stage
+	if (CurrentPlayersNum == MaxPlayersNum)
+	{
+		
 	}
 }
 
