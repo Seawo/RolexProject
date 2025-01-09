@@ -31,9 +31,6 @@ public:
 
 
 
-
-
-
 public:
 
 	UPROPERTY(EditAnywhere, Category = "Effect")

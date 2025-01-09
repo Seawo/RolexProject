@@ -132,14 +132,11 @@ void ACharacter_Sparrow::InputAttack(const FInputActionValue& inputValue)
 	CurrAttackState = static_cast<EAttackState>(inputVector);
 	ChangeAttackState(CurrAttackState);
 
-	if (!HasAuthority())
+	if (IsLocallyControlled())
 	{
 		Server_ChangeAttackState(CurrAttackState);
 	}
-	else
-	{
-		Server_ChangeAttackState(CurrAttackState);
-	}
+
 
 }
 
@@ -184,9 +181,9 @@ void ACharacter_Sparrow::ShootingArrowLBM()
 		}
 
 
-		FName sectionName = FName("fire");
 		bLBMIsCharging = false;
-		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, *sectionName.ToString());
+		/*FName sectionName = FName("fire");
+		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, *sectionName.ToString());*/
 
 		SpawnArrow("LBM");
 
@@ -239,9 +236,9 @@ void ACharacter_Sparrow::ShootingArrowRBM()
 			Server_ChangeAttackState(CurrAttackState);
 		}
 
-		FName sectionName = FName("fire");
 		bRBMIsCharging = false;
-		PlayAnimMontage(AttackMontages[TEXT("RBM")], 1.0f, *sectionName.ToString());
+		/*FName sectionName = FName("fire");
+		PlayAnimMontage(AttackMontages[TEXT("RBM")], 1.0f, *sectionName.ToString());*/
 
 		SpawnArrow("RBM");
 
@@ -327,9 +324,9 @@ void ACharacter_Sparrow::ShootingArrowQ()
 			Server_ChangeAttackState(CurrAttackState);
 		}
 
-		FName sectionName = FName("fire");
 		bQIsCharging = false;
-		PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());
+		/*FName sectionName = FName("fire");
+		PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());*/
 
 		// 데칼 숨기기
 		AimIndicator->SetVisibility(false);
@@ -498,7 +495,7 @@ void ACharacter_Sparrow::LBMAttack()
 		FName sectionName = FName("start");
 		bLBMIsCharging = true;
 		
-		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, *sectionName.ToString());
+		//PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, *sectionName.ToString());
 
 
 	}
@@ -521,10 +518,10 @@ void ACharacter_Sparrow::RBMAttack()
 		// 차징중엔 느려지게 하고, 
 		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
 
-		FName sectionName = FName("start");
 		bRBMIsCharging = true;
 
-		PlayAnimMontage(AttackMontages[TEXT("RBM")], 1.0f, *sectionName.ToString());
+		//FName sectionName = FName("start");
+		/*PlayAnimMontage(AttackMontages[TEXT("RBM")], 1.0f, *sectionName.ToString());*/
 
 
 	}
@@ -556,8 +553,8 @@ void ACharacter_Sparrow::QAttack()
 			// 움직임 막기
 			GetCharacterMovement()->DisableMovement();
 
-			FName sectionName = FName("start");
-			PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());
+		/*	FName sectionName = FName("start");
+			PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());*/
 
 			// 데칼 트루
 			AimIndicator->SetVisibility(true);
@@ -577,7 +574,7 @@ void ACharacter_Sparrow::EAttack()
 			return;
 	}
 
-	PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f);
+	//PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f);
 
 }
 
