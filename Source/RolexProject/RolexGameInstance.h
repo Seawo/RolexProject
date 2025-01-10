@@ -40,4 +40,7 @@ public:
 	void OnJoinSession(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 
 	FAddSession AddSession;
+
+	UPROPERTY()
+	TSubclassOf<class ABaseCharacter> MainLevelPawn;
 };
