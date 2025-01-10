@@ -9,6 +9,7 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSubsystemUtils.h"
 #include "ScreenPass.h"
+#include "Components/Image.h"
 #include "Interfaces/OnlineIdentityInterface.h"
 
 
@@ -52,10 +53,10 @@ void AWaitingRoomGameModeBase::HandleStartingNewPlayer_Implementation(APlayerCon
 			if (*SteamId && WaitingRoomUI)
 			{
 				// set Steam ID on player slot
-				const TArray<UWidget*>& PlayerSlot = WaitingRoomUI->PlayerSlots[CurrentPlayersNum]->GetAllChildren();
-				for (UWidget* SlotWidget: PlayerSlot)
+				const TArray<UWidget*>& PlayerSlotChildren = WaitingRoomUI->PlayerSlots[CurrentPlayersNum]->GetAllChildren();
+				for (UWidget* PlayerSlotChild: PlayerSlotChildren)
 				{
-					if (UTextBlock* TextBlock = Cast<UTextBlock>(SlotWidget))
+					if (UTextBlock* TextBlock = Cast<UTextBlock>(PlayerSlotChild))
 						TextBlock->SetText(FText::FromString(*SteamId));
 				}
 			}
@@ -67,7 +68,7 @@ void AWaitingRoomGameModeBase::HandleStartingNewPlayer_Implementation(APlayerCon
 	// switch to hero selection stage
 	if (CurrentPlayersNum == MaxPlayersNum)
 	{
-		
+		GetWorld()->ServerTravel(TEXT("/Game/Rolex/Map/Main?listen"));
 	}
 }
 
@@ -96,4 +97,17 @@ FString AWaitingRoomGameModeBase::GetSteamID(APlayerController* NewPlayer)
 	}
 
 	return SteamNickName;
+}
+
+void AWaitingRoomGameModeBase::SetPlayerSlotImage(UTexture2D* Texture2D)
+{
+	// get my player slot, Index: CurrentPlayersNum
+	const TArray<UWidget*>& PlayerSlotChildren = WaitingRoomUI->PlayerSlots[CurrentPlayersNum]->GetAllChildren();
+
+	// set player slot image
+	for (UWidget* PlayerSlotChild: PlayerSlotChildren)
+	{
+		if (UImage* PlayerSlotImage = Cast<UImage>(PlayerSlotChild))
+			PlayerSlotImage->SetBrushFromTexture(Texture2D);
+	}
 }

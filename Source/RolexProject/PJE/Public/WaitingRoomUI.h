@@ -30,7 +30,4 @@ public:
 	class UUniformGridPanel* HeroSelectionPanel;
 
 	TArray<class UButton*> HeroButtonArray;
-
-	UFUNCTION()
-	void OnHeroClicked();
 };

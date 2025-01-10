@@ -34,5 +34,8 @@ public:
 	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 
 	FString GetSteamID(APlayerController* NewPlayer);
+
+	UFUNCTION()
+	void SetPlayerSlotImage(UTexture2D* Texture2D);
 };
 
