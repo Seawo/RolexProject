@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "RolexProjectGameMode.generated.h"
+#include "RolexGameMode.generated.h"
 
 UCLASS(minimalapi)
-class ARolexProjectGameMode : public AGameModeBase
+class ARolexGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
-	ARolexProjectGameMode();
+	ARolexGameMode();
 };
 
 

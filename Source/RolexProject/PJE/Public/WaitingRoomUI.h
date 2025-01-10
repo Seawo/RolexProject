@@ -25,4 +25,9 @@ public:
 	int32 NumplayerSlots;
 	
 	void AddPlayer();
+
+	UPROPERTY(meta = (BindWidget))
+	class UUniformGridPanel* HeroSelectionPanel;
+
+	TArray<class UButton*> HeroButtonArray;
 };
