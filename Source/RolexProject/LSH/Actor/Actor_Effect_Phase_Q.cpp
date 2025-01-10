@@ -16,6 +16,8 @@ AActor_Effect_Phase_Q::AActor_Effect_Phase_Q()
 	BeamCollision->SetupAttachment(RootComponent);
 
 	BeamCollision->SetRelativeScale3D(FVector(26.5f, 2.0f, 2.0f));
+
+	//bReplicates = true;
 }
 
 void AActor_Effect_Phase_Q::BeginPlay()
@@ -27,7 +29,6 @@ void AActor_Effect_Phase_Q::BeginPlay()
 
 	// 충돌체 EndOverlap
 	BeamCollision->OnComponentEndOverlap.AddDynamic(this, &AActor_Effect_Phase_Q::OnOverlapEnd);
-
 
 
 	// 각각의 생성시간에 따른 Timer 설정
@@ -55,7 +56,7 @@ void AActor_Effect_Phase_Q::UpdateLocation(float DeltaTime)
 	FVector newLoc = Phase->GetMesh()->GetSocketLocation("FX_Hand_L4");
 
 	SetActorLocation(newLoc);
-	SetActorRotation(Phase->TpsCamComp->GetForwardVector().Rotation());
+	SetActorRotation(Phase->GetBaseAimRotation());
 }
 
 void AActor_Effect_Phase_Q::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -140,6 +141,7 @@ void AActor_Effect_Phase_Q::DrawLineTrace()
 
 	FHitResult hitResult;
 	FCollisionQueryParams params;
+	
 	params.AddIgnoredActor(this);
 	params.AddIgnoredActor(GetOwner());
 	FVector pivot = FVector(840,0,0);

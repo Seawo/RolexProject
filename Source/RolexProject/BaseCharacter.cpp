@@ -169,12 +169,14 @@ FRotator ABaseCharacter::SetAimDirection(ABaseCharacter* character, FVector& tar
 
 	APlayerController* playerController = Cast<APlayerController>(character->GetController());
 
-	FVector camLocation;
-	FRotator camRotation;
-	playerController->GetPlayerViewPoint(camLocation, camRotation);
+	FVector camLocation = TpsCamComp->GetComponentLocation();
+	FVector camRotation = TpsCamComp->GetForwardVector();
+	//playerController->GetPlayerViewPoint(camLocation, camRotation);
 
-	FVector start = camLocation;
-	FVector end = camLocation + camRotation.Vector() * 10000.0f;
+
+
+	FVector start =  camLocation;
+	FVector end = camLocation + camRotation * 10000.0f;
 
 	FHitResult hitResult;
 	FCollisionQueryParams params;
@@ -189,7 +191,7 @@ FRotator ABaseCharacter::SetAimDirection(ABaseCharacter* character, FVector& tar
 	//DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 1.0f, 0, 1.0f);
 
 	// 발사 방향 설정
-	FVector shotDirection = camRotation.Vector();
+	FVector shotDirection = camRotation;
 	targetLocation = end;
 
 	if (bHit)

@@ -91,7 +91,4 @@ private:
 	void Server_DashCheck(bool bIsDash);
 	UFUNCTION(NetMulticast, Reliable)
 	void Multi_DashCheck(bool bIsDash);
-
-
-
 };

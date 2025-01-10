@@ -6,6 +6,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/SphereComponent.h"
 
+#include "Character_Rampage.h"
+
 void UEffectSpawnNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
     if (!MeshComp || !EffectActorClass)
@@ -19,17 +21,18 @@ void UEffectSpawnNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceB
 
     //AEffectActor* spawnActor = MeshComp->GetWorld()->SpawnActor<AEffectActor>(EffectActorClass, spawnLocation, SpawnRotation);
 
+    ACharacter_Rampage* rampage = Cast<ACharacter_Rampage>(MeshComp);
+
+
     AEffectActor* spawnActor = MeshComp->GetWorld()->SpawnActorDeferred<AEffectActor>(EffectActorClass, FTransform(SpawnRotation, spawnLocation), MeshComp->GetOwner());
 
     if (spawnActor)
     {
-        spawnActor->FinishSpawning(FTransform(SpawnRotation, spawnLocation));
-        
-        /*spawnActor->SetOwner(MeshComp->GetOwner());*/
-
         USphereComponent* sphereComp = spawnActor->FindComponentByClass<USphereComponent>();
 
         sphereComp->SetSphereRadius(collionRang);
+
+        spawnActor->FinishSpawning(FTransform(SpawnRotation, spawnLocation));
 
         if (NiagaraEffect)
         {

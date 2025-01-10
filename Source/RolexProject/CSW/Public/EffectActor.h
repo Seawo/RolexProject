@@ -66,10 +66,10 @@ public:
 
 	// Initialize Niagara Effect
 	UFUNCTION(BlueprintCallable, Category = "Niagara")
-	void InitializeEffect(class UNiagaraSystem* niagaraSystem, FVector scale);
+	void InitializeEffect(UNiagaraSystem* niagaraSystemClass, FVector scale);
 
 	// Initialize Particle Effect
-	void InitializeEffect(UParticleSystem* ParticleEffect, FVector EffectScale);
+	void InitializeEffect(UParticleSystem* particleEffect, FVector effectScale);
 
 	void InititalizeThrowStone(const FVector& dir, float speed);
 
