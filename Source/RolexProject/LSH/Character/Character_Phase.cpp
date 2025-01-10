@@ -135,7 +135,7 @@ void ACharacter_Phase::Multi_ChangeAttackState_Implementation( EAttackState atta
 	//UE_LOG(LogTemp, Warning, TEXT("GetUniqueID : %d "), GetUniqueID());
 	//UE_LOG(LogTemp, Warning, TEXT("OtherID : %d "), id);
 
-	UE_LOG(LogTemp, Warning, TEXT("Multi_ChangeAttackState called for AttackState: %d"), (int32)AttackState);
+	//UE_LOG(LogTemp, Warning, TEXT("Multi_ChangeAttackState called for AttackState: %d"), (int32)AttackState);
 
 	switch (attackState)
 	{

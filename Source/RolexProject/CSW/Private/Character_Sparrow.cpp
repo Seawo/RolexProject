@@ -112,15 +112,6 @@ void ACharacter_Sparrow::ChangeAttackState(EAttackState state)
 void ACharacter_Sparrow::Multi_ChangeAttackState_Implementation(EAttackState attackState)
 {
 	FName sectionName;
-	FString EnumValue;
-
-	const UEnum* EnumPtr = StaticEnum<EAttackState>();
-	if (EnumPtr)
-	{
-		EnumValue = EnumPtr->GetNameStringByValue(static_cast<int64>(attackState));
-		UE_LOG(LogTemp, Warning, TEXT("Attack State: %s"), *EnumValue);
-
-	}
 
 	switch (attackState)
 	{
@@ -174,7 +165,7 @@ void ACharacter_Sparrow::InputAttack(const FInputActionValue& inputValue)
 		}
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("attack in"));
+	//UE_LOG(LogTemp, Warning, TEXT("attack in"));
 
 	int inputVector = inputValue.Get<float>();
 	inputVector--;
@@ -574,7 +565,10 @@ void ACharacter_Sparrow::Server_SpawnArrow_Implementation(FName arrowName)
 
 void ACharacter_Sparrow::SpawnArrow(FName arrowName)
 {
-	if (HasAuthority())
+	Server_SpawnArrow(arrowName);
+	
+
+/*	if (HasAuthority())
 	{
 		Server_SpawnArrow(arrowName);
 	}
@@ -582,6 +576,7 @@ void ACharacter_Sparrow::SpawnArrow(FName arrowName)
 	{
 		Server_SpawnArrow(arrowName); // 클라이언트에서 서버로 요청
 	}
+	*/
 }
 
 void ACharacter_Sparrow::SpawnCharge(FName chargeName)
