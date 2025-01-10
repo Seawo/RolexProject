@@ -181,6 +181,8 @@ void ACharacter_Muriel::Multi_AttackState_Implementation(EAttackState state)
 		PlayAttackMontage("Q", 1.0f, "QSkillStart");
 		break;
 	case EAttackState::ESkill:
+		bIsESkillCharge = true;
+		NearTeamCharacter = nullptr;
 		PlayAttackMontage("E", 1.0f, "ESkillStart");
 		MurielESkillRotate();
 		break;
@@ -195,6 +197,8 @@ void ACharacter_Muriel::Multi_AttackState_Implementation(EAttackState state)
 		PlayAttackMontage("Q", 1.0f, "QSkillFire");
 		break;
 	case EAttackState::ESkill_Completed:
+		bIsESkillCharge = false;
+		ESkillSpawnRotation = FRotator(0.0f, SetAimDirection(this, ESkillSpawnLocation).Yaw + ESkillRotationYaw, 0.0f);
 		PlayAttackMontage("E", 1.0f, "ESkillFire");
 		break;
 	case EAttackState::LMB_Completed:
