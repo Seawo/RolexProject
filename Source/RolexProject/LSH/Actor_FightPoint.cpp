@@ -27,24 +27,24 @@ void AActor_FightPoint::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (HasAuthority())
-	{
-		DrawDebugS(DeltaTime);
-	}
-	else
-	{
-		DrawDebugS(DeltaTime);
-	}
+	//if (HasAuthority())
+	//{
+	//	DrawDebugS(DeltaTime);
+	//}
+	//else
+	//{
+	//	DrawDebugS(DeltaTime);
+	//}
 
 
 	// 게임이 끝났거나, 거점이 비활성화라면 리턴해줘
-	if (Finish != EFinish::None or ActivePoint == EActivePoint::Deactivate) return;
+	//if (Finish != EFinish::None or ActivePoint == EActivePoint::Deactivate) return;
 
 
 	// 서버가 아니라면 계산 x
-	if (not HasAuthority()) return;
+	//if (not HasAuthority()) return;
 
-	SetPointGauge(DeltaTime);
+	//SetPointGauge(DeltaTime);
 }
 
 void AActor_FightPoint::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -57,7 +57,7 @@ void AActor_FightPoint::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 void AActor_FightPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (Finish != EFinish::None or ActivePoint == EActivePoint::Deactivate) return;
+	//if (Finish != EFinish::None or ActivePoint == EActivePoint::Deactivate) return;
 
 	Super::OnOverlapBegin(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 
@@ -67,10 +67,12 @@ void AActor_FightPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 	if (character and character->Data.Team == true)
 	{
 		ActiveATeamCount++;
+		OnPointOverlapChanged.Broadcast(true, 1);
 	}
 	else if (character and character->Data.Team == false)
 	{
 		ActiveBTeamCount++;
+		OnPointOverlapChanged.Broadcast(false, 1);
 	}
 
 
@@ -79,7 +81,7 @@ void AActor_FightPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 
 void AActor_FightPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (Finish != EFinish::None or ActivePoint == EActivePoint::Deactivate) return;
+	//if (Finish != EFinish::None or ActivePoint == EActivePoint::Deactivate) return;
 
 
 
@@ -90,10 +92,12 @@ void AActor_FightPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, A
 	if (character and character->Data.Team == true)
 	{
 		ActiveATeamCount--;
+		OnPointOverlapChanged.Broadcast(true, -1);
 	}
 	else if (character and character->Data.Team == false)
 	{
 		ActiveBTeamCount--;
+		OnPointOverlapChanged.Broadcast(false, -1);
 	}
 
 	//SetTeam();

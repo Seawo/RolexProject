@@ -6,6 +6,7 @@
 #include "GM_TrainingRoom.h"
 #include "Kismet/GameplayStatics.h"
 #include "Actor_FightPoint.h"
+#include "BaseCharacter.h"
 
 #include "Net/UnrealNetwork.h"
 
@@ -21,35 +22,62 @@ void AGS_TrainingRoom::BeginPlay()
 	Super::BeginPlay();
 	
 	IsActiveBsePoint = false;
+	TArray<AActor*> foundActors;
+	// 월드상의 모든 캐릭터 탐색
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), foundActors);
+	for (AActor* foundActor : foundActors)
+	{
+		ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(foundActor);
+		if (baseCharacter->Data.Team == true)
+		{
+			ATeamChracters.Add(baseCharacter);
+		}
+		else
+		{
+			BTeamChracters.Add(baseCharacter);
+		}
+	}
+
+	// 월드상의 모든 거점 탐색
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor_FightPoint::StaticClass(), foundActors);
+	for (AActor* foundActor : foundActors)
+	{
+		AActor_FightPoint* fightPoint = Cast<AActor_FightPoint>(foundActor);
+
+		// 거점의 델리게이트 함수에 대리자 추가
+		fightPoint->OnPointOverlapChanged.AddDynamic(this, &AGS_TrainingRoom::ChangeNumberOfTeam);
+
+		Points.Add(fightPoint);
+	}
 }
 
 void AGS_TrainingRoom::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	
-	if (HasAuthority())
+}
+
+void AGS_TrainingRoom::ChangeNumberOfTeam(bool bTeam, int32 ChangeValue)
+{
+	if (bTeam)
 	{
-		//DrawDebugString(GetWorld(), FVector(0, 0, 1000), FString::Printf(TEXT("PlayTime : %d"), (int32)GM->GetPlayTime()), nullptr, FColor::Red, DeltaTime);
-		GM->SetPlayTime(DeltaTime);
-		SetTimer(DeltaTime);
+		PointATeamCount += ChangeValue;
 	}
 	else
 	{
-		//DrawDebugString(GetWorld(), FVector(0, 0, 1000), FString::Printf(TEXT("PlayTime : %d"), (int32)GM->GetPlayTime()), nullptr, FColor::Red, DeltaTime);
+		PointBTeamCount += ChangeValue;
 	}
 }
 
-void AGS_TrainingRoom::SetTimer_Implementation(float DeltaTime)
-{
-	if (GM->GetPlayTime() >= 10.0f and not IsActiveBsePoint)
-	{
-		// 게임 시작하고 10초 후에 BasePoint 활성화
-		int32 rand = FMath::RandRange(0, GM->Points.Num() - 1);
-		UE_LOG(LogTemp, Warning, TEXT("rand : %d"), rand);
 
-		GM->Points[rand]->SetActivePoint(EActivePoint::Active);
-		UE_LOG(LogTemp, Warning, TEXT("BasePoint Active"));
-		IsActiveBsePoint = true;
-	}
+void AGS_TrainingRoom::NoneOccupation()
+{
+}
+
+void AGS_TrainingRoom::ATeamOccupation()
+{
+}
+
+void AGS_TrainingRoom::BTeamOccupation()
+{
 }

@@ -49,27 +49,6 @@ void AGM_TrainingRoom::BeginPlay()
 void AGM_TrainingRoom::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	DrawDebugString(GetWorld(), FVector(0, 0, 1000), FString::Printf(TEXT("PlayTime : %d"), (int32)PlayTime), nullptr, FColor::Red, DeltaTime);
+	//DrawDebugString(GetWorld(), FVector(0, 0, 1000), FString::Printf(TEXT("PlayTime : %d"), (int32)PlayTime), nullptr, FColor::Red, DeltaTime);
 
-	//if (not HasAuthority()) return;
-
-	
-
-	//Multi_SetPlayTimer(DeltaTime);
-}
-
-void AGM_TrainingRoom::Multi_SetPlayTimer_Implementation(float DeltaTime)
-{
-	PlayTime += DeltaTime;
-
-	if (PlayTime >= 10.0f and not IsActiveBsePoint)
-	{
-		// 게임 시작하고 10초 후에 BasePoint 활성화
-		int32 rand = FMath::RandRange(0, Points.Num() - 1);
-		UE_LOG(LogTemp, Warning, TEXT("rand : %d"), rand);
-
-		Points[rand]->SetActivePoint(EActivePoint::Active);
-		UE_LOG(LogTemp, Warning, TEXT("BasePoint Active"));
-		IsActiveBsePoint = true;
-	}
 }

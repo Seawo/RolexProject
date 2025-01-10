@@ -19,10 +19,6 @@ class ROLEXPROJECT_API AGM_TrainingRoom : public AGameModeBase
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
-
-	UFUNCTION(NetMulticast, Reliable)
-	void Multi_SetPlayTimer(float DeltaTime);
-
 public:
 	void SetPlayTime(float time) { PlayTime += time; }
 	float GetPlayTime() { return PlayTime; }

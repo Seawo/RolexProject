@@ -7,6 +7,10 @@
 #include "GameFramework/Actor.h"
 #include "Actor_FightPoint.generated.h"
 
+// 델리게이트 선언
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPointOverlapDelegate, bool, bTeam, int32, ChangeValue);
+
+// 거점 활성화 비활성화를 위한 Enum값
 UENUM(BlueprintType)
 enum class EActivePoint : uint8
 {
@@ -14,12 +18,13 @@ enum class EActivePoint : uint8
 	Active,
 };
 
+// 거점 상태를 알려주는 Enum값
 UENUM(BlueprintType)
 enum class ETeam : uint8
 {
-	None,				// 아무도 없는 상태
-	TeamA,				// A팀만 있는 상태
-	TeamB,				// B팀만 있는 상태
+	None,				// 점령 안된 상태
+	TeamA,				// A팀점령
+	TeamB,				// B팀점령
 	Clashing,			// A팀과 B팀이 충돌하는 상태
 };
 
@@ -71,6 +76,14 @@ public:
 
 	void SetActivePoint(EActivePoint activePoint) { ActivePoint = activePoint; }
 	ETeam GetTeam() const { return Team; }
+	
+public:
+	UPROPERTY()
+	FPointOverlapDelegate OnPointOverlapChanged;
+
+
+
+
 private:
 	UPROPERTY(VisibleAnywhere)
 	int32 ActiveATeamCount = 0;
