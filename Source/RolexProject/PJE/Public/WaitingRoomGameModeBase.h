@@ -37,5 +37,14 @@ public:
 
 	UFUNCTION()
 	void SetPlayerSlotImage(UTexture2D* Texture2D);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<class ABaseCharacter*> HeroArray;
+	
+	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
+
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+
+	
 };
 
