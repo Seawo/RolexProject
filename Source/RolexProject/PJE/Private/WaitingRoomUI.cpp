@@ -12,6 +12,8 @@ void UWaitingRoomUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	StartButton->OnClicked.AddDynamic(this, &UWaitingRoomUI::TravelToMain);
+	
 	// get player slots from player horizontal box
 	if (PlayerBox)
 	{
@@ -31,5 +33,10 @@ void UWaitingRoomUI::NativeConstruct()
 void UWaitingRoomUI::AddPlayer()
 {
 	
+}
+
+void UWaitingRoomUI::TravelToMain()
+{
+	GetWorld()->ServerTravel(TEXT("/Game/Rolex/Map/Main?listen"));
 }
 

@@ -13,6 +13,11 @@
 #include "Interfaces/OnlineIdentityInterface.h"
 
 
+AWaitingRoomGameModeBase::AWaitingRoomGameModeBase()
+{
+	bUseSeamlessTravel = true;
+}
+
 void AWaitingRoomGameModeBase::InitializeUI()
 {
 	if (WaitingRoomUIFactory)
@@ -37,7 +42,7 @@ void AWaitingRoomGameModeBase::HandleStartingNewPlayer_Implementation(APlayerCon
 
 	if (WaitingRoomUI == nullptr)
 		InitializeUI();
-	
+
 	if (NewPlayer)
 	{
 		ULocalPlayer* LocalPlayer =NewPlayer->GetLocalPlayer();
@@ -66,10 +71,10 @@ void AWaitingRoomGameModeBase::HandleStartingNewPlayer_Implementation(APlayerCon
 	}
 
 	// switch to hero selection stage
-	if (CurrentPlayersNum == MaxPlayersNum)
-	{
-		GetWorld()->ServerTravel(TEXT("/Game/Rolex/Map/Main?listen"));
-	}
+	// if (CurrentPlayersNum == MaxPlayersNum)
+	// {
+	// 	GetWorld()->ServerTravel(TEXT("/Game/Rolex/Map/Main?listen"));
+	// }
 }
 
 FString AWaitingRoomGameModeBase::GetSteamID(APlayerController* NewPlayer)
@@ -102,7 +107,7 @@ FString AWaitingRoomGameModeBase::GetSteamID(APlayerController* NewPlayer)
 void AWaitingRoomGameModeBase::SetPlayerSlotImage(UTexture2D* Texture2D)
 {
 	// get my player slot, Index: CurrentPlayersNum
-	const TArray<UWidget*>& PlayerSlotChildren = WaitingRoomUI->PlayerSlots[CurrentPlayersNum]->GetAllChildren();
+	const TArray<UWidget*>& PlayerSlotChildren = WaitingRoomUI->PlayerSlots[CurrentPlayersNum-1]->GetAllChildren();
 
 	// set player slot image
 	for (UWidget* PlayerSlotChild: PlayerSlotChildren)

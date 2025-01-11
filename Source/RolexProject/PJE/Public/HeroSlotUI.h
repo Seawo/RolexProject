@@ -27,7 +27,8 @@ public:
 	class UButton* HeroSelectButton;
 
 	FHeroSelectButtonClikcedDelegate HeroSelectButtonClickedDelegate;
-	
+
+	UFUNCTION()
 	void OnHeroSelectButtonClicked();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

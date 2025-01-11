@@ -16,6 +16,4 @@ class ROLEXPROJECT_API ARolexPlayerController : public APlayerController
 
 	ARolexPlayerController();
 	
-public:
-		
 };

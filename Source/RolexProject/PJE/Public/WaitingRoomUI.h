@@ -30,4 +30,10 @@ public:
 	class UUniformGridPanel* HeroSelectionPanel;
 
 	TArray<class UButton*> HeroButtonArray;
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* StartButton;
+
+	UFUNCTION()
+	void TravelToMain();
 };

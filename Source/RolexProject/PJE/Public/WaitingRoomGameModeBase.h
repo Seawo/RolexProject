@@ -14,6 +14,8 @@ UCLASS()
 class ROLEXPROJECT_API AWaitingRoomGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
+
+	AWaitingRoomGameModeBase();
 	
 public:
 	IOnlineSubsystem* OnlineSubsystem;

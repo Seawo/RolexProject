@@ -13,6 +13,8 @@ class ARolexGameMode : public AGameModeBase
 
 public:
 	ARolexGameMode();
+
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 };
 
 
