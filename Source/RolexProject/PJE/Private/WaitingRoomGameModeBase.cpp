@@ -111,3 +111,13 @@ void AWaitingRoomGameModeBase::SetPlayerSlotImage(UTexture2D* Texture2D)
 			PlayerSlotImage->SetBrushFromTexture(Texture2D);
 	}
 }
+
+UClass* AWaitingRoomGameModeBase::GetDefaultPawnClassForController_Implementation(AController* InController)
+{
+	return Super::GetDefaultPawnClassForController_Implementation(InController);
+}
+
+AActor* AWaitingRoomGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
+{
+	return Super::ChoosePlayerStart_Implementation(Player);
+}
