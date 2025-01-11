@@ -35,6 +35,12 @@ class ROLEXPROJECT_API ACharacter_Muriel : public ABaseCharacter
 	virtual void InputAttack(const struct FInputActionValue& inputValue) override;
 	void ChangeState(EMoveState state);					// 상태 변경
 
+	UFUNCTION(Server, Reliable)
+	void Server_AttackState(EAttackState state);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multi_AttackState(EAttackState state);
+
+
 
 
 	/*Input Function*/
@@ -50,12 +56,19 @@ class ROLEXPROJECT_API ACharacter_Muriel : public ABaseCharacter
 	// 몽타주 실행함수
 	void PlayAttackMontage(FString Key, float InPlayRate = 1.0f, FName StartSectionName = NAME_None);
 
+	UFUNCTION(Server, Reliable)
+	void Server_MoveModeChange(EMovementMode moveMode);
+	UFUNCTION(Server, Reliable)
+	void Server_MoveToLocation(FVector newLocation);
 
 	void UpdateQSkillMovement(float DeltaTime);			// Q스킬 이동 업데이트 함수(Tick)
 	void UpdateQSkillSearchPlayer();					// Q스킬 플레이어 찾기
 
 
 public:
+	UFUNCTION(Server, Reliable)
+	void Server_SpawnEffect(FName socketName, FName key);
+
 	void SpawnEffect(FName socketName, FName key);
 
 
