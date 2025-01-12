@@ -51,8 +51,7 @@ void AWaitingRoomGameModeBase::HandleStartingNewPlayer_Implementation(APlayerCon
 			// // get Steam ID
 			// FUniqueNetIdPtr NetId = LocalPlayer->GetPreferredUniqueNetId().GetUniqueNetId();
 			// FString SteamId = NetId->ToString();
-			//
-			// UE_LOG(LogTemp, Warning, TEXT("SteamId: %s"), *SteamId);
+			
 			FString SteamId = GetSteamID(NewPlayer);
 			
 			if (*SteamId && WaitingRoomUI)

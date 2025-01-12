@@ -29,12 +29,13 @@ AActor* ARolexGameMode::ChoosePlayerStart_Implementation(AController* Player)
 
 	if (RolexPlayerState && RolexGameInstance)
 	{
+		// print PlayerHeroSelection TMap
 		for (auto Pair : RolexGameInstance->PlayerHeroSelections)
 		{
-			ARolexPlayerState* Mapkey = Pair.Key;
-			if (Mapkey)
+			FString Mapkey = Pair.Key;
+			if (*Mapkey)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *Mapkey->GetName());
+				UE_LOG(LogTemp, Warning, TEXT("%s"), *Mapkey);
 			}
 			else
 			{
@@ -45,14 +46,26 @@ AActor* ARolexGameMode::ChoosePlayerStart_Implementation(AController* Player)
 				UE_LOG(LogTemp, Warning, TEXT("%s"), *MapValue->GetName());
 		}
 		UE_LOG(LogTemp, Warning, TEXT("Player State Name: %s"), *RolexPlayerState->GetName());
-		
+
+		RolexPlayerState->FindUniqueID();
 		if (TSubclassOf<ABaseCharacter>* BaseCharacterFactory =
-			RolexGameInstance->PlayerHeroSelections.Find(RolexPlayerState))
+			RolexGameInstance->PlayerHeroSelections.Find(RolexPlayerState->UniqueID))
 		{
-			FString CharacterName = BaseCharacterFactory->Get()->GetName();
-			UE_LOG(LogTemp, Warning, TEXT("Character: %s"), *CharacterName);
-			Player->Possess(GetWorld()->SpawnActor<ABaseCharacter>(*BaseCharacterFactory,
-				FVector::ZeroVector, FRotator::ZeroRotator));
+
+			ABaseCharacter* SpawnedCharacter = GetWorld()->SpawnActor<ABaseCharacter>
+			(*BaseCharacterFactory,FVector::ZeroVector, FRotator::ZeroRotator);
+			if (SpawnedCharacter)
+			{
+				// set ownership and possess
+				SpawnedCharacter->SetOwner(Player);
+				Player->Possess(SpawnedCharacter);
+				UE_LOG(LogTemp, Warning, TEXT("Player Possess Succeed"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Failed to find spawned character"));
+			}
+			return SpawnedCharacter;	
 		}
 		else
 		{
@@ -60,5 +73,5 @@ AActor* ARolexGameMode::ChoosePlayerStart_Implementation(AController* Player)
 		}
 	}
 	
-	return Super::ChoosePlayerStart_Implementation(Player); 
+	return Super::ChoosePlayerStart_Implementation(Player);
 }

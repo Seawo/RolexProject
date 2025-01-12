@@ -48,5 +48,5 @@ public:
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TMap<ARolexPlayerState*, TSubclassOf<ABaseCharacter>> PlayerHeroSelections;
+	TMap<FString, TSubclassOf<ABaseCharacter>> PlayerHeroSelections;
 };

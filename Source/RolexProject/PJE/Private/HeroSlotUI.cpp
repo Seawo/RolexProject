@@ -35,18 +35,20 @@ void UHeroSlotUI::OnHeroSelectButtonClicked()
 	if (RolexPlayerState)
 	{
 		RolexPlayerState->SelectedHero = BaseCharacter;
+		RolexPlayerState->FindUniqueID();
+		
 		URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
 		if (RolexGameInstance)
 		{
-			RolexGameInstance->PlayerHeroSelections.Add(RolexPlayerState, BaseCharacter);
+			RolexGameInstance->PlayerHeroSelections.Add(RolexPlayerState->UniqueID, BaseCharacter);
 
 			UE_LOG(LogTemp, Warning,TEXT("PlayerHeroSelections: %d"), RolexGameInstance->PlayerHeroSelections.Num());
 
 			for (auto Pair : RolexGameInstance->PlayerHeroSelections)
 			{
-				ARolexPlayerState* Mapkey = Pair.Key;
-				if (Mapkey)
-					UE_LOG(LogTemp, Warning, TEXT("%s"), *Mapkey->GetName());
+				FString Mapkey = Pair.Key;
+				if (*Mapkey)
+					UE_LOG(LogTemp, Warning, TEXT("%s"), *Mapkey);
 				TSubclassOf<ABaseCharacter> MapValue = Pair.Value;
 				if (MapValue)
 					UE_LOG(LogTemp, Warning, TEXT("%s"), *MapValue->GetName());

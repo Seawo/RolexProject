@@ -14,9 +14,14 @@ class ROLEXPROJECT_API ARolexPlayerState : public APlayerState
 {
 	GENERATED_BODY()
 
+	ARolexPlayerState();
+	
 public:
 	TSubclassOf<class ABaseCharacter> SelectedHero;
 
 	virtual void CopyProperties(APlayerState* PlayerState) override;
-	
+
+	FString UniqueID;
+
+	void FindUniqueID();
 };
