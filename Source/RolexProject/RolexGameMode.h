@@ -15,6 +15,9 @@ public:
 	ARolexGameMode();
 
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+
+	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
+
 };
 
 
