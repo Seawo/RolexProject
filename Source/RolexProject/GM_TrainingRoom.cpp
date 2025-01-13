@@ -4,11 +4,16 @@
 #include "GM_TrainingRoom.h"
 
 #include "GS_TrainingRoom.h"
+#include "PlayerController_TrainingRoom.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "BaseCharacter.h"
 #include "Actor_Point.h"
 #include "Actor_FightPoint.h"
+
+#include "Character_Phase.h"
+#include "Character_Rampage.h"
+#include "Character_Muriel.h"
 
 AGM_TrainingRoom::AGM_TrainingRoom()
 {
@@ -48,7 +53,7 @@ void AGM_TrainingRoom::BeginPlay()
 
 		Points.Add(fightPoint);
 	}
-
+	PC = Cast<APlayerController_TrainingRoom>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
 	// GameState의 변수 값 초기화
 	GS = Cast<AGS_TrainingRoom>(UGameplayStatics::GetGameState(GetWorld()));
@@ -85,6 +90,7 @@ void AGM_TrainingRoom::BeginPlay()
 		GS->IsGetATeamExtraTime = false;
 		GS->IsGetBTeamExtraTime = false;
 	}
+
 }
 
 void AGM_TrainingRoom::Tick(float DeltaTime)
@@ -98,6 +104,7 @@ void AGM_TrainingRoom::Tick(float DeltaTime)
 	}
 
 	PlayTime += DeltaTime;
+
 
 	if (PlayTime >= 10.0f)
 	{
@@ -142,9 +149,47 @@ void AGM_TrainingRoom::Tick(float DeltaTime)
 			GS->IsGetATeamExtraTime = IsGetATeamExtraTime;
 			GS->IsGetBTeamExtraTime = IsGetBTeamExtraTime;
 		}
-	}
+		if (PC) // 서버의 UI값 업데이트
+		{
+			PC->SetPlayTime(PlayTime);
+			PC->SetATeamCount(PointATeamCount);
+			PC->SetBTeamCount(PointBTeamCount);
+			PC->SetTakingGuage(PointTakeATeamGauge, PointTakeBTeamGauge);
+			PC->SetPercent(Occupation, PointATeamGaugePercent, PointBTeamGaugePercent);
+			PC->SetClashing(Clash);
+			PC->SetExtraTime(ExtraTime);
 
+			PC->SetIsATeamExtraTime(IsGetATeamExtraTime);
+			PC->SetIsBTeamExtraTime(IsGetBTeamExtraTime);
+
+		}
+	}
+	else
+	{
+		if (GS)
+		{
+			GS->PlayTime = PlayTime;
+		}
+		if (PC)
+		{
+			PC->SetPlayTime(PlayTime);
+		}
+	}
 }
+
+//APawn* AGM_TrainingRoom::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot)
+//{
+//	// 임시용으로 사용
+//	UE_LOG(LogTemp, Warning, TEXT("SpawnDefaultPawnFor_Implementation"));
+//	if (NewPlayer->IsLocalPlayerController()) // 서버라면
+//	{
+//		return GetWorld()->SpawnActor<ACharacter_Phase>(ACharacter_Phase::StaticClass(),StartSpot->GetActorLocation(), StartSpot->GetActorRotation());
+//	}
+//	else
+//	{
+//		return GetWorld()->SpawnActor<ACharacter_Muriel>(ACharacter_Muriel::StaticClass(), StartSpot->GetActorLocation(), StartSpot->GetActorRotation());
+//	}
+//}
 
 void AGM_TrainingRoom::UpdatePointGauge(float DeltaTime)
 {
@@ -161,7 +206,7 @@ void AGM_TrainingRoom::UpdatePointGauge(float DeltaTime)
 				// B팀 점령하기 위한 게이지를 차감하기
 				PointTakeBTeamGauge -= 40 * DeltaTime;
 				// 게이지가 0이 되면 0으로 고정
-				if (PointTakeBTeamGauge <= 0)
+				if (PointTakeBTeamGauge <= 1.0f)
 				{
 					PointTakeBTeamGauge = 0.0f;
 				}
@@ -172,7 +217,7 @@ void AGM_TrainingRoom::UpdatePointGauge(float DeltaTime)
 				// A팀이 점령하기 위한 게이지를 증가시킨다.
 				PointTakeATeamGauge += 15 * PointATeamCount * DeltaTime;
 				// 게이지가 100이 되면 점령하기 위한 게이지는 0으로 하고 거점상태를 A팀점령상태로 변경
-				if (PointTakeATeamGauge >= 100.0f)
+				if (PointTakeATeamGauge >= 99.0f)
 				{
 					PointTakeATeamGauge = 0.0f;
 					Occupation = EOccupation::TeamA;
@@ -187,7 +232,7 @@ void AGM_TrainingRoom::UpdatePointGauge(float DeltaTime)
 			if (PointTakeATeamGauge > 0)
 			{
 				PointTakeATeamGauge -= 40 * DeltaTime;
-				if (PointTakeATeamGauge <= 0)
+				if (PointTakeATeamGauge <= 1.0f)
 				{
 					PointTakeATeamGauge = 0.0f;
 				}
@@ -196,7 +241,7 @@ void AGM_TrainingRoom::UpdatePointGauge(float DeltaTime)
 			{
 				PointTakeBTeamGauge += 15 * PointBTeamCount * DeltaTime;
 
-				if (PointTakeBTeamGauge >= 100.0f)
+				if (PointTakeBTeamGauge >= 99.0f)
 				{
 					PointTakeBTeamGauge = 0.0f;
 					Occupation = EOccupation::TeamB;
@@ -261,7 +306,7 @@ void AGM_TrainingRoom::UpdatePointGauge(float DeltaTime)
 		if (IsGetBTeamExtraTime)
 		{
 			// A팀 게이지가 99.5% 이상이면
-			if (PointATeamGauge >= 118.0f)
+			if (PointATeamGaugePercent >= 99.0f)
 			{
 				// 추가시간이 끝났다면
 				if (ExtraTime <= 0)
@@ -273,7 +318,7 @@ void AGM_TrainingRoom::UpdatePointGauge(float DeltaTime)
 				else
 				{
 					// A팀 게이지를 99.5%로 고정
-					PointATeamGauge = 118.0f;
+					PointATeamGaugePercent = 99.5f;
 
 					// B팀이 거점에 들어왔을 경우
 					if (PointBTeamCount > 0)
@@ -370,7 +415,7 @@ void AGM_TrainingRoom::UpdatePointGauge(float DeltaTime)
 		if (IsGetATeamExtraTime)
 		{
 			// B팀 게이지가 99.5% 이상이면
-			if (PointBTeamGauge >= 118.0f)
+			if (PointBTeamGaugePercent >= 99.5f)
 			{
 				// 추가시간이 끝났다면
 				if (ExtraTime <= 0)
@@ -382,7 +427,7 @@ void AGM_TrainingRoom::UpdatePointGauge(float DeltaTime)
 				else
 				{
 					// B팀 게이지를 99.5%로 고정
-					PointBTeamGauge = 118.0f;
+					PointBTeamGaugePercent = 99.5f;
 					// A팀이 거점에 들어왔을 경우
 					if (PointATeamCount > 0)
 					{
@@ -415,8 +460,6 @@ void AGM_TrainingRoom::UpdatePointGauge(float DeltaTime)
 		{
 			PointBTeamGauge += DeltaTime;
 		}
-
-		PointBTeamGauge += DeltaTime;
 
 		if (PointBTeamCount == 0 and PointATeamCount > 0)
 		{

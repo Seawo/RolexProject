@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GM_TrainingRoom.h"
 #include "GameFramework/PlayerController.h"
 #include "PlayerController_TrainingRoom.generated.h"
 
@@ -19,6 +20,19 @@ class ROLEXPROJECT_API APlayerController_TrainingRoom : public APlayerController
 
 	void InitUI();
 
+public:
+	void SetPlayTime(float Time);
+	void SetTakingGuage(float Agauge, float Bgauge);
+
+	void SetATeamCount(int32 Count);
+	void SetBTeamCount(int32 Count);
+	void SetPercent(EOccupation occupation, float APercent, float BPercent);
+
+	void SetClashing(EClashing clash);
+	void SetExtraTime(float Time);
+
+	void SetIsATeamExtraTime(bool bExtra);
+	void SetIsBTeamExtraTime(bool bExtra);
 
 public:
 	UPROPERTY(EditAnywhere, Category = "UI")

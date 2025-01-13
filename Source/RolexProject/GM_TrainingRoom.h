@@ -46,6 +46,10 @@ class ROLEXPROJECT_API AGM_TrainingRoom : public AGameModeBase
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
+	//virtual APawn* SpawnDefaultPawnFor_Implementation(AController* NewPlayer, class AActor* StartSpot) override;
+
+
+
 	void UpdatePointGauge(float DeltaTime);
 
 	// 각 팀의 인원 변경값 함수
@@ -58,7 +62,7 @@ public:
 
 private:
 	class AGS_TrainingRoom* GS;
-
+	class APlayerController_TrainingRoom* PC;
 
 	bool IsActiveBsePoint = false;
 
@@ -105,6 +109,7 @@ public:
 	// 추가 시간 (거점 점령 퍼센트가 90퍼센트가 넘어 가게 될때 상대팀이 거점을 밟을 경우 추가 시간이 주어지며, 거점 게이지는 동결된다.)
 	// (추가 시간은 시간이 지날수록 최대치가 줄어들며, 상대팀이 거점을 밟고 있을 경우 추가 시간은 줄어들지 않는다. 추가 시간이 0이 되면 거점 게이지는 다시 작동한다.)
 	float ExtraTime = 8.0f;
+	float MaxExtraTime = 8.0f;
 	float ExtraTimeDecrease = 1.0f;
 
 	// 추가 시간 여부 확인

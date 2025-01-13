@@ -39,18 +39,14 @@ protected:
 	void OnRep_PointBTeamCount();
 
 	UFUNCTION()
-	void OnRep_PointTakeATeamGauge();
-	UFUNCTION()
-	void OnRep_PointTakeBTeamGauge();
+	void OnRep_PointTakeGauge();
 
 	UFUNCTION()
 	void OnRep_PointATeamGauge();
 	UFUNCTION()
 	void OnRep_PointBTeamGauge();
 	UFUNCTION()
-	void OnRep_PointATeamGaugePercent();
-	UFUNCTION()
-	void OnRep_PointBTeamGaugePercent();
+	void OnRep_PointGaugePercent();
 
 	UFUNCTION()
 	void OnRep_WaitTime();
@@ -69,6 +65,9 @@ protected:
 
 
 public:
+	UPROPERTY(VisibleAnywhere, Category = "Info")
+	class APlayerController_TrainingRoom* PC;
+
 	UPROPERTY(ReplicatedUsing = OnRep_PlayTime)
 	float PlayTime = 0.0f;
 	UPROPERTY(VisibleAnywhere, Category = "Info")
@@ -98,9 +97,9 @@ public:
 	int32 PointBTeamCount = 0;
 
 	// 팀별 거점 점령하기 위한 게이지 (거점이 점령되지 않았을 경우나 상대팀 거점일 경우에 거점에 상대팀이 없을 때, 이 게이지가 올라가며, 이 게이지가 다 차면 본인팀 거점으로 점령)
-	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_PointTakeATeamGauge, Category = "Info")
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_PointTakeGauge, Category = "Info")
 	float PointTakeATeamGauge = 0;
-	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_PointTakeBTeamGauge, Category = "Info")
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_PointTakeGauge, Category = "Info")
 	float PointTakeBTeamGauge = 0;
 
 	// 팀별 점령 게이지 (거점이 점령됬을 때, 점령한 팀의 게이지가 증가, 게이지가 100퍼되면 그 팀의 게임 승리)
@@ -108,9 +107,9 @@ public:
 	float PointATeamGauge = 0;
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_PointBTeamGauge, Category = "Info")
 	float PointBTeamGauge = 0;
-	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_PointATeamGaugePercent, Category = "Info")
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_PointGaugePercent, Category = "Info")
 	float PointATeamGaugePercent = 0;
-	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_PointBTeamGaugePercent, Category = "Info")
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_PointGaugePercent, Category = "Info")
 	float PointBTeamGaugePercent = 0;
 
 	// 대기 시간 (거점 점령하기 위한 게이지가 일부 차있는 상태에서 그 팀이 거점을 밟고 있지 않을 경우에 게이지가 초기화되기 까지의 대기 시간)

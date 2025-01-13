@@ -3,10 +3,12 @@
 
 #include "LSH/GS_TrainingRoom.h"
 
+#include "PlayerController_TrainingRoom.h"
 #include "GM_TrainingRoom.h"
 #include "Kismet/GameplayStatics.h"
 #include "Actor_FightPoint.h"
 #include "BaseCharacter.h"
+#include "UI_Zone.h"
 
 #include "Net/UnrealNetwork.h"
 
@@ -20,6 +22,8 @@ AGS_TrainingRoom::AGS_TrainingRoom()
 void AGS_TrainingRoom::BeginPlay()
 {
 	Super::BeginPlay();
+
+	PC = Cast<APlayerController_TrainingRoom>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
 	if (HasAuthority())
 	{
@@ -69,14 +73,17 @@ void AGS_TrainingRoom::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 void AGS_TrainingRoom::OnRep_PlayTime()
 {
-	if (HasAuthority())
-	{
-		UE_LOG(LogTemp, Log, TEXT("[GS_OnRep_Server] PlayTime"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("[GS_OnRep_Client] PlayTime"));
-	}
+	//if (HasAuthority())
+	//{
+	//	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep_Server] PlayTime"));
+	//	PC->SetPlayTime(PlayTime);
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep_Client] PlayTime"));
+	//	PC->UI_Zone->SetPlayTime(PlayTime);
+	//}
+	PC->SetPlayTime(PlayTime);
 }
 
 void AGS_TrainingRoom::OnRep_Points()
@@ -97,26 +104,27 @@ void AGS_TrainingRoom::OnRep_Result()
 void AGS_TrainingRoom::OnRep_Clash()
 {
 	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] Clash"));
+	PC->SetClashing(Clash);
 }
 
 void AGS_TrainingRoom::OnRep_PointATeamCount()
 {
-	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] PointATeamCount"));
+	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] PointATeamCount"));
+	//PC->UI_Zone->SetATeamCount(PointATeamCount);
+	PC->SetATeamCount(PointATeamCount);
 }
 
 void AGS_TrainingRoom::OnRep_PointBTeamCount()
 {
-	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] PointBTeamCount"));
+	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] PointBTeamCount"));
+	//PC->UI_Zone->SetBTeamCount(PointBTeamCount);
+	PC->SetBTeamCount(PointBTeamCount);
 }
 
-void AGS_TrainingRoom::OnRep_PointTakeATeamGauge()
+void AGS_TrainingRoom::OnRep_PointTakeGauge()
 {
 	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] PointTakeATeamGauge"));
-}
-
-void AGS_TrainingRoom::OnRep_PointTakeBTeamGauge()
-{
-	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] PointTakeBTeamGauge"));
+	PC->SetTakingGuage(PointTakeATeamGauge, PointTakeBTeamGauge);
 }
 
 void AGS_TrainingRoom::OnRep_PointATeamGauge()
@@ -129,14 +137,10 @@ void AGS_TrainingRoom::OnRep_PointBTeamGauge()
 	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] PointBTeamGauge"));
 }
 
-void AGS_TrainingRoom::OnRep_PointATeamGaugePercent()
+void AGS_TrainingRoom::OnRep_PointGaugePercent()
 {
 	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] PointATeamGaugePercent"));
-}
-
-void AGS_TrainingRoom::OnRep_PointBTeamGaugePercent()
-{
-	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] PointBTeamGaugePercent"));
+	PC->SetPercent(Occupation ,PointATeamGaugePercent, PointBTeamGaugePercent);
 }
 
 void AGS_TrainingRoom::OnRep_WaitTime()
@@ -147,6 +151,7 @@ void AGS_TrainingRoom::OnRep_WaitTime()
 void AGS_TrainingRoom::OnRep_ExtraTime()
 {
 	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] ExtraTime"));
+	PC->SetExtraTime(ExtraTime);
 }
 
 void AGS_TrainingRoom::OnRep_ExtraTimeDecrease()
@@ -156,10 +161,12 @@ void AGS_TrainingRoom::OnRep_ExtraTimeDecrease()
 
 void AGS_TrainingRoom::OnRep_IsGetATeamExtraTime()
 {
-	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] IsGetATeamExtraTime"))
+	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] IsGetATeamExtraTime"));
+	PC->SetIsATeamExtraTime(IsGetATeamExtraTime);
 }
 
 void AGS_TrainingRoom::OnRep_IsGetBTeamExtraTime()
 {
-	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] IsGetBTeamExtraTime"))
+	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] IsGetBTeamExtraTime"));
+	PC->SetIsBTeamExtraTime(IsGetBTeamExtraTime);
 }
