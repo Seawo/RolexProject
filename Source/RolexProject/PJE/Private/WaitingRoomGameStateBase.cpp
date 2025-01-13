@@ -21,7 +21,6 @@ void AWaitingRoomGameStateBase::BeginPlay()
 	}
 }
 
-
 void AWaitingRoomGameStateBase::MulticastRPC_UpdatePlayerSlotID_Implementation(int32 PlayerNum, const FString& NewText)
 {
 	WaitingRoomUI->PlayerSlots[PlayerNum]->PlayerID->SetText(FText::FromString(NewText));
@@ -29,21 +28,17 @@ void AWaitingRoomGameStateBase::MulticastRPC_UpdatePlayerSlotID_Implementation(i
 
 void AWaitingRoomGameStateBase::StartCountdownBeforeHeroSelection()
 {
-	// FTimerHandle CountdownTimerHandle;
-	// GetWorld()->GetTimerManager().SetTimer(CountdownTimerHandle, )
+	FTimerHandle CountdownTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(CountdownTimerHandle,
+		this, &AWaitingRoomGameStateBase::MultiCastRPC_Countdown, 1.0f, true);
 }
 
-void AWaitingRoomGameStateBase::OnRep_Countdown()
-{
-}
-
-void AWaitingRoomGameStateBase::MultiCastRPC_CountdownHeroSelection_Implementation()
+void AWaitingRoomGameStateBase::MultiCastRPC_Countdown_Implementation()
 {
 }
 
 void AWaitingRoomGameStateBase::MultiCastRPC_StartHeroSelection_Implementation()
 {
-	
 }
 
 

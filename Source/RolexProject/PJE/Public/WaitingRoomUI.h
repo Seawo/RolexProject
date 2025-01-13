@@ -36,6 +36,10 @@ public:
 
 public:
 	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* CountDown;
+	
+public:
+	UPROPERTY(meta = (BindWidget))
 	class UButton* StartButton;
 
 	UFUNCTION()

@@ -24,15 +24,10 @@ public:
 	
 	void StartCountdownBeforeHeroSelection();
 	
-	// UPROPERTY(ReplicatedUsing=OnRep_Countdown)
-	// int32 CountdownTime;
+	int32 CountdownTime;
 
-	UFUNCTION()
-	void OnRep_Countdown();
-
-	
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiCastRPC_CountdownHeroSelection();	
+	void MultiCastRPC_Countdown();	
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_StartHeroSelection();

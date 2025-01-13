@@ -45,33 +45,17 @@ void AWaitingRoomGameModeBase::HandleStartingNewPlayer_Implementation(APlayerCon
 		}
 
 		// update new player for the existing players
-		// ARolexPlayerController* ServerPlayerController =  Cast<ARolexPlayerController>(GetWorld()->GetFirstPlayerController());
-		// if (ServerPlayerController)
-		// {
-		// 	ServerPlayerController->WaitingRoomUI->PlayerSlots[CurrentPlayersNum]->Playe?rIDString = SteamId;
-		// 	ServerPlayerController->WaitingRoomUI->PlayerSlots[CurrentPlayersNum]->OnRep_SetPlayerID();		// for Server
-		// }
 		AWaitingRoomGameStateBase* WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetGameState<AGameStateBase>());
 		if (WaitingRoomGameStateBase)
 		{
 			if (WaitingRoomGameStateBase->WaitingRoomUI)
 			{
+				WaitingRoomGameStateBase->MulticastRPC_UpdatePlayerSlotID(CurrentPlayersNum, SteamId);
+				// WaitingRoomGameStateBase->WaitingRoomUI is different by player
 				// WaitingRoomGameStateBase->WaitingRoomUI->PlayerSlots[CurrentPlayersNum]->PlayerIDString = SteamId;
 				// WaitingRoomGameStateBase->WaitingRoomUI->PlayerSlots[CurrentPlayersNum]->OnRep_SetPlayerID();
-				WaitingRoomGameStateBase->MulticastRPC_UpdatePlayerSlotID(CurrentPlayersNum, SteamId);
 			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("No Room UI"));
-			}
-
 		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("No Game State"));
-		}
-
-			
 		
 		CurrentPlayersNum++;
 		UE_LOG(LogTemp, Warning, TEXT("Number of Current Players = %d"), CurrentPlayersNum);
