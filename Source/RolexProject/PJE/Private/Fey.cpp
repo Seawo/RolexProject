@@ -78,10 +78,23 @@ void AFey::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AFey::InputAttack(const FInputActionValue& inputValue)
 {
+	for (const TPair<FString, UAnimMontage*>& Pair : AttackMontages)
+	{
+		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(Pair.Value))
+		{
+			return;
+		}
+	}
+
 	int32 InputVector = inputValue.Get<float>();	// each input value are represented as a float val
 	InputVector--;
 	CurrentAttackState = static_cast<EAttackState>(InputVector);
 	ChangeAttackState(CurrentAttackState);
+	if (IsLocallyControlled())
+	{
+		Server_ChangeAttackState(CurrentAttackState);
+	}
+
 }
 
 void AFey::ChangeAttackState(EAttackState newState)
@@ -105,6 +118,61 @@ void AFey::ChangeAttackState(EAttackState newState)
 	}
 }
 
+void AFey::Server_ChangeAttackState_Implementation(EAttackState state)
+{
+	Multi_ChangeAttackState(state);
+}
+
+void AFey::Multi_ChangeAttackState_Implementation(EAttackState state)
+{
+	switch (state)
+	{
+	case EAttackState::QSkill:
+		PlayAnimMontage(AttackMontages["Q"], 1.0f);
+		break;
+	case EAttackState::ESkill:
+		PlayAnimMontage(AttackMontages["E"], 1.0f);
+		break;
+	case EAttackState::LMB:
+		break;
+	case EAttackState::RMB:
+		break;
+	case EAttackState::QSkill_Completed:
+		break;
+	case EAttackState::ESkill_Completed:
+		break;
+	case EAttackState::LMB_Completed:
+		PlayAnimMontage(AttackMontages["LMB"], 1.0f);
+		break;
+	case EAttackState::RMB_Completed:
+		PlayAnimMontage(AttackMontages["RMB"], 1.0f);
+		break;
+	default:
+		break;
+	}
+}
+
+void AFey::Server_SpawnQActor_Implementation()
+{
+	FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
+	FRotator SpawnRotation = FRotator(0.0f, FMath::FRandRange(0, 360.0f), 0.0f);
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.Owner = this;
+
+	AUltimateBall* Ball = GetWorld()->SpawnActor<AUltimateBall>(UltimateBallFactory, SpawnLocation, SpawnRotation, SpawnParameters);
+	if (Ball)
+	{
+		Ball->ProjectileMovement->SetVelocityInLocalSpace(
+			FVector(
+				FMath::FRandRange(MinVelocity, MaxVelocity),
+				FMath::FRandRange(MinVelocity, MaxVelocity),
+				FMath::FRandRange(MinVelocity, MaxVelocity))
+		);
+		Ball->ProjectileMovement->Activate();
+	}
+}
+
+
 void AFey::QAttack()
 {
 	 FString AttackName = TEXT("Q");
@@ -117,26 +185,11 @@ void AFey::QAttack()
 	// spawn heal & damage balls
 	for (int32 i=0; i<NumberOfBalls; i++)
 	{
-		FVector SpawnLocation = GetActorLocation() + GetActorForwardVector()*100.0f;
-		FRotator SpawnRotation = FRotator(0.0f, FMath::FRandRange(0, 360.0f), 0.0f);
-		FActorSpawnParameters SpawnParameters;
-		SpawnParameters.Owner = this;
-		
-		AUltimateBall* Ball = GetWorld()->SpawnActor<AUltimateBall>(UltimateBallFactory, SpawnLocation, SpawnRotation, SpawnParameters);
-		if (Ball)
-		{
-			Ball->ProjectileMovement->SetVelocityInLocalSpace(
-				FVector(
-					FMath::FRandRange(MinVelocity, MaxVelocity),
-					FMath::FRandRange(MinVelocity, MaxVelocity),
-					FMath::FRandRange(MinVelocity, MaxVelocity))
-					);
-			Ball->ProjectileMovement->Activate();
-		}
+		Server_SpawnQActor();
 	}
 	
 	SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
-	PlayAnimMontage(AttackMontages[AttackName], 1.0f);
+	//PlayAnimMontage(AttackMontages[AttackName], 1.0f);
 	SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
 }
 
@@ -167,7 +220,7 @@ void AFey::EAttack()
 	}
 	
 	SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
-	PlayAnimMontage(AttackMontages[AttackName], 1.0f);
+	//PlayAnimMontage(AttackMontages[AttackName], 1.0f);
 	SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
 }
 
@@ -246,7 +299,12 @@ void AFey::LMBAttack()
 	}
 	
 	SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
-	PlayAnimMontage(AttackMontages[AttackName], 1.0f);
+	//PlayAnimMontage(AttackMontages[AttackName], 1.0f);
+	CurrentAttackState = EAttackState::LMB_Completed;
+	if (IsLocallyControlled())
+	{
+		Server_ChangeAttackState(CurrentAttackState);
+	}
 	SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
 }
 
@@ -316,7 +374,12 @@ void AFey::RMBAttack()
 	}
 	
 	SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
-	PlayAnimMontage(AttackMontages[AttackName], 1.0f);
+	//PlayAnimMontage(AttackMontages[AttackName], 1.0f);
+	CurrentAttackState = EAttackState::RMB_Completed;
+	if (IsLocallyControlled())
+	{
+		Server_ChangeAttackState(CurrentAttackState);
+	}
 	SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
 }
 
