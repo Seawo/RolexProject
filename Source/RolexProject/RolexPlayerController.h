@@ -15,5 +15,22 @@ class ROLEXPROJECT_API ARolexPlayerController : public APlayerController
 	GENERATED_BODY()
 
 	ARolexPlayerController();
+
+public:
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UWaitingRoomUI> WaitingRoomUIFactory;
+
+	UWaitingRoomUI* WaitingRoomUI;
+
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_CreateWaitingRoomUI();
 	
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_InitWaitingRoomUI(const TArray<FString>& IDArray);
+
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_SetPlayerSlotUI(int32 PlayerNumber);
+	
+public:
+	class UPlayerSlotUI* OwnPlayerSlot;
 };

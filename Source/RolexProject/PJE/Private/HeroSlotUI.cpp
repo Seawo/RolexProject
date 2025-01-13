@@ -3,6 +3,7 @@
 
 #include "HeroSlotUI.h"
 
+#include "PlayerSlotUI.h"
 #include "RolexGameInstance.h"
 #include "RolexPlayerController.h"
 #include "RolexPlayerState.h"
@@ -17,11 +18,12 @@ void UHeroSlotUI::NativeConstruct()
 
 	HeroSelectButton->OnClicked.AddDynamic(this, &UHeroSlotUI::OnHeroSelectButtonClicked);
 
-	AWaitingRoomGameModeBase* WaitingRoomGameModeBase = GetWorld()->GetAuthGameMode<AWaitingRoomGameModeBase>();
-	if (WaitingRoomGameModeBase)
+	ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(GetOwningPlayer());
+	UPlayerSlotUI* PlayerSlotUI = RolexPlayerController->OwnPlayerSlot;
+	if (PlayerSlotUI)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("HeroSlotUI BindDelegate"));
-		HeroSelectButtonClickedDelegate.BindUObject(WaitingRoomGameModeBase, &AWaitingRoomGameModeBase::SetPlayerSlotImage);
+		UE_LOG(LogTemp, Warning, TEXT("HeroSlotUI Bind Delegate"));
+		HeroSelectButtonClickedDelegate.BindUObject(PlayerSlotUI, &UPlayerSlotUI::ServerRPC_SetPlayerHeroImage);
 	}
 }
 
@@ -30,7 +32,7 @@ void UHeroSlotUI::OnHeroSelectButtonClicked()
 	//  set image on player slot in waiting room UI  
 	HeroSelectButtonClickedDelegate.ExecuteIfBound(HeroTexture);
 	
-	//  set default pawn class
+	//  map player and pawn class for the main level 
 	ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(GetOwningPlayerState());
 	if (RolexPlayerState)
 	{
@@ -44,13 +46,13 @@ void UHeroSlotUI::OnHeroSelectButtonClicked()
 
 			UE_LOG(LogTemp, Warning,TEXT("PlayerHeroSelections: %d"), RolexGameInstance->PlayerHeroSelections.Num());
 
+			// debug
 			for (auto Pair : RolexGameInstance->PlayerHeroSelections)
 			{
-				FString Mapkey = Pair.Key;
-				if (*Mapkey)
+				if (FString Mapkey = Pair.Key; *Mapkey)
 					UE_LOG(LogTemp, Warning, TEXT("%s"), *Mapkey);
-				TSubclassOf<ABaseCharacter> MapValue = Pair.Value;
-				if (MapValue)
+				
+				if (TSubclassOf<ABaseCharacter> MapValue = Pair.Value)
 					UE_LOG(LogTemp, Warning, TEXT("%s"), *MapValue->GetName());
 			}
 		}

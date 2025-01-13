@@ -17,22 +17,26 @@ class ROLEXPROJECT_API UWaitingRoomUI : public UUserWidget
 	virtual void NativeConstruct() override;
 	
 public:
+	// players box
 	UPROPERTY(meta = (BindWidget))
 	class UHorizontalBox* PlayerBox;
 
-	TArray<class UVerticalBox*> PlayerSlots;
+	TArray<class UPlayerSlotUI*> PlayerSlots;
 
 	int32 NumplayerSlots;
 	
 	void AddPlayer();
 
+public:
+	// hero selection
 	UPROPERTY(meta = (BindWidget))
 	class UUniformGridPanel* HeroSelectionPanel;
 
-	TArray<class UButton*> HeroButtonArray;
+	TArray<class UHeroSlotUI*> HeroButtonArray;
 
+public:
 	UPROPERTY(meta = (BindWidget))
-	UButton* StartButton;
+	class UButton* StartButton;
 
 	UFUNCTION()
 	void TravelToMain();
