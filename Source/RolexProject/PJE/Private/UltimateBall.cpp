@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "UltimateBall.h"
@@ -42,7 +42,8 @@ AUltimateBall::AUltimateBall()
 		MeshComponent->SetMaterial(0, SelectedMaterial);
 	}
 	
-	InitialLifeSpan = 3.0f;
+	//InitialLifeSpan = 3.0f;
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -50,6 +51,8 @@ void AUltimateBall::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SetLifeSpan(3.0f);
+	
 	OwnCharacter = Cast<ABaseCharacter>(GetOwner());
 	
 	Sphere->OnComponentHit.AddDynamic(this, &AUltimateBall::OnHit);
@@ -60,6 +63,21 @@ void AUltimateBall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (HasAuthority())
+	{
+		Server_ActorPos(GetActorLocation());
+	}
+}
+
+void AUltimateBall::Server_ActorPos_Implementation(FVector pos)
+{
+	SetActorLocation(pos);
+	Multi_ActorPos(pos);
+}
+
+void AUltimateBall::Multi_ActorPos_Implementation(FVector pos)
+{
+	SetActorLocation(pos);
 }
 
 void AUltimateBall::OnHit(
@@ -95,4 +113,5 @@ void AUltimateBall::OnHit(
 	// FVector BounceDirection = NormalImpulse.GetSafeNormal();
 	// ProjectileMovement->Velocity = BounceDirection * 1000.0f;
 }
+
 

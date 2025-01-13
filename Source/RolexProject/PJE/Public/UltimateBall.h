@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -22,6 +22,12 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(Server, Reliable)
+	void Server_ActorPos(FVector pos);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multi_ActorPos(FVector pos);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite);
