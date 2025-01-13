@@ -16,11 +16,20 @@ class ROLEXPROJECT_API AWaitingRoomGameStateBase : public AGameStateBase
 
 public:
 	virtual void BeginPlay() override;
-	
+
+public:
 	class UWaitingRoomUI* WaitingRoomUI;
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_UpdatePlayerSlotID(int32 PlayerNum, const FString& NewText);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPC_Notice(const FString& NewText);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPC_UpdatePlayerTeam(class ARolexPlayerState* RolexPlayerState);
+public:
+	void MatchPlayers();
 	
 	void StartCountdownBeforeHeroSelection();
 	

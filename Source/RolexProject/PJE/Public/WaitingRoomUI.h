@@ -36,7 +36,10 @@ public:
 
 public:
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* CountDown;
+	class UTextBlock* Notice;
+	
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* CountDown;
 	
 public:
 	UPROPERTY(meta = (BindWidget))

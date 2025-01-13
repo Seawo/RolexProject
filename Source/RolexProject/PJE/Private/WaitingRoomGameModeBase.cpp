@@ -65,8 +65,10 @@ void AWaitingRoomGameModeBase::HandleStartingNewPlayer_Implementation(APlayerCon
 	if (CurrentPlayersNum == MaxPlayersNum)
 	{
 		AWaitingRoomGameStateBase* WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetGameState<AGameStateBase>());
-		if (WaitingRoomGameStateBase)
-			WaitingRoomGameStateBase->StartCountdownBeforeHeroSelection();
+		WaitingRoomGameStateBase->MulticastRPC_Notice(TEXT("Start Matching"));
+		
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, WaitingRoomGameStateBase, &AWaitingRoomGameStateBase::MatchPlayers, 2.0f, false);
 	}
 }
 

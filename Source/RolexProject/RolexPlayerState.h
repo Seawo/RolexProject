@@ -23,5 +23,7 @@ public:
 
 	FString UniqueID;
 
+	bool Team;
+	
 	void FindUniqueID();
 };

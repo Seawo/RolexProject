@@ -7,6 +7,7 @@
 #include "Components/Button.h"
 #include "Components/UniformGridPanel.h"
 #include "Components/HorizontalBox.h"
+#include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Net/UnrealNetwork.h"
 
@@ -14,6 +15,11 @@ void UWaitingRoomUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	Notice->SetVisibility(ESlateVisibility::Hidden);
+	CountDown->SetVisibility(ESlateVisibility::Hidden);
+	HeroSelectionPanel->SetVisibility(ESlateVisibility::Hidden);
+	StartButton->SetVisibility(ESlateVisibility::Hidden);
+	
 	StartButton->OnClicked.AddDynamic(this, &UWaitingRoomUI::TravelToMain);
 	
 	// get player slots from player horizontal box
