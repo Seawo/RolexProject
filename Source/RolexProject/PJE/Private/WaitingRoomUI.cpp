@@ -3,10 +3,12 @@
 
 #include "WaitingRoomUI.h"
 
+#include "PlayerSlotUI.h"
 #include "Components/Button.h"
 #include "Components/UniformGridPanel.h"
 #include "Components/HorizontalBox.h"
 #include "Components/VerticalBox.h"
+#include "Net/UnrealNetwork.h"
 
 void UWaitingRoomUI::NativeConstruct()
 {
@@ -17,11 +19,11 @@ void UWaitingRoomUI::NativeConstruct()
 	// get player slots from player horizontal box
 	if (PlayerBox)
 	{
-		const TArray<UWidget*> PlayerBoxChildren =  PlayerBox->GetAllChildren();
+		TArray<UWidget*> PlayerBoxChildren =  PlayerBox->GetAllChildren();
 
 		for (UWidget* PlayerBoxChild : PlayerBoxChildren)
 		{
-			if (UVerticalBox* PlayerVerticalBox = Cast<UVerticalBox>(PlayerBoxChild))
+			if (UPlayerSlotUI* PlayerVerticalBox = Cast<UPlayerSlotUI>(PlayerBoxChild))
 				PlayerSlots.Add(PlayerVerticalBox);
 		}
 		

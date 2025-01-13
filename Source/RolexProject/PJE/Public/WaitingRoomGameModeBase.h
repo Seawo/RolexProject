@@ -20,33 +20,20 @@ class ROLEXPROJECT_API AWaitingRoomGameModeBase : public AGameModeBase
 public:
 	IOnlineSubsystem* OnlineSubsystem;
 	
+
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class UWaitingRoomUI> WaitingRoomUIFactory;
+	int32 MaxPlayersNum = 2;
 
-	UWaitingRoomUI* WaitingRoomUI;
-
-	void InitializeUI();
-	
 	int32 CurrentPlayersNum = 0;
-
-	UPROPERTY(EditAnywhere)
-	int32 MaxPlayersNum = 1;
-
+	
 	// called when a new player joins the server
 	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
-
+	
 	FString GetSteamID(APlayerController* NewPlayer);
 
-	UFUNCTION()
-	void SetPlayerSlotImage(UTexture2D* Texture2D);
-
+	TArray<FString> PlayerIDArray;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<class ABaseCharacter*> HeroArray;
-	
-	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
-
-	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
-
-	
 };
 
