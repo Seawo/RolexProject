@@ -25,17 +25,19 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* PlayerID;
 
-	UFUNCTION(Server, Reliable)
-	void ServerRPC_SetPlayerHeroImage(UTexture2D* PlayerHeroTexture);
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastRPC_SetPlayerHeroImage(UTexture2D* PlayerHeroTexture);
+	// UFUNCTION(Server, Reliable)
+	// void ServerRPC_SetPlayerHeroImage(UTexture2D* PlayerHeroTexture, int32 Index);
+	//
+	// UFUNCTION(NetMulticast, Reliable)
+	// void MulticastRPC_SetPlayerHeroImage(UTexture2D* PlayerHeroTexture, int32 Index);
 
 	UPROPERTY(ReplicatedUsing=OnRep_SetPlayerID)
 	FString PlayerIDString;
 
 	UFUNCTION()
 	void OnRep_SetPlayerID();
+
+	int32 PlayerSlotIndex;
 
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;

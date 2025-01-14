@@ -3,24 +3,37 @@
 
 #include "PlayerSlotUI.h"
 
+#include "RolexPlayerState.h"
+#include "WaitingRoomGameModeBase.h"
+#include "WaitingRoomGameStateBase.h"
+#include "WaitingRoomUI.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Net/UnrealNetwork.h"
 
 
-void UPlayerSlotUI::ServerRPC_SetPlayerHeroImage_Implementation(UTexture2D* PlayerHeroTexture)
-{
-	MulticastRPC_SetPlayerHeroImage(PlayerHeroTexture);
-}
 
-void UPlayerSlotUI::MulticastRPC_SetPlayerHeroImage_Implementation(UTexture2D* PlayerHeroTexture)
-{
-	PlayerHeroImage->SetBrushFromTexture(PlayerHeroTexture);
-}
+
+// void UPlayerSlotUI::ServerRPC_SetPlayerHeroImage_Implementation(UTexture2D* PlayerHeroTexture, int32 Index)
+// {
+// 	UE_LOG(LogTemp, Warning, TEXT("ServerRPC_SetPlayerHeroImage, Index: %d"), Index);
+// 	MulticastRPC_SetPlayerHeroImage(PlayerHeroTexture, Index);
+// }
+//
+// void UPlayerSlotUI::MulticastRPC_SetPlayerHeroImage_Implementation(UTexture2D* PlayerHeroTexture, int32 Index)
+// {
+// 	UE_LOG(LogTemp, Warning, TEXT("MulticastRPC_SetPlayerHeroImage"));
+// 	AWaitingRoomGameStateBase* WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetWorld()->GetGameState());
+// 	if (WaitingRoomGameStateBase)
+// 	{
+// 		WaitingRoomGameStateBase->WaitingRoomUI->PlayerSlots[Index]->PlayerHeroImage->SetBrushFromTexture(PlayerHeroTexture);
+// 	}
+// }
 
 void UPlayerSlotUI::OnRep_SetPlayerID()
 {
 	PlayerID->SetText(FText::FromString(PlayerIDString));
+	
 	UE_LOG(LogTemp, Display, TEXT("OnRep_SetPlayerID"));
 }
 

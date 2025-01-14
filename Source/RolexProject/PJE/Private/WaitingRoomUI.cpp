@@ -3,6 +3,7 @@
 
 #include "WaitingRoomUI.h"
 
+#include "HeroSlotUI.h"
 #include "PlayerSlotUI.h"
 #include "Components/Button.h"
 #include "Components/UniformGridPanel.h"
@@ -35,6 +36,20 @@ void UWaitingRoomUI::NativeConstruct()
 		
 		NumplayerSlots = PlayerSlots.Num();
 		 UE_LOG(LogTemp, Warning, TEXT("Number of Player Slots: %d"), NumplayerSlots);
+	}
+
+	// get Hero Buttons from Hero selection panel
+	if (HeroSelectionPanel)
+	{
+		TArray<UWidget*> HeroSelectionPanelChildren =  HeroSelectionPanel->GetAllChildren();
+
+		for (UWidget* HeroSelectionPanelChild : HeroSelectionPanelChildren)
+		{
+			if (UHeroSlotUI* HeroSlotUI = Cast<UHeroSlotUI>(HeroSelectionPanelChild))
+				HeroButtonArray.Add(HeroSlotUI);
+		}
+		
+		UE_LOG(LogTemp, Warning, TEXT("Number of Hero Buttons: %d"), HeroButtonArray.Num());
 	}
 }
 

@@ -8,6 +8,7 @@
 #include "RolexPlayerState.h"
 #include "WaitingRoomUI.h"
 #include "Algo/RandomShuffle.h"
+#include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Components/UniformGridPanel.h"
@@ -114,6 +115,15 @@ void AWaitingRoomGameStateBase::StartHeroSelectionCountdown()
 	GetWorld()->GetTimerManager().SetTimer(CountdownTimerHandle, this, &AWaitingRoomGameStateBase::MulticastRPC_Countdown, 1.0f, true);
 }
 
+// void AWaitingRoomGameStateBase::ServerRPC_SetPlayerHeroImage_Implementation(UTexture2D* PlayerHeroTexture, int32 Index)
+// {
+// 	MulticastRPC_SetPlayerHeroImage(PlayerHeroTexture, Index);
+// }
+//
+void AWaitingRoomGameStateBase::MulticastRPC_SetPlayerHeroImage_Implementation(UTexture2D* PlayerHeroTexture, int32 Index)
+{
+	WaitingRoomUI->PlayerSlots[Index]->PlayerHeroImage->SetBrushFromTexture(PlayerHeroTexture);
+}
 
 void AWaitingRoomGameStateBase::MulticastRPC_Countdown_Implementation()
 {
@@ -124,13 +134,13 @@ void AWaitingRoomGameStateBase::MulticastRPC_Countdown_Implementation()
 	{
 		WaitingRoomUI->CountDown->SetVisibility(ESlateVisibility::Hidden);		
 		GetWorld()->GetTimerManager().ClearTimer(CountdownTimerHandle);
+		WaitingRoomUI->StartButton->SetVisibility(ESlateVisibility::Visible);
 	}
 	
 	WaitingRoomUI->CountDown->SetVisibility(ESlateVisibility::Visible);
 	WaitingRoomUI->CountDown->SetText(FText::AsNumber(CountdownTime));
 
 	CountdownTime--;
-	UE_LOG(LogTemp, Warning, TEXT("Countdown Time: %d"), CountdownTime);
 }
 
 void AWaitingRoomGameStateBase::MulticastRPC_StartHeroSelection_Implementation()

@@ -50,4 +50,11 @@ public:
 	FTimerHandle CountdownTimerHandle;
 	
 	void StartHeroSelectionCountdown();
+
+// public:
+// 	UFUNCTION(Server, Reliable)
+// 	void ServerRPC_SetPlayerHeroImage(UTexture2D* PlayerHeroTexture, int32 Index);
+//
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPC_SetPlayerHeroImage(UTexture2D* PlayerHeroTexture, int32 Index);
 };

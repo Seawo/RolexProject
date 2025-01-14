@@ -7,7 +7,7 @@
 #include "HeroSlotUI.generated.h"
 
 
-DECLARE_DELEGATE_OneParam(FHeroSelectButtonClikcedDelegate, UTexture2D*)
+DECLARE_DELEGATE_TwoParams(FHeroSelectButtonClikcedDelegate, UTexture2D*, int32);
 
 UCLASS()
 class ROLEXPROJECT_API UHeroSlotUI : public UUserWidget
@@ -33,4 +33,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class ABaseCharacter> BaseCharacter;
+
+	int32 OwnerPlayerSlotIndex;
+
+	class AWaitingRoomGameStateBase*  WaitingRoomGameStateBase;
+
+	class ARolexPlayerController* RolexPlayerController;
 };

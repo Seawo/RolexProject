@@ -17,6 +17,10 @@ class ROLEXPROJECT_API ARolexPlayerController : public APlayerController
 	ARolexPlayerController();
 
 public:
+	virtual void BeginPlay() override;
+	
+	class AWaitingRoomGameStateBase* WaitingRoomGameStateBase;
+		
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UWaitingRoomUI> WaitingRoomUIFactory;
 
@@ -42,4 +46,11 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_InformClientPlayerSlotIndex(int32 PlayerNumber, UPlayerSlotUI* PlayerSlotUI);
+
+public:
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_SetPlayerHeroImage(UTexture2D* PlayerHeroTexture, int32 Index);
+
+	// UFUNCTION(NetMulticast, Reliable)
+	// void MulticastRPC_SetPlayerHeroImage(UTexture2D* PlayerHeroTexture, int32 Index);
 };
