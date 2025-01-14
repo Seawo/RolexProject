@@ -4,6 +4,8 @@
 #include "RolexPlayerController.h"
 
 #include "PlayerSlotUI.h"
+#include "WaitingRoomGameModeBase.h"
+#include "WaitingRoomGameStateBase.h"
 #include "WaitingRoomUI.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
@@ -11,6 +13,33 @@
 
 ARolexPlayerController::ARolexPlayerController()
 {
+	
+}
+
+void ARolexPlayerController::ServerRPC_InformClientPlayerSlotIndex_Implementation(int32 PlayerNumber, UPlayerSlotUI* PlayerSlotUI)
+{
+	PlayerSlotIndex = PlayerNumber;
+	OwnPlayerSlot = PlayerSlotUI;
+}
+
+
+void ARolexPlayerController::ServerRPC_UpdateWholePlayerNumber_Implementation()
+{
+	AWaitingRoomGameStateBase* WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetWorld()->GetGameState());
+	if (WaitingRoomGameStateBase)
+	{
+		WaitingRoomGameStateBase->WholePlayerNumber += 1;
+		AWaitingRoomGameModeBase* WaitingRoomGameModeBase = Cast<AWaitingRoomGameModeBase>(GetWorld()->GetAuthGameMode());
+		if (WaitingRoomGameStateBase->WholePlayerNumber == WaitingRoomGameModeBase->MaxPlayersNum)
+		{
+			
+			WaitingRoomGameStateBase->MulticastRPC_UpdateNotice("Start Matching");
+
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, WaitingRoomGameStateBase, &AWaitingRoomGameStateBase::MatchPlayers, 3.0f, false);
+		}
+	}
+	
 	
 }
 
@@ -37,19 +66,19 @@ void ARolexPlayerController::ClientRPC_CreateWaitingRoomUI_Implementation()
 	}
 }
 
-// init previous information (players who was already in the game)
 
 void ARolexPlayerController::ClientRPC_SetPlayerSlotUI_Implementation(int32 PlayerNumber)
 {
 	// set Steam ID on player slot textbox
+	PlayerSlotIndex = PlayerNumber;
+	UE_LOG(LogTemp, Warning, TEXT("Player Controller %s, PlayerSlotIndex %d"), *GetName(), PlayerSlotIndex);
+	
 	UPlayerSlotUI* PlayerSlot = WaitingRoomUI->PlayerSlots[PlayerNumber];
 	if (PlayerSlot)
 	{
 		OwnPlayerSlot = PlayerSlot;
-		UE_LOG(LogTemp, Warning, TEXT("Set PlayerIDString"));
 	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Set PlayerIDString Failed"));
-	}
+
+	ServerRPC_InformClientPlayerSlotIndex(PlayerNumber, PlayerSlot);
+	ServerRPC_UpdateWholePlayerNumber();
 }

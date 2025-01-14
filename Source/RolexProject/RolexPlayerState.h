@@ -23,7 +23,10 @@ public:
 
 	FString UniqueID;
 
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Replicated)
 	bool Team;
+
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	void FindUniqueID();
 };

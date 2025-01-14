@@ -41,6 +41,7 @@ void AWaitingRoomGameModeBase::HandleStartingNewPlayer_Implementation(APlayerCon
 		{
 			RolexPlayerController->ClientRPC_CreateWaitingRoomUI();
 			RolexPlayerController->ClientRPC_InitWaitingRoomUI(PlayerIDArray);
+			// let server and the owner client know information both
 			RolexPlayerController->ClientRPC_SetPlayerSlotUI(CurrentPlayersNum);
 		}
 
@@ -48,7 +49,7 @@ void AWaitingRoomGameModeBase::HandleStartingNewPlayer_Implementation(APlayerCon
 		AWaitingRoomGameStateBase* WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetGameState<AGameStateBase>());
 		if (WaitingRoomGameStateBase)
 		{
-			if (WaitingRoomGameStateBase->WaitingRoomUI)
+			if (WaitingRoomGameStateBase)
 			{
 				WaitingRoomGameStateBase->MulticastRPC_UpdatePlayerSlotID(CurrentPlayersNum, SteamId);
 				// WaitingRoomGameStateBase->WaitingRoomUI is different by player
@@ -58,17 +59,6 @@ void AWaitingRoomGameModeBase::HandleStartingNewPlayer_Implementation(APlayerCon
 		}
 		
 		CurrentPlayersNum++;
-		UE_LOG(LogTemp, Warning, TEXT("Number of Current Players = %d"), CurrentPlayersNum);
-	}
-
-	// switch to hero selection stage
-	if (CurrentPlayersNum == MaxPlayersNum)
-	{
-		AWaitingRoomGameStateBase* WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetGameState<AGameStateBase>());
-		WaitingRoomGameStateBase->MulticastRPC_Notice(TEXT("Start Matching"));
-		
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, WaitingRoomGameStateBase, &AWaitingRoomGameStateBase::MatchPlayers, 2.0f, false);
 	}
 }
 

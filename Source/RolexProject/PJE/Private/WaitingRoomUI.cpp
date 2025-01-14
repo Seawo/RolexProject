@@ -43,6 +43,19 @@ void UWaitingRoomUI::AddPlayer()
 	
 }
 
+void UWaitingRoomUI::OnRep_SetNotice()
+{
+	Notice->SetVisibility(ESlateVisibility::Visible);
+	Notice->SetText(NoticeText);
+}
+
+void UWaitingRoomUI::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UWaitingRoomUI, NoticeText);
+}
+
 void UWaitingRoomUI::TravelToMain()
 {
 	GetWorld()->ServerTravel(TEXT("/Game/Rolex/Map/Main?listen"));

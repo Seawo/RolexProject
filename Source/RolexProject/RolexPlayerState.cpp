@@ -3,6 +3,8 @@
 
 #include "RolexPlayerState.h"
 
+#include "Net/UnrealNetwork.h"
+
 ARolexPlayerState::ARolexPlayerState()
 {
 	// get ID
@@ -27,6 +29,13 @@ void ARolexPlayerState::CopyProperties(APlayerState* PlayerState)
 	{
 		RolexPlayerState->SelectedHero = SelectedHero;
 	}
+}
+
+void ARolexPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ARolexPlayerState, Team);
 }
 
 void ARolexPlayerState::FindUniqueID()

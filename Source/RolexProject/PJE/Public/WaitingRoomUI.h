@@ -21,6 +21,7 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UHorizontalBox* PlayerBox;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<class UPlayerSlotUI*> PlayerSlots;
 
 	int32 NumplayerSlots;
@@ -37,10 +38,17 @@ public:
 public:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Notice;
+
+	UPROPERTY(ReplicatedUsing=OnRep_SetNotice)
+	FText NoticeText;
+
+	UFUNCTION()
+	void OnRep_SetNotice();
 	
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* CountDown;
-	
+
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* StartButton;

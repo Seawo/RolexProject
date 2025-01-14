@@ -18,28 +18,36 @@ public:
 	virtual void BeginPlay() override;
 
 public:
-	class UWaitingRoomUI* WaitingRoomUI;
+	UPROPERTY(Replicated)
+	int32 WholePlayerNumber = 0;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+public:
+	class UWaitingRoomUI* WaitingRoomUI;
+	
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_UpdatePlayerSlotID(int32 PlayerNum, const FString& NewText);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastRPC_Notice(const FString& NewText);
+	void MulticastRPC_UpdateNotice(const FString& NewText);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastRPC_UpdatePlayerTeam(class ARolexPlayerState* RolexPlayerState);
+	void MulticastRPC_UpdatePlayerTeam(int32 PlayerSlotIndex, FLinearColor Color);
+	
 public:
 	void MatchPlayers();
-	
-	void StartCountdownBeforeHeroSelection();
-	
+
+	UPROPERTY(Replicated)
 	int32 CountdownTime;
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiCastRPC_Countdown();	
+	void MulticastRPC_Countdown();	
 	
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiCastRPC_StartHeroSelection();
-
-	void CountdownHeroSelectionText();
+	void MulticastRPC_StartHeroSelection();
+	
+	FTimerHandle CountdownTimerHandle;
+	
+	void StartHeroSelectionCountdown();
 };

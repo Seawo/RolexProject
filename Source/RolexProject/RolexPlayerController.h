@@ -30,7 +30,16 @@ public:
 
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_SetPlayerSlotUI(int32 PlayerNumber);
+
+	int32 PlayerSlotIndex;
 	
 public:
 	class UPlayerSlotUI* OwnPlayerSlot;
+
+public:
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_UpdateWholePlayerNumber();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_InformClientPlayerSlotIndex(int32 PlayerNumber, UPlayerSlotUI* PlayerSlotUI);
 };

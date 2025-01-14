@@ -22,7 +22,7 @@ public:
 	
 
 	UPROPERTY(EditAnywhere)
-	int32 MaxPlayersNum = 2;
+	int32 MaxPlayersNum = 4;
 
 	int32 CurrentPlayersNum = 0;
 	
