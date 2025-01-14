@@ -53,4 +53,11 @@ public:
 
 	// UFUNCTION(NetMulticast, Reliable)
 	// void MulticastRPC_SetPlayerHeroImage(UTexture2D* PlayerHeroTexture, int32 Index);
+
+public:
+	// UFUNCTION(Server, Reliable)
+	// void ServerRPC_SetSelectedHero(class ARolexPlayerState* RolexPlayerState, TSubclassOf<class ABaseCharacter> BaseCharacter);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_SetSelectedHero(const FString& ID, TSubclassOf<class ABaseCharacter> BaseCharacter);
 };

@@ -5,6 +5,7 @@
 
 #include "HeroSlotUI.h"
 #include "PlayerSlotUI.h"
+#include "RolexGameInstance.h"
 #include "WaitingRoomGameModeBase.h"
 #include "WaitingRoomGameStateBase.h"
 #include "WaitingRoomUI.h"
@@ -24,6 +25,53 @@ void ARolexPlayerController::BeginPlay()
 	WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetWorld()->GetGameState()); 
 }
 
+void ARolexPlayerController::ServerRPC_SetSelectedHero_Implementation(const FString& ID,
+	TSubclassOf<class ABaseCharacter> BaseCharacter)
+{
+	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
+	if (RolexGameInstance)
+	{
+		RolexGameInstance->PlayerHeroSelections.Add(ID, BaseCharacter);
+	
+		// debug
+		UE_LOG(LogTemp, Warning,TEXT("PlayerHeroSelectionsMap) Number of elements: %d"), RolexGameInstance->PlayerHeroSelections.Num());
+		for (auto Pair : RolexGameInstance->PlayerHeroSelections)
+		{
+			if (FString Mapkey = Pair.Key; *Mapkey)
+				UE_LOG(LogTemp, Warning, TEXT("Key: %s"), *Mapkey);
+				
+			if (TSubclassOf<ABaseCharacter> MapValue = Pair.Value)
+				UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *MapValue->GetName());
+		}
+	}
+}
+
+// void ARolexPlayerController::ServerRPC_SetSelectedHero_Implementation(ARolexPlayerState* RolexPlayerState,
+//                                                                       TSubclassOf<ABaseCharacter> BaseCharacter)
+// {
+// 	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
+// 	if (RolexGameInstance && RolexPlayerState)
+// 	{
+// 		if (*RolexPlayerState->UniqueID == nullptr)
+// 		{
+// 			RolexPlayerState->FindUniqueID();
+// 			UE_LOG(LogTemp, Warning, TEXT("Server found UniqueID: %s"), *RolexPlayerState->UniqueID);
+// 		}
+// 		RolexGameInstance->PlayerHeroSelections.Add(RolexPlayerState->UniqueID, BaseCharacter);
+//
+// 		// debug
+// 		UE_LOG(LogTemp, Warning,TEXT("PlayerHeroSelectionsMap) Number of elements: %d"), RolexGameInstance->PlayerHeroSelections.Num());
+// 		// for (auto Pair : RolexGameInstance->PlayerHeroSelections)
+// 		// {
+// 		// 	if (FString Mapkey = Pair.Key; *Mapkey)
+// 		// 		UE_LOG(LogTemp, Warning, TEXT("Key: %s"), *Mapkey);
+// 		// 		
+// 		// 	if (TSubclassOf<ABaseCharacter> MapValue = Pair.Value)
+// 		// 		UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *MapValue->GetName());
+// 		// }
+// 	}
+// }
+
 void ARolexPlayerController::ServerRPC_SetPlayerHeroImage_Implementation(UTexture2D* PlayerHeroTexture, int32 Index)
 {
 	// cannot implement MulticastRPC_SetPlayerHeroImage in RolexPlayerController since clients only have its own controller
@@ -38,7 +86,7 @@ void ARolexPlayerController::ServerRPC_InformClientPlayerSlotIndex_Implementatio
 	if (PlayerSlotUI)
 	{
 		PlayerSlotUI->PlayerSlotIndex = PlayerNumber;
-		UE_LOG(LogTemp, Warning, TEXT("Player Controller Name %s, PlayerSlotIndex Set %d "), *GetName(), PlayerSlotUI->PlayerSlotIndex);
+		//UE_LOG(LogTemp, Warning, TEXT("Player Controller Name %s, PlayerSlotIndex Set %d "), *GetName(), PlayerSlotUI->PlayerSlotIndex);
 	}
 	else
 	{
@@ -53,7 +101,7 @@ void ARolexPlayerController::ServerRPC_UpdateWholePlayerNumber_Implementation()
 	{
 		WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetWorld()->GetGameState());
 	}
-		UE_LOG(LogTemp, Warning, TEXT("Exist"));
+		//UE_LOG(LogTemp, Warning, TEXT("Exist"));
 		WaitingRoomGameStateBase->WholePlayerNumber += 1;
 		AWaitingRoomGameModeBase* WaitingRoomGameModeBase = Cast<AWaitingRoomGameModeBase>(GetWorld()->GetAuthGameMode());
 		if (WaitingRoomGameStateBase->WholePlayerNumber == WaitingRoomGameModeBase->MaxPlayersNum)
@@ -85,7 +133,8 @@ void ARolexPlayerController::ClientRPC_CreateWaitingRoomUI_Implementation()
 			WaitingRoomUI = Cast<UWaitingRoomUI>(CreateWidget(GetWorld(), WaitingRoomUIFactory));
 			if (WaitingRoomUI)
 				WaitingRoomUI->AddToViewport();
-			UE_LOG(LogTemp, Warning, TEXT("Waiting Room Created"));
+			
+			//UE_LOG(LogTemp, Warning, TEXT("Waiting Room Created"));
 		}
 	}
 }
@@ -95,7 +144,7 @@ void ARolexPlayerController::ClientRPC_SetPlayerSlotUI_Implementation(int32 Play
 {
 	// set Steam ID on player slot textbox
 	PlayerSlotIndex = PlayerNumber;
-	UE_LOG(LogTemp, Warning, TEXT("Player Controller %s, PlayerSlotIndex %d"), *GetName(), PlayerSlotIndex);
+	//UE_LOG(LogTemp, Warning, TEXT("Player Controller %s, PlayerSlotIndex %d"), *GetName(), PlayerSlotIndex);
 	UPlayerSlotUI* PlayerSlot = WaitingRoomUI->PlayerSlots[PlayerNumber];
 	if (PlayerSlot)
 	{
@@ -122,3 +171,4 @@ void ARolexPlayerController::ClientRPC_SetPlayerSlotUI_Implementation(int32 Play
 	
 		ServerRPC_UpdateWholePlayerNumber();
 }
+

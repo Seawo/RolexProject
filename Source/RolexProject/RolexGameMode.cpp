@@ -22,7 +22,7 @@ ARolexGameMode::ARolexGameMode()
 
 UClass* ARolexGameMode::GetDefaultPawnClassForController_Implementation(AController* InController)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Main Level --------- Choose Player ---------"));
+	UE_LOG(LogTemp, Warning, TEXT("Main Level ------------------------------------------------------------------------ Choose Player ------------------------------------------------------------------------"));
 	
 	ARolexPlayerState* RolexPlayerState = InController->GetPlayerState<ARolexPlayerState>();
 	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());

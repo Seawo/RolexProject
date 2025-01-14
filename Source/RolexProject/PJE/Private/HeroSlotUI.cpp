@@ -30,35 +30,21 @@ void UHeroSlotUI::OnHeroSelectButtonClicked()
 	if (RolexPlayerController ==nullptr)
 		RolexPlayerController = Cast<ARolexPlayerController>(GetWorld()->GetFirstPlayerController());
 	
-	//  set image on player slot in waiting room UI // index can be Zero
-	UE_LOG(LogTemp, Warning, TEXT("OwnerPlayerSlotIndex: %d"), OwnerPlayerSlotIndex);
+	// //  set image on player slot in waiting room UI // index can be Zero
+	// UE_LOG(LogTemp, Warning, TEXT("OwnerPlayerSlotIndex: %d"), OwnerPlayerSlotIndex);
 
-	//HeroSelectButtonClickedDelegate.ExecuteIfBound(HeroTexture, OwnerPlayerSlotIndex);
-	RolexPlayerController->ServerRPC_SetPlayerHeroImage(HeroTexture, OwnerPlayerSlotIndex);
-	
-	//  map <player, pawn class> for the main level 
-	ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(GetOwningPlayerState());
+	ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(RolexPlayerController->PlayerState);
 	if (RolexPlayerState)
 	{
 		RolexPlayerState->SelectedHero = BaseCharacter;
 		RolexPlayerState->FindUniqueID();
-		
-		URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
-		if (RolexGameInstance)
-		{
-			RolexGameInstance->PlayerHeroSelections.Add(RolexPlayerState->UniqueID, BaseCharacter);
-
-			//UE_LOG(LogTemp, Warning,TEXT("PlayerHeroSelections: %d"), RolexGameInstance->PlayerHeroSelections.Num());
-
-			// // debug
-			// for (auto Pair : RolexGameInstance->PlayerHeroSelections)
-			// {
-			// 	if (FString Mapkey = Pair.Key; *Mapkey)
-			// 		UE_LOG(LogTemp, Warning, TEXT("%s"), *Mapkey);
-			// 	
-			// 	if (TSubclassOf<ABaseCharacter> MapValue = Pair.Value)
-			// 		UE_LOG(LogTemp, Warning, TEXT("%s"), *MapValue->GetName());
-			// }
-		}
+		UE_LOG(LogTemp, Warning, TEXT("UniqueID: %s"), *RolexPlayerState->UniqueID);
 	}
+	
+	//HeroSelectButtonClickedDelegate.ExecuteIfBound(HeroTexture, OwnerPlayerSlotIndex);
+	RolexPlayerController->ServerRPC_SetPlayerHeroImage(HeroTexture, OwnerPlayerSlotIndex);
+	RolexPlayerController->ServerRPC_SetSelectedHero(RolexPlayerState->UniqueID, BaseCharacter);
+	//RolexPlayerController->ServerRPC_SetSelectedHero(RolexPlayerState, BaseCharacter);
+	
+	//  map <player, pawn class> for the main level 
 }

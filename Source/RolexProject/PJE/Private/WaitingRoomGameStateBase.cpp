@@ -55,7 +55,7 @@ void AWaitingRoomGameStateBase::MulticastRPC_UpdatePlayerTeam_Implementation(int
 {
 	if (WaitingRoomUI)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("PlayerSlotIndex: %d"), PlayerSlotIndex);
+		//UE_LOG(LogTemp, Warning, TEXT("PlayerSlotIndex: %d"), PlayerSlotIndex);
 		WaitingRoomUI->PlayerSlots[PlayerSlotIndex]->TeamColor->SetColorAndOpacity(Color);
 	}
 }
@@ -73,15 +73,15 @@ void AWaitingRoomGameStateBase::MatchPlayers()
 		ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(PlayerArray[i]);
 		if (RolexPlayerState)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Rolex Player State Exists, %d player"), i);
+			//UE_LOG(LogTemp, Warning, TEXT("Rolex Player State Exists, %d player"), i);
 			if (i < HalfPlayers)
 			{
 				RolexPlayerState->Team = true;
 				ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(RolexPlayerState->GetPlayerController());
 				if (RolexPlayerController)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Rolex Player Controller Exists, Player %d, Name: %s, PlayerSlotIndex: %d"),
-						i, *RolexPlayerController->GetName(), RolexPlayerController->PlayerSlotIndex);
+					// UE_LOG(LogTemp, Warning, TEXT("Rolex Player Controller Exists, Player %d, Name: %s, PlayerSlotIndex: %d"),
+					// 	i, *RolexPlayerController->GetName(), RolexPlayerController->PlayerSlotIndex);
 					MulticastRPC_UpdatePlayerTeam(RolexPlayerController->PlayerSlotIndex, FLinearColor::Red);
 				}
 			}
@@ -91,7 +91,7 @@ void AWaitingRoomGameStateBase::MatchPlayers()
 				ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(RolexPlayerState->GetPlayerController());
 				if (RolexPlayerController)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Rolex Player Controller Exists, %d player, Name: %s"), i, *RolexPlayerController->GetName());
+					//UE_LOG(LogTemp, Warning, TEXT("Rolex Player Controller Exists, %d player, Name: %s"), i, *RolexPlayerController->GetName());
 					MulticastRPC_UpdatePlayerTeam(RolexPlayerController->PlayerSlotIndex, FLinearColor::Blue);
 				}
 			}

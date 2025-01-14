@@ -38,7 +38,7 @@ public:
 public:
 	void MatchPlayers();
 
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, BlueprintReadWrite)
 	int32 CountdownTime;
 
 	UFUNCTION(NetMulticast, Reliable)

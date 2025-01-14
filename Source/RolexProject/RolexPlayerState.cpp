@@ -45,7 +45,6 @@ void ARolexPlayerState::FindUniqueID()
 	if (NetId.IsValid())
 	{
 		UniqueID = NetId->ToString();
-		UE_LOG(LogTemp, Warning, TEXT("UniqueID: %s"), *UniqueID);
 	}
 	else
 	{
