@@ -95,6 +95,8 @@ void ABaseCharacter::Tick(float DeltaTime)
 
 void ABaseCharacter::ModifyHP(int Value)
 {
+	if (!HasAuthority()) return;
+
 	if (Data.Hp <= 0) return;
 
 	// 힐이 들어올 경우
@@ -244,6 +246,12 @@ void ABaseCharacter::OnRep_MoveState()
 	}
 }
 
+void ABaseCharacter::OnRep_CharacterData()
+{
+	// 업데이트 된 hp 확인
+	UE_LOG(LogTemp, Warning, TEXT("Hp updated to: %d"), Data.Hp);
+}
+
 void ABaseCharacter::ChangeState(EMoveState newState, UAnimMontage* montage)
 {
 	MoveState = newState;
@@ -304,7 +312,7 @@ void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	// 동기화를 해준다?? 
 	DOREPLIFETIME(ABaseCharacter, MoveState);
-	
+	DOREPLIFETIME(ABaseCharacter, Data);
 
 }
 

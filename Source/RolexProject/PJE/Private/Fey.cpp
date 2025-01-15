@@ -246,6 +246,11 @@ void AFey::StackHeal()
 
 void AFey::LMBAttack()
 {
+	Server_LMBAttack();
+}
+
+void AFey::Server_LMBAttack_Implementation()
+{
 	GetWorld()->GetTimerManager().ClearTimer(StackHealTimer);
 
 	// check montage is available
@@ -254,7 +259,7 @@ void AFey::LMBAttack()
 
 	// block montage being overlapped
 	for (const TPair<FString, UAnimMontage*>& Pair : AttackMontages)
-		if (IsMontagePlaying(Pair.Value)) return;	
+		if (IsMontagePlaying(Pair.Value)) return;
 
 	// collision check
 	FHitResult HitResult;
@@ -264,12 +269,12 @@ void AFey::LMBAttack()
 
 	FVector StartLocation = CameraLocation;
 	FVector EndLocation = StartLocation + CameraRotation.Vector() * 1000.0f;
-	
+
 	float Radius = 50.0f;
 
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
-	
+
 	bool bHit = GetWorld()->SweepSingleByChannel(
 		HitResult,
 		StartLocation,
@@ -278,26 +283,25 @@ void AFey::LMBAttack()
 		ECC_Pawn,
 		FCollisionShape::MakeSphere(Radius),
 		QueryParams
-		);
+	);
 
 	// collision detection region
 	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Green, false, 2.0f);
 	DrawDebugSphere(GetWorld(), StartLocation, Radius, 10, FColor::Blue, false, 2.0f);
-	
+
 	if (bHit)
 	{
 		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, Radius, 10, FColor::Red, false, 2.0f);
-		UE_LOG(LogTemp, Warning, TEXT("Heal Value: %d"), HealValue);
-		
+
+
 		ABaseCharacter* Opponent = Cast<ABaseCharacter>(HitResult.GetActor());
 		if (Opponent && Opponent->Data.Team == Data.Team)
 		{
-			Opponent->Data.Hp += HealValue;
-			// if (Opponent->Data.Hp > Opponent->Data.MaxHp)
-			// 	Opponent->Data.Hp = Opponent->Data.MaxHp;
+			//Opponent->Data.Hp += HealValue;
+			Opponent->ModifyHP(HealValue);
 		}
 	}
-	
+
 	SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
 	//PlayAnimMontage(AttackMontages[AttackName], 1.0f);
 	CurrentAttackState = EAttackState::LMB_Completed;
@@ -327,11 +331,16 @@ void AFey::StackAttack()
 
 void AFey::RMBAttack()
 {
+	Server_RMBAttack();
+}
+
+void AFey::Server_RMBAttack_Implementation()
+{
 	FString AttackName = TEXT("RMB");
 	if (AttackMontages[AttackName] == nullptr) return;
 
 	for (const TPair<FString, UAnimMontage*>& Pair : AttackMontages)
-		if (IsMontagePlaying(Pair.Value)) return;	
+		if (IsMontagePlaying(Pair.Value)) return;
 
 	// collision check
 	FHitResult HitResult;
@@ -341,12 +350,12 @@ void AFey::RMBAttack()
 
 	FVector StartLocation = CameraLocation;
 	FVector EndLocation = StartLocation + CameraRotation.Vector() * 1000.0f;
-	
+
 	float Radius = 50.0f;
 
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
-	
+
 	bool bHit = GetWorld()->SweepSingleByChannel(
 		HitResult,
 		StartLocation,
@@ -355,24 +364,24 @@ void AFey::RMBAttack()
 		ECC_Pawn,
 		FCollisionShape::MakeSphere(Radius),
 		QueryParams
-		);
+	);
 
 	// collision detection region
 	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Green, false, 2.0f);
 	DrawDebugSphere(GetWorld(), StartLocation, Radius, 10, FColor::Blue, false, 2.0f);
-	
+
 	if (bHit)
 	{
 		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, Radius, 10, FColor::Red, false, 2.0f);
-		UE_LOG(LogTemp, Warning, TEXT("Attack Value: %d"), AttackValue);
-		
+
 		ABaseCharacter* Opponent = Cast<ABaseCharacter>(HitResult.GetActor());
 		if (Opponent && Opponent->Data.Team != Data.Team)
 		{
-			Opponent->Data.Hp -= AttackValue;
+			//Opponent->Data.Hp -= AttackValue;
+			Opponent->ModifyHP(-AttackValue);
 		}
 	}
-	
+
 	SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
 	//PlayAnimMontage(AttackMontages[AttackName], 1.0f);
 	CurrentAttackState = EAttackState::RMB_Completed;

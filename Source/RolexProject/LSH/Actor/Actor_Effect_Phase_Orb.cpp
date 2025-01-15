@@ -71,13 +71,6 @@ void AActor_Effect_Phase_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComp
 		return;
 	}
 
-	// NiagaraSystem 실행
-	if (HitNiagaraSystem)
-	{
-		FVector hitloc = OtherActor->GetActorLocation();
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitNiagaraSystem, GetActorLocation());
-	}
-
 	//UE_LOG(LogTemp, Warning, TEXT("[Orb] Other : %s, Owner : %s"),
 	//	*OtherActor->GetName(), *GetOwner()->GetName());
 	//UE_LOG(LogTemp, Log, TEXT("[Orb] Overlap Begin"));
@@ -90,8 +83,14 @@ void AActor_Effect_Phase_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComp
 	if (character && character->Data.Team != onwer ->Data.Team)
 	{
 		character->ModifyHP(-1);
+
+		// NiagaraSystem 실행
+		if (HitNiagaraSystem)
+		{
+			FVector hitloc = OtherActor->GetActorLocation();
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitNiagaraSystem, GetActorLocation());
+		}
+
+		Destroy();
 	}
-
-
-	Destroy();
 }

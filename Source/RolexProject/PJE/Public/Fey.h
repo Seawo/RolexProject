@@ -64,6 +64,8 @@ public:
 	void LMBAttackStart();
 	void StackHeal();
 	void  LMBAttack();
+	UFUNCTION(Server, Reliable)
+	void Server_LMBAttack();
 
 	UPROPERTY(EditAnywhere)
 	int32 HealValue = 0;
@@ -73,6 +75,9 @@ public:
 	void RMBAttackStart();
 	void StackAttack();
 	void RMBAttack();
+
+	UFUNCTION(Server, Reliable)
+	void Server_RMBAttack();
 
 	UPROPERTY(EditAnywhere)
 	int32 AttackValue = 0;
