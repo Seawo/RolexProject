@@ -373,7 +373,8 @@ void ACharacter_Sparrow::ShootingArrowQ()
 
 				// 다시 원래대로 돌아온다
 				// 모션을 다 한뒤 마지막 함수 호출로 다시할 예정
-				GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+				MoveEnable();
+				//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 
 			}),
 			3.0f, false);
@@ -500,7 +501,9 @@ void ACharacter_Sparrow::QAttack()
 			PlayerController->SetInputMode(FInputModeGameAndUI());
 
 			// 움직임 막기
-			GetCharacterMovement()->DisableMovement();
+			MoveDisable();
+
+			//GetCharacterMovement()->DisableMovement();
 
 		/*	FName sectionName = FName("start");
 			PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());*/

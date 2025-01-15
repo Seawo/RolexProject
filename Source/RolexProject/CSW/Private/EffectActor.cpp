@@ -198,11 +198,17 @@ void AEffectActor::CheckOverlapAndApplyDamage()
 		}
 
 
+
 		if (Actor && Actor->CanBeDamaged())
 		{
 			UGameplayStatics::ApplyDamage(Actor, Damage, GetInstigatorController(), this, nullptr);
 			
 			ABaseCharacter* character = Cast<ABaseCharacter>(Actor);
+			ABaseCharacter* onwer = Cast<ABaseCharacter>(GetOwner());
+
+			if (character->Data.Team == onwer->Data.Team)
+				return;
+
 			if (character)
 			{
 				if (NiagaraCollusionEffect)

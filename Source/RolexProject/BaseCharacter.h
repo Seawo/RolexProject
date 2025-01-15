@@ -165,5 +165,14 @@ public:
 	UFUNCTION()
 	void OnRep_CharacterData();
 
+	// 움직임 막기
+	void MoveDisable();
+	UFUNCTION(Server, Reliable)
+	void Sever_MoveDisable();
+	// 다시 움직이기
+	void MoveEnable();
+	UFUNCTION(Server, Reliable)
+	void Sever_MoveEnable();
+
 
 };

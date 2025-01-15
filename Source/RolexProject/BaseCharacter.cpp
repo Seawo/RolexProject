@@ -252,6 +252,27 @@ void ABaseCharacter::OnRep_CharacterData()
 	UE_LOG(LogTemp, Warning, TEXT("Hp updated to: %d"), Data.Hp);
 }
 
+void ABaseCharacter::MoveDisable()
+{
+	Sever_MoveDisable();
+}
+
+void ABaseCharacter::Sever_MoveDisable_Implementation()
+{
+	
+	GetCharacterMovement()->SetMovementMode(MOVE_None);
+}
+
+void ABaseCharacter::MoveEnable()
+{
+	Sever_MoveEnable();
+}
+
+void ABaseCharacter::Sever_MoveEnable_Implementation()
+{
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+}
+
 void ABaseCharacter::ChangeState(EMoveState newState, UAnimMontage* montage)
 {
 	MoveState = newState;
@@ -347,7 +368,7 @@ void ABaseCharacter::InputRotation(const FInputActionValue& inputValue)
 
 void ABaseCharacter::Sturn(UAnimMontage* montage)
 {
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	MoveDisable();
 	// Test
 	PlayAnimMontage(montage);
 
@@ -357,7 +378,7 @@ void ABaseCharacter::Sturn(UAnimMontage* montage)
 	GetWorld()->GetTimerManager().SetTimer(montageTimer, FTimerDelegate::CreateLambda(
 		[this]() 
 		{
-			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+			MoveEnable();
 
 		}),
 		montageDelay, false);
@@ -366,7 +387,7 @@ void ABaseCharacter::Sturn(UAnimMontage* montage)
 
 void ABaseCharacter::Die(UAnimMontage* montage)
 {
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	MoveDisable();
 	PlayAnimMontage(montage);
 
 	float montageDelay = montage->GetPlayLength() + 1.0f;
@@ -375,8 +396,7 @@ void ABaseCharacter::Die(UAnimMontage* montage)
 	GetWorld()->GetTimerManager().SetTimer(montageTimer, FTimerDelegate::CreateLambda(
 		[this]()
 		{
-			
-			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+			MoveEnable();
 		}),
 		montageDelay, false);
 	
@@ -385,7 +405,7 @@ void ABaseCharacter::Die(UAnimMontage* montage)
 void ABaseCharacter::Start(UAnimMontage* montage)
 {
 	//bIsMove = false;
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	MoveDisable();
 	PlayAnimMontage(montage);
 
 	float montageDelay = montage->GetPlayLength() + 1.0f;
@@ -394,7 +414,7 @@ void ABaseCharacter::Start(UAnimMontage* montage)
 	GetWorld()->GetTimerManager().SetTimer(montageTimer, FTimerDelegate::CreateLambda(
 		[this]()
 		{
-			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+			MoveEnable();
 			//bIsMove = true;
 
 		}),
