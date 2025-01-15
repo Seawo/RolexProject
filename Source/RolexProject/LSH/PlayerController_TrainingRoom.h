@@ -22,6 +22,7 @@ class ROLEXPROJECT_API APlayerController_TrainingRoom : public APlayerController
 
 public:
 	void SetPlayTime(float Time);
+	void SetPoint(int idx);
 	void SetTakingGuage(float Agauge, float Bgauge);
 
 	void SetATeamCount(int32 Count);

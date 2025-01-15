@@ -21,6 +21,8 @@ public:
 	// Set 함수들
 	void SetPlayTime(float Time);						// 플레이 시간 설정
 
+	void SetPoint(int idx);								// 거점 설정
+
 	void SetATeamCount(int32 Count);					// A팀 점령중인 인원 설정
 	void SetBTeamCount(int32 Count);					// B팀 점령중인 인원 설정
 

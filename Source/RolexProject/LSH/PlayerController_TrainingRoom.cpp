@@ -62,6 +62,14 @@ void APlayerController_TrainingRoom::SetPlayTime(float Time)
 	}
 }
 
+void APlayerController_TrainingRoom::SetPoint(int idx)
+{
+	if (IsLocalController() and UI_Zone)
+	{
+		UI_Zone->SetPoint(idx);
+	}
+}
+
 void APlayerController_TrainingRoom::SetTakingGuage(float Agauge, float Bgauge) // 0 ~ 100
 {
 	if (IsLocalController() and UI_Zone)

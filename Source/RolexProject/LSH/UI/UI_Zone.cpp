@@ -46,6 +46,22 @@ void UUI_Zone::SetPlayTime(float Time)
 	TB_PlayTime->SetText(FText::FromString(FString::Printf(TEXT("%d"), (int32)Time)));
 }
 
+void UUI_Zone::SetPoint(int idx)
+{
+	if (idx == 0)
+	{
+		Img_Lock->SetVisibility(ESlateVisibility::Hidden);
+		TB_A->SetVisibility(ESlateVisibility::Visible);
+		TB_B->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else if (idx == 1)
+	{
+		Img_Lock->SetVisibility(ESlateVisibility::Hidden);
+		TB_A->SetVisibility(ESlateVisibility::Hidden);
+		TB_B->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
 void UUI_Zone::SetATeamCount(int32 Count)
 {
 	if (Count == 0)
@@ -124,6 +140,7 @@ void UUI_Zone::SetPercent(EOccupation occupation, float APercent, float BPercent
 		B_ATeam->SetBrushColor(FLinearColor(0.0f, 0.646928f, 1.0f, 1.0f));
 		B_BTeam->SetBrushColor(FLinearColor(0.001661f, 0.004162f, 0.015625f, 1.0f));
 		TB_ATeamPercent->SetText(FText::FromString(FString::Printf(TEXT("%d"), (int32)APercent)));
+		//UE_LOG(LogTemp, Log, TEXT("A : %d"), FCString::Atoi(*TB_ATeamPercent->GetText().ToString()));
 	}
 	else if (occupation == EOccupation::TeamB)
 	{
@@ -148,8 +165,7 @@ void UUI_Zone::SetClashing(EClashing clash)
 
 void UUI_Zone::SetExtraTime(float Time)
 {
-	TB_ATeamPercent->GetText().ToString();
-	if (bIsATeamExtraTime or bIsBTeamExtraTime)
+	if ((bIsATeamExtraTime and FCString::Atoi(*TB_BTeamPercent->GetText().ToString()) >= 99) or (bIsBTeamExtraTime and FCString::Atoi(*TB_ATeamPercent->GetText().ToString()) >= 99))
 	{
 		VB_ExtraTime->SetVisibility(ESlateVisibility::Visible);
 

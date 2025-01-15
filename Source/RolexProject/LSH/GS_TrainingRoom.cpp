@@ -89,6 +89,15 @@ void AGS_TrainingRoom::OnRep_PlayTime()
 void AGS_TrainingRoom::OnRep_Points()
 {
 	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] Points"));
+	int32 idx = 0;
+	for (AActor_FightPoint* point : Points)
+	{
+		if (point->GetActivePoint() == EActivePoint::Active)
+		{
+			PC->SetPoint(idx);
+		}
+		idx++;
+	}
 }
 
 void AGS_TrainingRoom::OnRep_Occupation()

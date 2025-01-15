@@ -113,56 +113,60 @@ void AGM_TrainingRoom::Tick(float DeltaTime)
 			int32 random = FMath::RandRange(0, Points.Num() - 1);
 
 			Points[random]->SetActivePoint(EActivePoint::Active);
+			PC->SetPoint(random);
 			IsActiveBsePoint = true;
 		}
 
-
-		UpdatePointGauge(DeltaTime);
-		if (GS)
+		if (Result == EResult::None)
 		{
-			GS->PlayTime = PlayTime;
-			GS->IsActiveBsePoint = IsActiveBsePoint;
+			UpdatePointGauge(DeltaTime);
+			if (GS)
+			{
+				GS->PlayTime = PlayTime;
+				GS->IsActiveBsePoint = IsActiveBsePoint;
 
-			GS->Occupation = Occupation;
-			GS->Result = Result;
-			GS->Clash = Clash;
+				GS->Occupation = Occupation;
+				GS->Result = Result;
+				GS->Clash = Clash;
 
-			GS->ATeamChracters = ATeamChracters;
-			GS->BTeamChracters = BTeamChracters;
-			GS->Points = Points;
+				GS->ATeamChracters = ATeamChracters;
+				GS->BTeamChracters = BTeamChracters;
+				GS->Points = Points;
 
-			GS->PointATeamCount = PointATeamCount;
-			GS->PointBTeamCount = PointBTeamCount;
+				GS->PointATeamCount = PointATeamCount;
+				GS->PointBTeamCount = PointBTeamCount;
 
-			GS->PointTakeATeamGauge = PointTakeATeamGauge;
-			GS->PointTakeBTeamGauge = PointTakeBTeamGauge;
+				GS->PointTakeATeamGauge = PointTakeATeamGauge;
+				GS->PointTakeBTeamGauge = PointTakeBTeamGauge;
 
-			GS->PointATeamGauge = PointATeamGauge;
-			GS->PointBTeamGauge = PointBTeamGauge;
-			GS->PointATeamGaugePercent = PointATeamGaugePercent;
-			GS->PointBTeamGaugePercent = PointBTeamGaugePercent;
+				GS->PointATeamGauge = PointATeamGauge;
+				GS->PointBTeamGauge = PointBTeamGauge;
+				GS->PointATeamGaugePercent = PointATeamGaugePercent;
+				GS->PointBTeamGaugePercent = PointBTeamGaugePercent;
 
-			GS->WaitTime = WaitTime;
+				GS->WaitTime = WaitTime;
 
-			GS->ExtraTime = ExtraTime;
-			GS->ExtraTimeDecrease = ExtraTimeDecrease;
-			GS->IsGetATeamExtraTime = IsGetATeamExtraTime;
-			GS->IsGetBTeamExtraTime = IsGetBTeamExtraTime;
+				GS->ExtraTime = ExtraTime;
+				GS->ExtraTimeDecrease = ExtraTimeDecrease;
+				GS->IsGetATeamExtraTime = IsGetATeamExtraTime;
+				GS->IsGetBTeamExtraTime = IsGetBTeamExtraTime;
+			}
+			if (PC) // 서버의 UI값 업데이트
+			{
+				PC->SetPlayTime(PlayTime);
+				PC->SetATeamCount(PointATeamCount);
+				PC->SetBTeamCount(PointBTeamCount);
+				PC->SetTakingGuage(PointTakeATeamGauge, PointTakeBTeamGauge);
+				PC->SetPercent(Occupation, PointATeamGaugePercent, PointBTeamGaugePercent);
+				PC->SetClashing(Clash);
+				PC->SetExtraTime(ExtraTime);
+
+				PC->SetIsATeamExtraTime(IsGetATeamExtraTime);
+				PC->SetIsBTeamExtraTime(IsGetBTeamExtraTime);
+
+			}
 		}
-		if (PC) // 서버의 UI값 업데이트
-		{
-			PC->SetPlayTime(PlayTime);
-			PC->SetATeamCount(PointATeamCount);
-			PC->SetBTeamCount(PointBTeamCount);
-			PC->SetTakingGuage(PointTakeATeamGauge, PointTakeBTeamGauge);
-			PC->SetPercent(Occupation, PointATeamGaugePercent, PointBTeamGaugePercent);
-			PC->SetClashing(Clash);
-			PC->SetExtraTime(ExtraTime);
-
-			PC->SetIsATeamExtraTime(IsGetATeamExtraTime);
-			PC->SetIsBTeamExtraTime(IsGetBTeamExtraTime);
-
-		}
+		
 	}
 	else
 	{
@@ -199,6 +203,8 @@ void AGM_TrainingRoom::UpdatePointGauge(float DeltaTime)
 		// 거점에 A팀만 있는 상태
 		if (PointATeamCount > 0 and PointBTeamCount == 0)
 		{
+			Clash = EClashing::None;
+
 			WaitTime = 0;
 			// B팀이 점령하기 위해서 거점에 먼저 올라가서 게이지가 조금이라도 차있는 상태라면?
 			if (PointTakeBTeamGauge > 0)
@@ -228,6 +234,8 @@ void AGM_TrainingRoom::UpdatePointGauge(float DeltaTime)
 		// 거점에 B팀만 있는 경우
 		else if (PointATeamCount == 0 and PointBTeamCount > 0)
 		{
+			Clash = EClashing::None;
+
 			WaitTime = 0;
 			if (PointTakeATeamGauge > 0)
 			{
@@ -250,6 +258,8 @@ void AGM_TrainingRoom::UpdatePointGauge(float DeltaTime)
 		}
 		else if (PointATeamCount == 0 and PointBTeamCount == 0)
 		{
+			Clash = EClashing::None;
+
 			WaitTime += DeltaTime;
 			if (WaitTime >= 3.0f)
 			{
@@ -272,6 +282,10 @@ void AGM_TrainingRoom::UpdatePointGauge(float DeltaTime)
 				}
 			}
 		}
+		else
+		{
+			Clash = EClashing::Clash;
+		}
 	}
 	else if (Occupation == EOccupation::TeamA)
 	{
@@ -289,6 +303,7 @@ void AGM_TrainingRoom::UpdatePointGauge(float DeltaTime)
 		{
 			// A팀 승리
 			UE_LOG(LogTemp, Warning, TEXT("ATeam Win"));
+			PointATeamGaugePercent = 100.0f;
 			Result = EResult::AWin;
 			return;
 		}
@@ -401,6 +416,7 @@ void AGM_TrainingRoom::UpdatePointGauge(float DeltaTime)
 		{
 			// B팀 승리
 			UE_LOG(LogTemp, Warning, TEXT("BTeam Win"));
+			PointBTeamGaugePercent = 100.0f;
 			Result = EResult::BWin;
 			return;
 		}
