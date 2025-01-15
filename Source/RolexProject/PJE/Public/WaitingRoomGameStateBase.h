@@ -39,7 +39,7 @@ public:
 	void MatchPlayers();
 
 	UPROPERTY(Replicated, BlueprintReadWrite)
-	int32 CountdownTime;
+	int32 CountdownTime = 5;
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_Countdown();	
