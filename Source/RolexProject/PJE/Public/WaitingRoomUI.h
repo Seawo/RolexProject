@@ -35,6 +35,8 @@ public:
 
 	TArray<class UHeroSlotUI*> HeroButtonArray;
 
+	bool HeroSelectionVisible = false;
+	
 public:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Notice;

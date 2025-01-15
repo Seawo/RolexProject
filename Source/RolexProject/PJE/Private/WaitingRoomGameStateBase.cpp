@@ -110,8 +110,7 @@ void AWaitingRoomGameStateBase::MatchPlayers()
 void AWaitingRoomGameStateBase::StartHeroSelectionCountdown()
 {
 	MulticastRPC_UpdateNotice("Hero Selection");
-
-	CountdownTime = 15;
+	
 	GetWorld()->GetTimerManager().SetTimer(CountdownTimerHandle, this, &AWaitingRoomGameStateBase::MulticastRPC_Countdown, 1.0f, true);
 }
 
@@ -127,8 +126,11 @@ void AWaitingRoomGameStateBase::MulticastRPC_SetPlayerHeroImage_Implementation(U
 
 void AWaitingRoomGameStateBase::MulticastRPC_Countdown_Implementation()
 {
-	if (CountdownTime == 15)
+	if (!WaitingRoomUI->HeroSelectionVisible)
+	{
 		WaitingRoomUI->HeroSelectionPanel->SetVisibility(ESlateVisibility::Visible);
+		WaitingRoomUI->HeroSelectionVisible = true;
+	}
 	
 	if (CountdownTime <= 0)
 	{

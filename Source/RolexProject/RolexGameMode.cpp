@@ -29,35 +29,31 @@ UClass* ARolexGameMode::GetDefaultPawnClassForController_Implementation(AControl
 
 	if (RolexPlayerState && RolexGameInstance)
 	{
-		// print PlayerHeroSelection TMap
-		for (auto Pair : RolexGameInstance->PlayerHeroSelections)
-		{
-			FString Mapkey = Pair.Key;
-			if (*Mapkey)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *Mapkey);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Failed to find player state"));
-			}
-			TSubclassOf<ABaseCharacter> MapValue = Pair.Value;
-			if (MapValue)
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *MapValue->GetName());
-		}
-		UE_LOG(LogTemp, Warning, TEXT("Player State Name: %s"), *RolexPlayerState->GetName());
-
+		//find selected hero class based on the UniqueID key
 		RolexPlayerState->FindUniqueID();
-		if (TSubclassOf<ABaseCharacter>* BaseCharacterFactory =
-			RolexGameInstance->PlayerHeroSelections.Find(RolexPlayerState->UniqueID))
+		if (TSubclassOf<ABaseCharacter>* BaseCharacterFactory = RolexGameInstance->PlayerHeroSelections.Find(RolexPlayerState->UniqueID))
 		{
 			return *BaseCharacterFactory;	
 		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Failed to find BaseCharacter"));
-		}
 	}
 	
+	UE_LOG(LogTemp, Warning, TEXT("Failed to find BaseCharacter"));
 	return Super::GetDefaultPawnClassForController_Implementation(InController);
 }
+
+// // print PlayerHeroSelection TMap
+// for (auto Pair : RolexGameInstance->PlayerHeroSelections)
+// {
+// 	if (FString Mapkey = Pair.Key; *Mapkey)
+// 	{
+// 		UE_LOG(LogTemp, Warning, TEXT("Key: %s"), *Mapkey);
+// 		Message = FString::Printf(TEXT("Key: %s"), *Mapkey);
+// 		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, Message);
+// 	}
+// 	if (TSubclassOf<ABaseCharacter> MapValue = Pair.Value)
+// 	{
+// 		UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *MapValue->GetName());
+// 		Message = FString::Printf(TEXT("Name: %s"), *MapValue->GetName());
+// 		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, Message);
+// 	}
+// }
