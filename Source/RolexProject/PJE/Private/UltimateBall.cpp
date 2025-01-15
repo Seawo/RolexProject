@@ -96,15 +96,17 @@ void AUltimateBall::OnHit(
 		{
 			if (Character == OwnCharacter) return;
 			
-			if (Character->Data.Team == OwnCharacter->Data.Team && Type == true)
+			if (Character->Data.Team == OwnCharacter->Data.Team )
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Heal Ball"));
-				Character->Data.Hp += 15.0f;
+				//Character->Data.Hp += 15.0f;
+				Character->ModifyHP(15.0f);
 			}
-			if (Character->Data.Team != OwnCharacter->Data.Team && Type == false)
+			if (Character->Data.Team != OwnCharacter->Data.Team)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Attack Ball"));
-				Character->Data.Hp -= 15.0f;
+				//Character->Data.Hp -= 15.0f;
+				Character->ModifyHP(-15.0f);
 			}
 		}
 	}
