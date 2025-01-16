@@ -57,10 +57,6 @@ void ACharacter_Rampage::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	DashHeightAngle = GetActorRotation().Yaw;
-	UE_LOG(LogTemp, Warning, TEXT("Rotation %f "), DashHeightAngle);
-
-
 	if (bIsDashing)
 	{
 		// Update elapsed time
