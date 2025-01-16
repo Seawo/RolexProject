@@ -175,4 +175,7 @@ public:
 	void Sever_MoveEnable();
 
 
+	// 카메라 동기화 
+	FVector StartPos;
+
 };

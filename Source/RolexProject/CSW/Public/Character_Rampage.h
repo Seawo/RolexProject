@@ -73,7 +73,9 @@ private:
 	FVector StartPos;
 	float ElapsedTime = 0.0f;
 	float  DashHeight = 500.0f;
-	
+	float DashHeightAngle;
+
+
 	// 콤보 리셋을 위한 타이머 핸들
 	FTimerHandle ComboResetTimerHandle;
 	FTimerHandle DashTimerHandle;
