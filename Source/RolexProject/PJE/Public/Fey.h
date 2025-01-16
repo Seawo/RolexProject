@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -30,6 +30,13 @@ public:
 	
 	virtual void ChangeAttackState(EAttackState newState) override;
 
+	UFUNCTION(Server, Reliable)
+	void Server_ChangeAttackState(EAttackState state);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multi_ChangeAttackState(EAttackState state);
+
+	UFUNCTION(Server, Reliable)
+	void Server_SpawnQActor();
 public:
 	EAttackState CurrentAttackState;
 
@@ -57,6 +64,8 @@ public:
 	void LMBAttackStart();
 	void StackHeal();
 	void  LMBAttack();
+	UFUNCTION(Server, Reliable)
+	void Server_LMBAttack();
 
 	UPROPERTY(EditAnywhere)
 	int32 HealValue = 0;
@@ -66,6 +75,9 @@ public:
 	void RMBAttackStart();
 	void StackAttack();
 	void RMBAttack();
+
+	UFUNCTION(Server, Reliable)
+	void Server_RMBAttack();
 
 	UPROPERTY(EditAnywhere)
 	int32 AttackValue = 0;

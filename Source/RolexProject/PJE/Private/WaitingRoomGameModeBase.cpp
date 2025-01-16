@@ -2,32 +2,26 @@
 
 
 #include "WaitingRoomGameModeBase.h"
+
+#include <string>
+
 #include "WaitingRoomUI.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "OnlineSubsystemSteam.h"
 #include "OnlineSubsystem.h"
 #include "OnlineSubsystemUtils.h"
+#include "PlayerSlotUI.h"
+#include "RolexPlayerController.h"
 #include "ScreenPass.h"
+#include "WaitingRoomGameStateBase.h"
 #include "Components/Image.h"
 #include "Interfaces/OnlineIdentityInterface.h"
 
 
-void AWaitingRoomGameModeBase::InitializeUI()
+AWaitingRoomGameModeBase::AWaitingRoomGameModeBase()
 {
-	if (WaitingRoomUIFactory)
-	{
-		WaitingRoomUI = Cast<UWaitingRoomUI>(CreateWidget(GetWorld(), WaitingRoomUIFactory));
-		if (WaitingRoomUI)
-		{
-			WaitingRoomUI->AddToViewport();
-			UE_LOG(LogTemp, Warning, TEXT("Waiting Room UI Created"));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Waiting Room UI is NULL"));
-		}
-	}
+	bUseSeamlessTravel = true;
 }
 
 // called when a new player joins the server
@@ -35,46 +29,43 @@ void AWaitingRoomGameModeBase::HandleStartingNewPlayer_Implementation(APlayerCon
 {
 	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 
-	if (WaitingRoomUI == nullptr)
-		InitializeUI();
-	
 	if (NewPlayer)
 	{
-		ULocalPlayer* LocalPlayer =NewPlayer->GetLocalPlayer();
-		if (LocalPlayer)
+		// get ID
+		FString SteamId= GetSteamID(NewPlayer);
+		PlayerIDArray.Add(SteamId);
+		
+		// create widget and initialize for the new player
+		ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(NewPlayer);
+		if (RolexPlayerController)
 		{
-			// // get Steam ID
-			// FUniqueNetIdPtr NetId = LocalPlayer->GetPreferredUniqueNetId().GetUniqueNetId();
-			// FString SteamId = NetId->ToString();
-			//
-			// UE_LOG(LogTemp, Warning, TEXT("SteamId: %s"), *SteamId);
-			FString SteamId = GetSteamID(NewPlayer);
-			
-			if (*SteamId && WaitingRoomUI)
+			RolexPlayerController->ClientRPC_CreateWaitingRoomUI();
+			RolexPlayerController->ClientRPC_InitWaitingRoomUI(PlayerIDArray);
+			// let server and the owner client know information both
+			RolexPlayerController->ClientRPC_SetPlayerSlotUI(CurrentPlayersNum);
+		}
+
+		// update new player for the existing players
+		AWaitingRoomGameStateBase* WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetGameState<AGameStateBase>());
+		if (WaitingRoomGameStateBase)
+		{
+			if (WaitingRoomGameStateBase)
 			{
-				// set Steam ID on player slot
-				const TArray<UWidget*>& PlayerSlotChildren = WaitingRoomUI->PlayerSlots[CurrentPlayersNum]->GetAllChildren();
-				for (UWidget* PlayerSlotChild: PlayerSlotChildren)
-				{
-					if (UTextBlock* TextBlock = Cast<UTextBlock>(PlayerSlotChild))
-						TextBlock->SetText(FText::FromString(*SteamId));
-				}
+				WaitingRoomGameStateBase->MulticastRPC_UpdatePlayerSlotID(CurrentPlayersNum, SteamId);
+				
+				// WaitingRoomGameStateBase->WaitingRoomUI is different by player
+				// WaitingRoomGameStateBase->WaitingRoomUI->PlayerSlots[CurrentPlayersNum]->PlayerIDString = SteamId;
+				// WaitingRoomGameStateBase->WaitingRoomUI->PlayerSlots[CurrentPlayersNum]->OnRep_SetPlayerID();
 			}
 		}
+		
 		CurrentPlayersNum++;
-		UE_LOG(LogTemp, Warning, TEXT("Number of Current Players = %d"), CurrentPlayersNum);
-	}
-
-	// switch to hero selection stage
-	if (CurrentPlayersNum == MaxPlayersNum)
-	{
-		GetWorld()->ServerTravel(TEXT("/Game/Rolex/Map/Main?listen"));
 	}
 }
 
 FString AWaitingRoomGameModeBase::GetSteamID(APlayerController* NewPlayer)
 {
-	FString SteamNickName = TEXT("unknown");
+	FString SteamNickName = FString::FromInt(NewPlayer->GetUniqueID());
 	
 	OnlineSubsystem = Online::GetSubsystem(GetWorld(), "STEAM");
 	if (OnlineSubsystem)
@@ -86,28 +77,10 @@ FString AWaitingRoomGameModeBase::GetSteamID(APlayerController* NewPlayer)
 		{
 			// get Steam ID
 			FUniqueNetIdPtr NetId = LocalPlayer->GetPreferredUniqueNetId().GetUniqueNetId();
-
-			// FString SteamId = NetId->ToString();
-			// UE_LOG(LogTemp, Warning, TEXT("SteamId: %s"), *SteamId);
-			
 			SteamNickName = Identity->GetPlayerNickname(*NetId);
-			
-			UE_LOG(LogTemp, Warning, TEXT("Steam Nick Name: %s"), *SteamNickName);
 		}
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("Steam Nick Name: %s"), *SteamNickName);
 	return SteamNickName;
-}
-
-void AWaitingRoomGameModeBase::SetPlayerSlotImage(UTexture2D* Texture2D)
-{
-	// get my player slot, Index: CurrentPlayersNum
-	const TArray<UWidget*>& PlayerSlotChildren = WaitingRoomUI->PlayerSlots[CurrentPlayersNum]->GetAllChildren();
-
-	// set player slot image
-	for (UWidget* PlayerSlotChild: PlayerSlotChildren)
-	{
-		if (UImage* PlayerSlotImage = Cast<UImage>(PlayerSlotChild))
-			PlayerSlotImage->SetBrushFromTexture(Texture2D);
-	}
 }

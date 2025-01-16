@@ -3,8 +3,13 @@
 
 #include "HeroSlotUI.h"
 
+#include "PlayerSlotUI.h"
 #include "RolexGameInstance.h"
+#include "RolexPlayerController.h"
+#include "RolexPlayerState.h"
+#include "RolexPlayerState.h"
 #include "WaitingRoomGameModeBase.h"
+#include "WaitingRoomGameStateBase.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -12,26 +17,34 @@ void UHeroSlotUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetWorld()->GetGameState());
+	RolexPlayerController = Cast<ARolexPlayerController>(GetWorld()->GetFirstPlayerController());
 	HeroSelectButton->OnClicked.AddDynamic(this, &UHeroSlotUI::OnHeroSelectButtonClicked);
-
-	AWaitingRoomGameModeBase* WaitingRoomGameModeBase = GetWorld()->GetAuthGameMode<AWaitingRoomGameModeBase>();
-	if (WaitingRoomGameModeBase)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Called Waiting Room GameMode Base from HeroSlot UI"));
-		HeroSelectButtonClickedDelegate.BindUObject(WaitingRoomGameModeBase, &AWaitingRoomGameModeBase::SetPlayerSlotImage);
-	}
 }
 
 void UHeroSlotUI::OnHeroSelectButtonClicked()
 {
-	//  set image on player slot in waiting room UI  
-	HeroSelectButtonClickedDelegate.ExecuteIfBound(HeroTexture);
+	if (WaitingRoomGameStateBase== nullptr)
+		WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetWorld()->GetGameState());
 
-	//  set default pawn class
-	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetWorld()->GetGameInstance());
-	if (RolexGameInstance)
+	if (RolexPlayerController ==nullptr)
+		RolexPlayerController = Cast<ARolexPlayerController>(GetWorld()->GetFirstPlayerController());
+	
+	// //  set image on player slot in waiting room UI // index can be Zero
+	// UE_LOG(LogTemp, Warning, TEXT("OwnerPlayerSlotIndex: %d"), OwnerPlayerSlotIndex);
+
+	ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(RolexPlayerController->PlayerState);
+	if (RolexPlayerState)
 	{
-		RolexGameInstance->MainLevelPawn = BaseCharacter;
+		RolexPlayerState->SelectedHero = BaseCharacter;
+		RolexPlayerState->FindUniqueID();
+		UE_LOG(LogTemp, Warning, TEXT("UniqueID: %s"), *RolexPlayerState->UniqueID);
 	}
 	
+	//HeroSelectButtonClickedDelegate.ExecuteIfBound(HeroTexture, OwnerPlayerSlotIndex);
+	RolexPlayerController->ServerRPC_SetPlayerHeroImage(HeroTexture, OwnerPlayerSlotIndex);
+	RolexPlayerController->ServerRPC_SetSelectedHero(RolexPlayerState->UniqueID, BaseCharacter);
+	//RolexPlayerController->ServerRPC_SetSelectedHero(RolexPlayerState, BaseCharacter);
+	
+	//  map <player, pawn class> for the main level 
 }

@@ -353,7 +353,6 @@ void ACharacter_Rampage::CreateStone()
 
 void ACharacter_Rampage::ThrowStone()
 {
-
 	if (Stone)
 	{
 		// 소켓에서 불리
@@ -364,7 +363,6 @@ void ACharacter_Rampage::ThrowStone()
 		Stone->InititalizeThrowStone(throwdir, 3000.0f);
 
 		SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
-
 	}
 }
 

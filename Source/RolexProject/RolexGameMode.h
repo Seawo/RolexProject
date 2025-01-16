@@ -13,6 +13,9 @@ class ARolexGameMode : public AGameModeBase
 
 public:
 	ARolexGameMode();
+
+	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
+
 };
 
 

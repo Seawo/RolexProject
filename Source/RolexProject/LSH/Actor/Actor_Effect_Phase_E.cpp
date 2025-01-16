@@ -53,24 +53,27 @@ void AActor_Effect_Phase_E::OnOverlapBegin(UPrimitiveComponent* OverlappedCompon
 		return;
 	}
 
-	if (bIsOverlap) return;	// 중복 방지
-	bIsOverlap = true;
-
-
 	UE_LOG(LogTemp, Warning, TEXT("[E] Other : %s, Owner : %s"),
 		*OtherActor->GetName(), *GetOwner()->GetName());
 	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
+	ABaseCharacter* onwer = Cast<ABaseCharacter>(GetOwner());
 
-	if (character and OtherActor != this)
+	if (character && character->Data.Team != onwer->Data.Team)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Shield Overlap Begin"));
+		if (bIsOverlap) return;	// 중복 방지
+		bIsOverlap = true;
+
+		if (character and OtherActor != this)
+		{
+			UE_LOG(LogTemp, Log, TEXT("Shield Overlap Begin"));
 
 
-		FVector myLoc = GetActorLocation();
-		FVector targetLoc = character->GetActorLocation();
-		FVector dir = (targetLoc - myLoc).GetSafeNormal();
+			FVector myLoc = GetActorLocation();
+			FVector targetLoc = character->GetActorLocation();
+			FVector dir = (targetLoc - myLoc).GetSafeNormal();
 
-		// 힘적용
-		character->LaunchCharacter(dir * 2000, true, true);
+			// 힘적용
+			character->LaunchCharacter(dir * 2000, true, true);
+		}
 	}
 }

@@ -134,9 +134,13 @@ void AEffectActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 		UE_LOG(LogTemp, Log, TEXT("Effect collided with: %s"), *OtherActor->GetName());
 
 		ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
+		ABaseCharacter* onwer = Cast<ABaseCharacter>(GetOwner());
+
+
 		if (character)
 		{
-			
+			if (character->Data.Team == onwer->Data.Team)
+				return;
 
 			character->ModifyHP(-Damage);
 			
@@ -194,11 +198,17 @@ void AEffectActor::CheckOverlapAndApplyDamage()
 		}
 
 
+
 		if (Actor && Actor->CanBeDamaged())
 		{
 			UGameplayStatics::ApplyDamage(Actor, Damage, GetInstigatorController(), this, nullptr);
 			
 			ABaseCharacter* character = Cast<ABaseCharacter>(Actor);
+			ABaseCharacter* onwer = Cast<ABaseCharacter>(GetOwner());
+
+			if (character->Data.Team == onwer->Data.Team)
+				return;
+
 			if (character)
 			{
 				if (NiagaraCollusionEffect)

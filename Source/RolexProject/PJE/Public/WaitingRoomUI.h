@@ -17,17 +17,44 @@ class ROLEXPROJECT_API UWaitingRoomUI : public UUserWidget
 	virtual void NativeConstruct() override;
 	
 public:
+	// players box
 	UPROPERTY(meta = (BindWidget))
 	class UHorizontalBox* PlayerBox;
 
-	TArray<class UVerticalBox*> PlayerSlots;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<class UPlayerSlotUI*> PlayerSlots;
 
 	int32 NumplayerSlots;
 	
 	void AddPlayer();
 
+public:
+	// hero selection
 	UPROPERTY(meta = (BindWidget))
 	class UUniformGridPanel* HeroSelectionPanel;
 
-	TArray<class UButton*> HeroButtonArray;
+	TArray<class UHeroSlotUI*> HeroButtonArray;
+
+	bool HeroSelectionVisible = false;
+	
+public:
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* Notice;
+
+	UPROPERTY(ReplicatedUsing=OnRep_SetNotice)
+	FText NoticeText;
+
+	UFUNCTION()
+	void OnRep_SetNotice();
+	
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* CountDown;
+
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+public:
+	UPROPERTY(meta = (BindWidget))
+	class UButton* StartButton;
+
+	UFUNCTION()
+	void TravelToMain();
 };

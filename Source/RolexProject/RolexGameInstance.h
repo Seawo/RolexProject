@@ -7,6 +7,8 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSessionSettings.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "BaseCharacter.h"
+#include "RolexPlayerState.h"
 #include "RolexGameInstance.generated.h"
 
 
@@ -42,5 +44,9 @@ public:
 	FAddSession AddSession;
 
 	UPROPERTY()
-	TSubclassOf<class ABaseCharacter> MainLevelPawn;
+	TSubclassOf<ABaseCharacter> MainLevelPawn;
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TMap<FString, TSubclassOf<ABaseCharacter>> PlayerHeroSelections;
 };

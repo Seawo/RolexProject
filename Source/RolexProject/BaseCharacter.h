@@ -99,7 +99,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_CharacterData)
 	FCharacterData Data;				// 캐릭터 데이터를 가지고있을 구조체
 	
 	UPROPERTY(ReplicatedUsing = OnRep_MoveState)
@@ -161,6 +161,18 @@ public:
 
 	UFUNCTION()
 	void OnRep_MoveState();
+
+	UFUNCTION()
+	void OnRep_CharacterData();
+
+	// 움직임 막기
+	void MoveDisable();
+	UFUNCTION(Server, Reliable)
+	void Sever_MoveDisable();
+	// 다시 움직이기
+	void MoveEnable();
+	UFUNCTION(Server, Reliable)
+	void Sever_MoveEnable();
 
 
 };
