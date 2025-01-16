@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GM_TrainingRoom.h"
 #include "GameFramework/PlayerController.h"
+#include "RolexPlayerController.h"
 #include "PlayerController_TrainingRoom.generated.h"
 
 /**
@@ -15,7 +16,7 @@ class ROLEXPROJECT_API APlayerController_TrainingRoom : public APlayerController
 {
 	GENERATED_BODY()
 	
-
+public:
 	virtual void BeginPlay() override;
 
 	void InitUI();

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "RolexGameMode.h"
 #include "GM_TrainingRoom.generated.h"
 
 // 거점 점령 상태를 알려주는 Enum값
@@ -37,7 +38,7 @@ enum class EClashing : uint8
  * 
  */
 UCLASS()
-class ROLEXPROJECT_API AGM_TrainingRoom : public AGameModeBase
+class ROLEXPROJECT_API AGM_TrainingRoom : public ARolexGameMode
 {
 	GENERATED_BODY()
 	

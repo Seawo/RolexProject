@@ -26,6 +26,8 @@ void AGM_TrainingRoom::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] BeginPlay start"));
+
 	IsActiveBsePoint = false;
 
 	// 각 팀 캐릭터 값 가져오기
@@ -34,6 +36,11 @@ void AGM_TrainingRoom::BeginPlay()
 	for (AActor* foundActor : foundActors)
 	{
 		ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(foundActor);
+		if (baseCharacter == nullptr)
+		{
+			UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] baseCharacter is nullptr"));
+		}
+
 		if (baseCharacter->Data.Team == true)
 		{
 			ATeamChracters.Add(baseCharacter);
@@ -51,9 +58,33 @@ void AGM_TrainingRoom::BeginPlay()
 		AActor_FightPoint* fightPoint = Cast<AActor_FightPoint>(foundActor);
 		fightPoint->OnPointOverlapChanged.AddDynamic(this, &AGM_TrainingRoom::ChangeNumberOfTeam);
 
+		if (not fightPoint)
+		{
+			UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] fightPoint is nullptr"));
+		}
+
 		Points.Add(fightPoint);
 	}
-	PC = Cast<APlayerController_TrainingRoom>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+
+	FTimerHandle timerHandle;
+	// 람다식으로
+	GetWorld()->GetTimerManager().SetTimer(timerHandle, [this]()
+		{
+			PC = Cast<APlayerController_TrainingRoom>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+			if (PC)
+			{
+				UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] PC : %s"), *PC->GetName());
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] PC is nullptr"));
+			}
+
+
+		}, 1.0f, false);
+
+
+
 
 	// GameState의 변수 값 초기화
 	GS = Cast<AGS_TrainingRoom>(UGameplayStatics::GetGameState(GetWorld()));
@@ -90,7 +121,12 @@ void AGM_TrainingRoom::BeginPlay()
 		GS->IsGetATeamExtraTime = false;
 		GS->IsGetBTeamExtraTime = false;
 	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] GS is nullptr"));
+	}
 
+	UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] BeginPlay end"));
 }
 
 void AGM_TrainingRoom::Tick(float DeltaTime)
@@ -113,6 +149,9 @@ void AGM_TrainingRoom::Tick(float DeltaTime)
 			int32 random = FMath::RandRange(0, Points.Num() - 1);
 
 			Points[random]->SetActivePoint(EActivePoint::Active);
+
+			UE_LOG(LogTemp, Warning, TEXT("[AGM_TrainingRoom] PC : %s"), *PC->GetName());
+
 			PC->SetPoint(random);
 			IsActiveBsePoint = true;
 		}

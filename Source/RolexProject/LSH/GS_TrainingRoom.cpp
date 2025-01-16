@@ -24,6 +24,15 @@ void AGS_TrainingRoom::BeginPlay()
 	Super::BeginPlay();
 
 	PC = Cast<APlayerController_TrainingRoom>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (PC)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] PC : %s"), *PC->GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] PC is nullptr"));
+	}
+
 
 	if (HasAuthority())
 	{
