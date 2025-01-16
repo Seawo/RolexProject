@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "RolexPlayerController.h"
@@ -25,12 +25,15 @@ void ARolexPlayerController::BeginPlay()
 	WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetWorld()->GetGameState()); 
 }
 
+// 서버 RPC : 플레이어가 선택한 영웅 정보를 서버에 전달
 void ARolexPlayerController::ServerRPC_SetSelectedHero_Implementation(const FString& ID,
 	TSubclassOf<class ABaseCharacter> BaseCharacter)
 {
+	// RolexGameInstance 가져오기
 	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
 	if (RolexGameInstance)
 	{
+		// PlayerHeroSelections 맵에 플레이어 ID와 선택된 영웅 클래스 추가
 		RolexGameInstance->PlayerHeroSelections.Add(ID, BaseCharacter);
 	
 		// debug

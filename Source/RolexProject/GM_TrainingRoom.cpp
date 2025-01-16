@@ -5,6 +5,8 @@
 
 #include "GS_TrainingRoom.h"
 #include "PlayerController_TrainingRoom.h"
+#include "RolexPlayerState.h"
+#include "RolexGameInstance.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "BaseCharacter.h"
@@ -18,7 +20,7 @@
 AGM_TrainingRoom::AGM_TrainingRoom()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	bUseSeamlessTravel = true;
 
 }
 
@@ -144,6 +146,7 @@ void AGM_TrainingRoom::Tick(float DeltaTime)
 
 	if (PlayTime >= 10.0f)
 	{
+		// 거점 활성화
 		if (IsActiveBsePoint == false)
 		{
 			int32 random = FMath::RandRange(0, Points.Num() - 1);
@@ -156,9 +159,12 @@ void AGM_TrainingRoom::Tick(float DeltaTime)
 			IsActiveBsePoint = true;
 		}
 
+		// 결과가 안나왔을 경우
 		if (Result == EResult::None)
 		{
+			// 거점 게이지 업데이트
 			UpdatePointGauge(DeltaTime);
+			// 거점 게이트 GameState에 업데이트
 			if (GS)
 			{
 				GS->PlayTime = PlayTime;
@@ -190,7 +196,8 @@ void AGM_TrainingRoom::Tick(float DeltaTime)
 				GS->IsGetATeamExtraTime = IsGetATeamExtraTime;
 				GS->IsGetBTeamExtraTime = IsGetBTeamExtraTime;
 			}
-			if (PC) // 서버의 UI값 업데이트
+			// 서버의 UI값 업데이트
+			if (PC) 
 			{
 				PC->SetPlayTime(PlayTime);
 				PC->SetATeamCount(PointATeamCount);
@@ -233,6 +240,26 @@ void AGM_TrainingRoom::Tick(float DeltaTime)
 //		return GetWorld()->SpawnActor<ACharacter_Muriel>(ACharacter_Muriel::StaticClass(), StartSpot->GetActorLocation(), StartSpot->GetActorRotation());
 //	}
 //}
+
+UClass* AGM_TrainingRoom::GetDefaultPawnClassForController_Implementation(AController* InController)
+{
+	// 서버의 UI값 업데이트
+	ARolexPlayerState* RolexPlayerState = InController->GetPlayerState<ARolexPlayerState>();
+	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
+
+	if (RolexPlayerState && RolexGameInstance)
+	{
+		//find selected hero class based on the UniqueID key
+		RolexPlayerState->FindUniqueID();
+		if (TSubclassOf<ABaseCharacter>* BaseCharacterFactory = RolexGameInstance->PlayerHeroSelections.Find(RolexPlayerState->UniqueID))
+		{
+			return *BaseCharacterFactory;
+		}
+	}
+
+
+	return Super::GetDefaultPawnClassForController_Implementation(InController);
+}
 
 void AGM_TrainingRoom::UpdatePointGauge(float DeltaTime)
 {

@@ -38,7 +38,7 @@ enum class EClashing : uint8
  * 
  */
 UCLASS()
-class ROLEXPROJECT_API AGM_TrainingRoom : public ARolexGameMode
+class ROLEXPROJECT_API AGM_TrainingRoom : public AGameModeBase
 {
 	GENERATED_BODY()
 	
@@ -49,7 +49,7 @@ class ROLEXPROJECT_API AGM_TrainingRoom : public ARolexGameMode
 
 	//virtual APawn* SpawnDefaultPawnFor_Implementation(AController* NewPlayer, class AActor* StartSpot) override;
 
-
+	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
 
 	void UpdatePointGauge(float DeltaTime);
 
