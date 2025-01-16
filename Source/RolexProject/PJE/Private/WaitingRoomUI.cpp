@@ -16,6 +16,14 @@ void UWaitingRoomUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	
+	if (PlayerController)
+	{
+		PlayerController->SetInputMode(FInputModeUIOnly());
+		PlayerController ->bShowMouseCursor = true;
+	}
+	
 	Notice->SetVisibility(ESlateVisibility::Hidden);
 	CountDown->SetVisibility(ESlateVisibility::Hidden);
 	HeroSelectionPanel->SetVisibility(ESlateVisibility::Hidden);

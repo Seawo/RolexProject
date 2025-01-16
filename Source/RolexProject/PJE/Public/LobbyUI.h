@@ -26,8 +26,11 @@ public:
 	UFUNCTION()
 	void CreateSession();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UCreateSessionUI> CreateSessionUIFactory;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	// TSubclassOf<UCreateSessionUI> CreateSessionUIFactory;
+
+	UPROPERTY(meta = (BindWidget))
+	class UCreateSessionUI* CreateSessionUI;
 	
 	UPROPERTY(meta = (BindWidget))
 	UButton* FindSessionBtn;
