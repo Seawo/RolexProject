@@ -107,6 +107,11 @@ void AWaitingRoomGameStateBase::MatchPlayers()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AWaitingRoomGameStateBase::StartHeroSelectionCountdown, 3.0f, false);
 }
 
+void AWaitingRoomGameStateBase::ServerRPC_StartButtonVisible_Implementation()
+{
+	WaitingRoomUI->StartButton->SetVisibility(ESlateVisibility::Visible);
+}
+
 void AWaitingRoomGameStateBase::StartHeroSelectionCountdown()
 {
 	MulticastRPC_UpdateNotice("Hero Selection");
@@ -136,7 +141,7 @@ void AWaitingRoomGameStateBase::MulticastRPC_Countdown_Implementation()
 	{
 		WaitingRoomUI->CountDown->SetVisibility(ESlateVisibility::Hidden);		
 		GetWorld()->GetTimerManager().ClearTimer(CountdownTimerHandle);
-		WaitingRoomUI->StartButton->SetVisibility(ESlateVisibility::Visible);
+		ServerRPC_StartButtonVisible();
 	}
 	
 	WaitingRoomUI->CountDown->SetVisibility(ESlateVisibility::Visible);

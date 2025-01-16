@@ -46,6 +46,9 @@ public:
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_StartHeroSelection();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_StartButtonVisible();
 	
 	FTimerHandle CountdownTimerHandle;
 	
