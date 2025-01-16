@@ -75,6 +75,7 @@ public:
 
 
 	void SetActivePoint(EActivePoint activePoint) { ActivePoint = activePoint; }
+	EActivePoint GetActivePoint() const { return ActivePoint; }
 	ETeam GetTeam() const { return Team; }
 	
 public:

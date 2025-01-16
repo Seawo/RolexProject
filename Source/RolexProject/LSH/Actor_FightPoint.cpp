@@ -38,8 +38,8 @@ void AActor_FightPoint::Tick(float DeltaTime)
 
 
 	// 게임이 끝났거나, 거점이 비활성화라면 리턴해줘
-	//if (Finish != EFinish::None or ActivePoint == EActivePoint::Deactivate) return;
-
+	if (Finish != EFinish::None or ActivePoint == EActivePoint::Deactivate) return;
+	DrawDebugS(DeltaTime);
 
 	// 서버가 아니라면 계산 x
 	//if (not HasAuthority()) return;
@@ -57,7 +57,7 @@ void AActor_FightPoint::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 void AActor_FightPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	//if (Finish != EFinish::None or ActivePoint == EActivePoint::Deactivate) return;
+	if (Finish != EFinish::None or ActivePoint == EActivePoint::Deactivate) return;
 
 	Super::OnOverlapBegin(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 
@@ -81,7 +81,7 @@ void AActor_FightPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 
 void AActor_FightPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	//if (Finish != EFinish::None or ActivePoint == EActivePoint::Deactivate) return;
+	if (Finish != EFinish::None or ActivePoint == EActivePoint::Deactivate) return;
 
 
 
