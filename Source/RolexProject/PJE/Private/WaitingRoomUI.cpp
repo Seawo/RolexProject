@@ -73,6 +73,6 @@ void UWaitingRoomUI::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>&
 
 void UWaitingRoomUI::TravelToMain()
 {
-	GetWorld()->ServerTravel(TEXT("/Game/Rolex/Map/Main?listen"));
+	GetWorld()->ServerTravel(TEXT("/Game/Rolex/PublicMap/PlayMap/PlayLevel?listen"));
 }
 
