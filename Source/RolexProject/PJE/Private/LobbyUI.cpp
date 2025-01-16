@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PJE/Public/LobbyUI.h"
-
+#include "LobbyUI.h"
+#include "Blueprint/UserWidget.h"
 #include "NavigationSystemTypes.h"
 #include "RolexGameInstance.h"
 #include "SessionItemUI.h"
@@ -10,11 +10,24 @@
 #include "Components/EditableTextBox.h"
 #include "Components/ScrollBox.h"
 #include "Components/TextBlock.h"
+#include "Kismet/GameplayStatics.h"
 
 void ULobbyUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	CreateSessionUI->SetVisibility(ESlateVisibility::Hidden);
+	
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	
+	if (PlayerController)
+	{
+		PlayerController->SetInputMode(FInputModeUIOnly());
+		PlayerController ->bShowMouseCursor = true;
+	}
+
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->ConsoleCommand(TEXT("r.ScreenPercentage 0"));
+	
 	RolexGameInstace = Cast<URolexGameInstance>(GetWorld()->GetGameInstance());
 
 	// bind function to OnClicked delegate
@@ -27,11 +40,7 @@ void ULobbyUI::NativeConstruct()
 
 void ULobbyUI::CreateSession()
 {
-	UCreateSessionUI* CreateSessionUI = Cast<UCreateSessionUI>(CreateWidget(this, CreateSessionUIFactory));
-	if (CreateSessionUI)
-	{
-		CreateSessionUI->AddToViewport();
-	}
+	CreateSessionUI->SetVisibility(ESlateVisibility::Visible);
 }
 
 void ULobbyUI::FindSession()

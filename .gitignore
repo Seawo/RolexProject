@@ -93,3 +93,7 @@ RolexProject.bat
 # Include
 !Content/ParagonFey/Characters/Heroes/Fey/Animations/Montage/
 !Content/ParagonFey/Characters/Heroes/Fey/Animations/Montage/**
+
+# UI Assests
+Content/ProgressBarsPack
+Content/ProIconPack
