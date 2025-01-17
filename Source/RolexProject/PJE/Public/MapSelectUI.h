@@ -4,28 +4,28 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "CreateSessionUI.generated.h"
+#include "MapSelectUI.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ROLEXPROJECT_API UCreateSessionUI : public UUserWidget
+class ROLEXPROJECT_API UMapSelectUI : public UUserWidget
 {
 	GENERATED_BODY()
 
-	void NativeConstruct() override;
+	virtual void NativeConstruct() override;
 	
 public:
 	UPROPERTY(meta = (BindWidget))
-	class UEditableTextBox* SessionNameBox;
+	class UButton* LeftButton;
 	
 	UPROPERTY(meta = (BindWidget))
-	class UButton* ConfirmBtn;
-
-	UFUNCTION()
-	void Confrim();
+	UButton* RightButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UComboBoxString* NumberofPlayers;
+	UButton* MedivalAsia;
+	
+	UFUNCTION()
+	void OnClickedMedivalAsia();
 };

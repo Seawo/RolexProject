@@ -16,12 +16,13 @@ class ROLEXPROJECT_API AWaitingRoomGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 
 	AWaitingRoomGameModeBase();
+
+	virtual void BeginPlay() override;
 	
 public:
 	IOnlineSubsystem* OnlineSubsystem;
-	
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 MaxPlayersNum = 4;
 
 	int32 CurrentPlayersNum = 0;

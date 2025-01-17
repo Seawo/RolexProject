@@ -99,11 +99,8 @@ void URolexGameInstance::OnFindSession(bool bWasSuccessful)
 		for (int32 i = 0; i < results.Num(); i++)
 		{
 			FOnlineSessionSearchResult SearchResult = results[i];
-
 			FString SessionId = SearchResult.GetSessionIdStr();
-			
 			FString OwnerName = SearchResult.Session.OwningUserName;
-
 			FString SessionName;
 			SearchResult.Session.SessionSettings.Get(TEXT("RoomName"), SessionName);
 
@@ -141,4 +138,9 @@ void URolexGameInstance::OnJoinSession(FName SessionName, EOnJoinSessionComplete
 		}
 	}
 }
+
+
+
+
+
 

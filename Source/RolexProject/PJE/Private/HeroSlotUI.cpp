@@ -11,6 +11,8 @@
 #include "WaitingRoomGameModeBase.h"
 #include "WaitingRoomGameStateBase.h"
 #include "Components/Button.h"
+#include "Components/Image.h"
+#include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 
 void UHeroSlotUI::NativeConstruct()
@@ -20,6 +22,8 @@ void UHeroSlotUI::NativeConstruct()
 	WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetWorld()->GetGameState());
 	RolexPlayerController = Cast<ARolexPlayerController>(GetWorld()->GetFirstPlayerController());
 	HeroSelectButton->OnClicked.AddDynamic(this, &UHeroSlotUI::OnHeroSelectButtonClicked);
+
+	HeroInfo->SetText(HeroDescription);
 }
 
 void UHeroSlotUI::OnHeroSelectButtonClicked()
