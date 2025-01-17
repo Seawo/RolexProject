@@ -46,7 +46,14 @@ public:
 	UPROPERTY()
 	TSubclassOf<ABaseCharacter> MainLevelPawn;
 
+	// create session settings
+public:
+	int32 MaxPlayersNum;
+
+	FString TravelLevel = FString("/Game/Rolex/PublicMap/PlayMap/PlayLevel?listen");;
+	
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TMap<FString, TSubclassOf<ABaseCharacter>> PlayerHeroSelections;
+
 };

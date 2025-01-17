@@ -20,12 +20,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UTexture2D* HeroTexture;
 	
-	UPROPERTY(meta = (BindWidget), EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(meta = (BindWidget), BlueprintReadOnly)
 	class UImage* HeroImage;
 	
-	UPROPERTY(meta = (BindWidget), EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(meta = (BindWidget))
 	class UButton* HeroSelectButton;
 
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* HeroInfo;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FText HeroDescription;
+	
 	FHeroSelectButtonClikcedDelegate HeroSelectButtonClickedDelegate;
 
 	UFUNCTION()

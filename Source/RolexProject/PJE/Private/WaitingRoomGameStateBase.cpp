@@ -114,7 +114,7 @@ void AWaitingRoomGameStateBase::ServerRPC_StartButtonVisible_Implementation()
 
 void AWaitingRoomGameStateBase::StartHeroSelectionCountdown()
 {
-	MulticastRPC_UpdateNotice("Hero Selection");
+	MulticastRPC_UpdateNotice("HERO SELECTION");
 	
 	GetWorld()->GetTimerManager().SetTimer(CountdownTimerHandle, this, &AWaitingRoomGameStateBase::MulticastRPC_Countdown, 1.0f, true);
 }
@@ -126,6 +126,7 @@ void AWaitingRoomGameStateBase::StartHeroSelectionCountdown()
 //
 void AWaitingRoomGameStateBase::MulticastRPC_SetPlayerHeroImage_Implementation(UTexture2D* PlayerHeroTexture, int32 Index)
 {
+	WaitingRoomUI->PlayerSlots[Index]->PlayerHeroImage->SetColorAndOpacity(FLinearColor(1.0, 1.0, 1.0, 1.0));
 	WaitingRoomUI->PlayerSlots[Index]->PlayerHeroImage->SetBrushFromTexture(PlayerHeroTexture);
 }
 

@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CreateSessionUI.h"
 #include "Blueprint/UserWidget.h"
 #include "LobbyUI.generated.h"
 
@@ -26,18 +25,21 @@ public:
 	UFUNCTION()
 	void CreateSession();
 
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	// TSubclassOf<UCreateSessionUI> CreateSessionUIFactory;
-
 	UPROPERTY(meta = (BindWidget))
 	class UCreateSessionUI* CreateSessionUI;
+
+	UPROPERTY(meta = (BindWidget))
+	class UMapSelectUI* MapSelectUI;
 	
 	UPROPERTY(meta = (BindWidget))
 	UButton* FindSessionBtn;
 
 	UFUNCTION()
 	void FindSession();
-
+	
+	UPROPERTY(meta = (BindWidget))
+	class UBorder* SessionScrollBoxBorder;
+	
 	UPROPERTY(meta = (BindWidget))
 	class UScrollBox* SessionScrollBox;
 

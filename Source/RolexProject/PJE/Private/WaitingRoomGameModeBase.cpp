@@ -12,6 +12,7 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSubsystemUtils.h"
 #include "PlayerSlotUI.h"
+#include "RolexGameInstance.h"
 #include "RolexPlayerController.h"
 #include "ScreenPass.h"
 #include "WaitingRoomGameStateBase.h"
@@ -22,6 +23,17 @@
 AWaitingRoomGameModeBase::AWaitingRoomGameModeBase()
 {
 	bUseSeamlessTravel = true;
+}
+
+void AWaitingRoomGameModeBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
+	if (RolexGameInstance->MaxPlayersNum)
+	{
+		MaxPlayersNum = RolexGameInstance->MaxPlayersNum;
+	}
 }
 
 // called when a new player joins the server

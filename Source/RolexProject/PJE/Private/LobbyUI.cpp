@@ -11,12 +11,17 @@
 #include "Components/ScrollBox.h"
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
+#include "CreateSessionUI.h"
+#include "MapSelectUI.h"
+#include "Components/Border.h"
 
 void ULobbyUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 
 	CreateSessionUI->SetVisibility(ESlateVisibility::Hidden);
+	MapSelectUI->SetVisibility(ESlateVisibility::Hidden);
+	SessionScrollBoxBorder->SetVisibility(ESlateVisibility::Hidden);
 	
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	
@@ -40,11 +45,13 @@ void ULobbyUI::NativeConstruct()
 
 void ULobbyUI::CreateSession()
 {
+	MapSelectUI->SetVisibility(ESlateVisibility::Visible);
 	CreateSessionUI->SetVisibility(ESlateVisibility::Visible);
 }
 
 void ULobbyUI::FindSession()
 {
+	SessionScrollBoxBorder->SetVisibility(ESlateVisibility::Visible);
 	RolexGameInstace->FindSession();
 }
 

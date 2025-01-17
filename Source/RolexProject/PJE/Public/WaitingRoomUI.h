@@ -24,6 +24,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<class UPlayerSlotUI*> PlayerSlots;
 
+	void GetAllDescendants(UPanelWidget* ParentWidget, TArray<class UHeroSlotUI*>& Descendants);
+	
 	int32 NumplayerSlots;
 	
 	void AddPlayer();
@@ -32,7 +34,7 @@ public:
 	// hero selection
 	UPROPERTY(meta = (BindWidget))
 	class UUniformGridPanel* HeroSelectionPanel;
-
+	
 	TArray<class UHeroSlotUI*> HeroButtonArray;
 
 	bool HeroSelectionVisible = false;

@@ -15,6 +15,8 @@ class ROLEXPROJECT_API UPlayerSlotUI : public UUserWidget
 {
 	GENERATED_BODY()
 
+	virtual void NativeConstruct() override;
+	
 public:
 	UPROPERTY(meta = (BindWidget))
 	UImage* TeamColor;

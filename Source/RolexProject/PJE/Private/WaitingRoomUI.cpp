@@ -5,11 +5,13 @@
 
 #include "HeroSlotUI.h"
 #include "PlayerSlotUI.h"
+#include "RolexGameInstance.h"
 #include "Components/Button.h"
 #include "Components/UniformGridPanel.h"
 #include "Components/HorizontalBox.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
+#include "Components/UniformGridPanel.h"
 #include "Net/UnrealNetwork.h"
 
 void UWaitingRoomUI::NativeConstruct()
@@ -46,18 +48,26 @@ void UWaitingRoomUI::NativeConstruct()
 		 UE_LOG(LogTemp, Warning, TEXT("Number of Player Slots: %d"), NumplayerSlots);
 	}
 
-	// get Hero Buttons from Hero selection panel
+	// get Hero Buttons from Hero selection panel, detect every child (not only the first level child)
 	if (HeroSelectionPanel)
 	{
-		TArray<UWidget*> HeroSelectionPanelChildren =  HeroSelectionPanel->GetAllChildren();
-
-		for (UWidget* HeroSelectionPanelChild : HeroSelectionPanelChildren)
-		{
-			if (UHeroSlotUI* HeroSlotUI = Cast<UHeroSlotUI>(HeroSelectionPanelChild))
-				HeroButtonArray.Add(HeroSlotUI);
-		}
-		
+		GetAllDescendants(HeroSelectionPanel, HeroButtonArray);
 		UE_LOG(LogTemp, Warning, TEXT("Number of Hero Buttons: %d"), HeroButtonArray.Num());
+	}
+}
+
+void UWaitingRoomUI::GetAllDescendants(UPanelWidget* ParentWidget, TArray<UHeroSlotUI*>& Descendants)
+{
+	for (int32 i = 0; i < ParentWidget->GetChildrenCount(); i++)
+	{
+		UWidget* Child = ParentWidget->GetChildAt(i);
+		
+		if (UHeroSlotUI* HeroSlotUI = Cast<UHeroSlotUI>(Child))
+			Descendants.Add(HeroSlotUI);
+
+		// if  it has its own child
+		if (UPanelWidget* Panel = Cast<UPanelWidget>(Child))
+			GetAllDescendants(Panel, Descendants);
 	}
 }
 
@@ -81,6 +91,7 @@ void UWaitingRoomUI::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>&
 
 void UWaitingRoomUI::TravelToMain()
 {
-	GetWorld()->ServerTravel(TEXT("/Game/Rolex/PublicMap/PlayMap/PlayLevel?listen"));
+	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
+	GetWorld()->ServerTravel(RolexGameInstance->TravelLevel);
 }
 
