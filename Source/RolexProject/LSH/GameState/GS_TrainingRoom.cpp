@@ -1,12 +1,13 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "LSH/GS_TrainingRoom.h"
+#include "GS_TrainingRoom.h"
 
-#include "PlayerController_TrainingRoom.h"
+#include "PlayerController/PlayerController_TrainingRoom.h"
+#include "RolexPlayerController.h"
 #include "GM_TrainingRoom.h"
 #include "Kismet/GameplayStatics.h"
-#include "Actor_FightPoint.h"
+#include "Point/Actor_FightPoint.h"
 #include "BaseCharacter.h"
 #include "UI_Zone.h"
 
@@ -23,10 +24,11 @@ void AGS_TrainingRoom::BeginPlay()
 {
 	Super::BeginPlay();
 
-	PC = Cast<APlayerController_TrainingRoom>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	PC = Cast<ARolexPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (PC)
 	{
 		UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] PC : %s"), *PC->GetName());
+		PC->InitUI();
 	}
 	else
 	{
@@ -34,14 +36,14 @@ void AGS_TrainingRoom::BeginPlay()
 	}
 
 
-	if (HasAuthority())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("GameState initialized on SERVER"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("GameState initialized on CLIENT"));
-	}
+	//if (HasAuthority())
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("GameState initialized on SERVER"));
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("GameState initialized on CLIENT"));
+	//}
 }
 
 void AGS_TrainingRoom::Tick(float DeltaTime)

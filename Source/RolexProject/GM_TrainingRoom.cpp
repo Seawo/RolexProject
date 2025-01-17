@@ -3,15 +3,16 @@
 
 #include "GM_TrainingRoom.h"
 
-#include "GS_TrainingRoom.h"
-#include "PlayerController_TrainingRoom.h"
+#include "GameState/GS_TrainingRoom.h"
+#include "PlayerController/PlayerController_TrainingRoom.h"
+#include "RolexPlayerController.h"
 #include "RolexPlayerState.h"
 #include "RolexGameInstance.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "BaseCharacter.h"
-#include "Actor_Point.h"
-#include "Actor_FightPoint.h"
+#include "Point/Actor_Point.h"
+#include "Point/Actor_FightPoint.h"
 
 #include "Character_Phase.h"
 #include "Character_Rampage.h"
@@ -72,10 +73,12 @@ void AGM_TrainingRoom::BeginPlay()
 	// 람다식으로
 	GetWorld()->GetTimerManager().SetTimer(timerHandle, [this]()
 		{
-			PC = Cast<APlayerController_TrainingRoom>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+			PC = Cast<ARolexPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+			
 			if (PC)
 			{
 				UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] PC : %s"), *PC->GetName());
+				PC->InitUI();
 			}
 			else
 			{
@@ -129,6 +132,8 @@ void AGM_TrainingRoom::BeginPlay()
 	}
 
 	UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] BeginPlay end"));
+
+
 }
 
 void AGM_TrainingRoom::Tick(float DeltaTime)
@@ -254,9 +259,12 @@ UClass* AGM_TrainingRoom::GetDefaultPawnClassForController_Implementation(AContr
 		if (TSubclassOf<ABaseCharacter>* BaseCharacterFactory = RolexGameInstance->PlayerHeroSelections.Find(RolexPlayerState->UniqueID))
 		{
 			return *BaseCharacterFactory;
+
+			UE_LOG(LogTemp, Warning, TEXT("Find BaseCharacter"));
 		}
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("Failed to find BaseCharacter"));
 
 	return Super::GetDefaultPawnClassForController_Implementation(InController);
 }

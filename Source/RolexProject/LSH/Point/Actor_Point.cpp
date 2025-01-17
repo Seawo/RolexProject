@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "LSH/Actor_Point.h"
+#include "Actor_Point.h"
 
 
 #include "Components/BoxComponent.h"

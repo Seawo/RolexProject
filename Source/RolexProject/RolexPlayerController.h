@@ -1,9 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "GM_TrainingRoom.h"
 #include "RolexPlayerController.generated.h"
 
 /**
@@ -60,4 +61,34 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_SetSelectedHero(const FString& ID, TSubclassOf<class ABaseCharacter> BaseCharacter);
+
+
+	bool bIsGoInPlayMap;			// 플레이맵으로 넘어가는지 여부
+/////////////////////////PlayMap에서 사용될 함수 변수들/////////////////////////
+
+public:
+	void InitUI();
+
+public:
+	void SetPlayTime(float Time);
+	void SetPoint(int idx);
+	void SetTakingGuage(float Agauge, float Bgauge);
+
+	void SetATeamCount(int32 Count);
+	void SetBTeamCount(int32 Count);
+	void SetPercent(EOccupation occupation, float APercent, float BPercent);
+
+	void SetClashing(EClashing clash);
+	void SetExtraTime(float Time);
+
+	void SetIsATeamExtraTime(bool bExtra);
+	void SetIsBTeamExtraTime(bool bExtra);
+
+public:
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UUI_Zone> UI_ZoneClass;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	class UUI_Zone* UI_Zone;
+
 };

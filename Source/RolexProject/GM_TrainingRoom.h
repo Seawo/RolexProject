@@ -63,7 +63,7 @@ public:
 
 private:
 	class AGS_TrainingRoom* GS;
-	class APlayerController_TrainingRoom* PC;
+	class ARolexPlayerController* PC;
 
 	bool IsActiveBsePoint = false;
 

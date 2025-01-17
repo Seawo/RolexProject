@@ -12,6 +12,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "UI_Zone.h"
 
 
 ARolexPlayerController::ARolexPlayerController()
@@ -23,8 +24,12 @@ void ARolexPlayerController::BeginPlay()
 	Super::BeginPlay();
 
 	WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetWorld()->GetGameState()); 
-}
 
+	if (UI_ZoneClass)
+	{
+		UI_Zone = CreateWidget<UUI_Zone>(this, UI_ZoneClass);
+	}
+}
 // 서버 RPC : 플레이어가 선택한 영웅 정보를 서버에 전달
 void ARolexPlayerController::ServerRPC_SetSelectedHero_Implementation(const FString& ID,
 	TSubclassOf<class ABaseCharacter> BaseCharacter)
@@ -48,7 +53,6 @@ void ARolexPlayerController::ServerRPC_SetSelectedHero_Implementation(const FStr
 		}
 	}
 }
-
 // void ARolexPlayerController::ServerRPC_SetSelectedHero_Implementation(ARolexPlayerState* RolexPlayerState,
 //                                                                       TSubclassOf<ABaseCharacter> BaseCharacter)
 // {
@@ -74,14 +78,12 @@ void ARolexPlayerController::ServerRPC_SetSelectedHero_Implementation(const FStr
 // 		// }
 // 	}
 // }
-
 void ARolexPlayerController::ServerRPC_SetPlayerHeroImage_Implementation(UTexture2D* PlayerHeroTexture, int32 Index)
 {
 	// cannot implement MulticastRPC_SetPlayerHeroImage in RolexPlayerController since clients only have its own controller
 	// client GameStateBase cannot call RPC functions but server can
 	WaitingRoomGameStateBase->MulticastRPC_SetPlayerHeroImage(PlayerHeroTexture, Index); 
 }
-
 void ARolexPlayerController::ServerRPC_InformClientPlayerSlotIndex_Implementation(int32 PlayerNumber, UPlayerSlotUI* PlayerSlotUI)
 {
 	PlayerSlotIndex = PlayerNumber;
@@ -96,8 +98,6 @@ void ARolexPlayerController::ServerRPC_InformClientPlayerSlotIndex_Implementatio
 		UE_LOG(LogTemp, Warning, TEXT("No OwnPlayerSlot"));
 	}
 }
-
-
 void ARolexPlayerController::ServerRPC_UpdateWholePlayerNumber_Implementation()
 {
 	if (WaitingRoomGameStateBase == nullptr)
@@ -117,7 +117,6 @@ void ARolexPlayerController::ServerRPC_UpdateWholePlayerNumber_Implementation()
 		}
 	
 }
-
 void ARolexPlayerController::ClientRPC_InitWaitingRoomUI_Implementation(const TArray<FString>& IDArray)
 {
 	TArray<class UPlayerSlotUI*> PlayerSlots = WaitingRoomUI->PlayerSlots;
@@ -126,7 +125,6 @@ void ARolexPlayerController::ClientRPC_InitWaitingRoomUI_Implementation(const TA
 		PlayerSlots[i]->PlayerID->SetText(FText::FromString(IDArray[i]));
 	}
 }
-
 void ARolexPlayerController::ClientRPC_CreateWaitingRoomUI_Implementation()
 {
 	if (IsLocalController())
@@ -141,8 +139,6 @@ void ARolexPlayerController::ClientRPC_CreateWaitingRoomUI_Implementation()
 		}
 	}
 }
-
-
 void ARolexPlayerController::ClientRPC_SetPlayerSlotUI_Implementation(int32 PlayerNumber)
 {
 	// set Steam ID on player slot textbox
@@ -175,3 +171,86 @@ void ARolexPlayerController::ClientRPC_SetPlayerSlotUI_Implementation(int32 Play
 		ServerRPC_UpdateWholePlayerNumber();
 }
 
+
+//////////////////////////////////////////////////////////////////////////
+
+
+void ARolexPlayerController::InitUI()
+{
+	if (IsLocalController())
+	{
+		UI_Zone->AddToViewport();
+		UI_Zone->UIInit();
+	}
+}
+
+void ARolexPlayerController::SetPlayTime(float Time)
+{
+	if (IsLocalController() && UI_Zone)
+	{
+		UI_Zone->SetPlayTime(Time);
+	}
+}
+void ARolexPlayerController::SetPoint(int idx)
+{
+	if (IsLocalController() && UI_Zone)
+	{
+		UI_Zone->SetPoint(idx);
+	}
+}
+void ARolexPlayerController::SetTakingGuage(float Agauge, float Bgauge)
+{
+	if (IsLocalController() && UI_Zone)
+	{
+		UI_Zone->SetTakingGuage(Agauge, Bgauge);
+	}
+}
+void ARolexPlayerController::SetATeamCount(int32 Count)
+{
+	if (IsLocalController() && UI_Zone)
+	{
+		UI_Zone->SetATeamCount(Count);
+	}
+}
+void ARolexPlayerController::SetBTeamCount(int32 Count)
+{
+	if (IsLocalController() && UI_Zone)
+	{
+		UI_Zone->SetBTeamCount(Count);
+	}
+}
+void ARolexPlayerController::SetPercent(EOccupation occupation, float APercent, float BPercent)
+{
+	if (IsLocalController() && UI_Zone)
+	{
+		UI_Zone->SetPercent(occupation, APercent, BPercent);
+	}
+}
+void ARolexPlayerController::SetClashing(EClashing clash)
+{
+	if (IsLocalController() && UI_Zone)
+	{
+		UI_Zone->SetClashing(clash);
+	}
+}
+void ARolexPlayerController::SetExtraTime(float Time)
+{
+	if (IsLocalController() && UI_Zone)
+	{
+		UI_Zone->SetExtraTime(Time);
+	}
+}
+void ARolexPlayerController::SetIsATeamExtraTime(bool bExtra)
+{
+	if (IsLocalController() and UI_Zone)
+	{
+		UI_Zone->SetIsATeamExtraTime(bExtra);
+	}
+}
+void ARolexPlayerController::SetIsBTeamExtraTime(bool bExtra)
+{
+	if (IsLocalController() and UI_Zone)
+	{
+		UI_Zone->SetIsBTeamExtraTime(bExtra);
+	}
+}

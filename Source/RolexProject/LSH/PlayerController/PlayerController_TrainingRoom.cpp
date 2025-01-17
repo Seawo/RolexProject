@@ -1,10 +1,10 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "LSH/PlayerController_TrainingRoom.h"
+#include "PlayerController_TrainingRoom.h"
 
 #include "LSH/UI/UI_Zone.h"
-#include "GS_TrainingRoom.h"
+#include "GameState/GS_TrainingRoom.h"
 
 
 #include "Kismet/GameplayStatics.h"
