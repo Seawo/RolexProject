@@ -53,7 +53,6 @@ void AEffectActor::BeginPlay()
 	SetReplicatingMovement(true);
 	
 
-
 	if (bIsDamage)
 	{
 		CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AEffectActor::OnOverlapBegin);
@@ -139,7 +138,7 @@ void AEffectActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 
 		if (character)
 		{
-			if (character->Data.Team == onwer->Data.Team)
+			if (character->Data.Team == onwer->Data.Team || character->MoveState == EMoveState::Die)
 				return;
 
 			character->ModifyHP(-Damage);

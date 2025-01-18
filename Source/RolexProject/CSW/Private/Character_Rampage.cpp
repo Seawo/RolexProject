@@ -17,6 +17,8 @@
 #include "Net/UnrealNetwork.h"
 #include "Components/SphereComponent.h"
 
+#include <GameFramework\SpringArmComponent.h>
+#include "Camera\CameraComponent.h"
 ACharacter_Rampage::ACharacter_Rampage()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -87,14 +89,8 @@ void ACharacter_Rampage::Tick(float DeltaTime)
 		// Apply new location
 		SetActorLocation(newLocation, true);
 	}
+	
 
-
-
-	//if (bIsDashing)
-	//{
-	//	// Move the character in the dash direction
-	//	AddActorWorldOffset(DashDirection * DashSpeed * DeltaTime, true);
-	//}
 }
 
 void ACharacter_Rampage::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

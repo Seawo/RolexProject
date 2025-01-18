@@ -30,6 +30,14 @@
 // 	}
 // }
 
+void UPlayerSlotUI::NativeConstruct()
+{
+	Super::NativeConstruct();
+	
+	PlayerHeroImage->SetColorAndOpacity(FLinearColor(1.0, 1.0, 1.0, 0.4));
+	TeamColor->SetColorAndOpacity(FLinearColor(1.0, 1.0, 1.0, 0.4));
+}
+
 void UPlayerSlotUI::OnRep_SetPlayerID()
 {
 	PlayerID->SetText(FText::FromString(PlayerIDString));

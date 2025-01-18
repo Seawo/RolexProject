@@ -22,7 +22,7 @@ ARolexPlayerController::ARolexPlayerController()
 void ARolexPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetWorld()->GetGameState()); 
 
 	if (UI_ZoneClass)
@@ -110,12 +110,11 @@ void ARolexPlayerController::ServerRPC_UpdateWholePlayerNumber_Implementation()
 		if (WaitingRoomGameStateBase->WholePlayerNumber == WaitingRoomGameModeBase->MaxPlayersNum)
 		{
 			
-			WaitingRoomGameStateBase->MulticastRPC_UpdateNotice("Start Matching");
+			WaitingRoomGameStateBase->MulticastRPC_UpdateNotice("START MATCHING");
 
 			FTimerHandle TimerHandle;
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle, WaitingRoomGameStateBase, &AWaitingRoomGameStateBase::MatchPlayers, 3.0f, false);
 		}
-	
 }
 void ARolexPlayerController::ClientRPC_InitWaitingRoomUI_Implementation(const TArray<FString>& IDArray)
 {

@@ -25,4 +25,7 @@ public:
 
 	UFUNCTION()
 	void Confrim();
+
+	UPROPERTY(meta = (BindWidget))
+	class UComboBoxString* NumberofPlayers;
 };

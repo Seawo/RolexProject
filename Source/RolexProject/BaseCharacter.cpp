@@ -64,6 +64,10 @@ void ABaseCharacter::BeginPlay()
 		}
 	}
 
+
+	// startPos 저장
+	StartPos = GetActorLocation();
+
 }
 
 // Called every frame
@@ -204,6 +208,7 @@ FRotator ABaseCharacter::SetAimDirection(ABaseCharacter* character, FVector& tar
 	}
 	else
 	{
+		
 		//UE_LOG(LogTemp, Warning, TEXT("Not Hit"));
 		//shotDirection = (targetLocation - startLocation).GetSafeNormal();
 	}
@@ -391,14 +396,23 @@ void ABaseCharacter::Die(UAnimMontage* montage)
 	PlayAnimMontage(montage);
 
 	float montageDelay = montage->GetPlayLength() + 1.0f;
+	float DeathTime = 10.0f;
+	
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("NoCollision"));
+
 
 	FTimerHandle montageTimer;
 	GetWorld()->GetTimerManager().SetTimer(montageTimer, FTimerDelegate::CreateLambda(
 		[this]()
 		{
+			SetActorLocation(StartPos);
+			ChangeState(EMoveState::Start, stateMontages[TEXT("Start")]);
+
+			GetCapsuleComponent()->SetCollisionProfileName(TEXT("Pawn"));
 			MoveEnable();
+			Data.Hp = Data.MaxHp;
 		}),
-		montageDelay, false);
+		DeathTime, false);
 	
 }
 

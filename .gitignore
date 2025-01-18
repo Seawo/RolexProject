@@ -85,6 +85,7 @@ Content/ParagonSparrow
 Content/EffectAsset
 Content/ModularSciFiEnv_I
 Content/Asian_town
+Content/ParagonSteel
 
 
 # bat 파일
@@ -93,3 +94,7 @@ RolexProject.bat
 # Include
 !Content/ParagonFey/Characters/Heroes/Fey/Animations/Montage/
 !Content/ParagonFey/Characters/Heroes/Fey/Animations/Montage/**
+
+# UI Assests
+Content/ProgressBarsPack
+Content/ProIconPack
