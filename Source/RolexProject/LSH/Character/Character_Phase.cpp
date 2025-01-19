@@ -34,7 +34,7 @@ ACharacter_Phase::ACharacter_Phase()
 	Data.RoleType = ERoleType::Dealer;
 	Data.Name = "Phase";
 	Data.Team = false;
-	Data.MaxHp = 250;
+	Data.MaxHp = 200;
 	Data.Hp = 200;
 	Data.Shield = 0;
 	Data.Speed = 400.0f;
@@ -58,12 +58,11 @@ void ACharacter_Phase::BeginPlay()
 	
 	if (UI_InGameClass)
 	{
-		UI_InGame = CreateWidget<UUI_InGame>(GetWorld(), UI_InGameClass);
-		if (UI_InGame)
-		{
-			UI_InGame->AddToViewport();
-		}
-	
+		// UI_InGame = CreateWidget<UUI_InGame>(GetWorld(), UI_InGameClass);
+		// if (UI_InGame)
+		// {
+		// 	UI_InGame->AddToViewport();
+		// }
 	}
 	//PlayMontage("Select", 1.0f);
 	//ChangeState(EMoveState::Stun);

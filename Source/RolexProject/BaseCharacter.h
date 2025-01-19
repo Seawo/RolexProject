@@ -178,4 +178,23 @@ public:
 	// 카메라 동기화 
 	FVector StartPos;
 
+public:
+	// hero UI image
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="UI")
+	class UTexture2D* BaseCharacterImage;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="UI")
+	UTexture2D* SkillImage;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="UI")
+	UTexture2D* WeaponImage;
+
+	// create UI
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="UI")
+	TSubclassOf<class UHeroUI> HeroUIFactory;
+
+	UPROPERTY(BlueprintReadOnly, Category="UI")
+	UHeroUI* HeroUI;
+
+	void InitHeroUI();
 };

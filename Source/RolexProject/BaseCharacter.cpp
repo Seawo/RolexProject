@@ -9,9 +9,13 @@
 #include "InputAction.h"
 
 #include <GameFramework\SpringArmComponent.h>
+
+#include "HeroUI.h"
+#include "RolexPlayerController.h"
 #include "Camera\CameraComponent.h"
 
 #include "Animation\AnimMontage.h"
+#include "Blueprint/UserWidget.h"
 #include "GameFramework\CharacterMovementComponent.h"
 
 #include "Net/UnrealNetwork.h"
@@ -44,8 +48,6 @@ ABaseCharacter::ABaseCharacter()
 	bUseControllerRotationRoll = false;
 
 	bReplicates = true;
-
-
 }
 
 // Called when the game starts or when spawned
@@ -68,6 +70,25 @@ void ABaseCharacter::BeginPlay()
 	// startPos 저장
 	StartPos = GetActorLocation();
 
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABaseCharacter::InitHeroUI, 5.0f, false);
+}
+
+void ABaseCharacter::InitHeroUI()
+{
+	if (GetController())
+		UE_LOG(LogTemp, Warning, TEXT("Controller Exists"));
+	// create UI
+	ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(GetController());
+	if (HeroUIFactory && RolexPlayerController && RolexPlayerController->IsLocalPlayerController())
+	{
+		HeroUI = CreateWidget<UHeroUI>(RolexPlayerController, HeroUIFactory);	// sometimes error occurrs
+		if (HeroUI)
+		{
+			HeroUI->BaseCharacter = this;
+			HeroUI->AddToViewport();
+		}
+	}
 }
 
 // Called every frame

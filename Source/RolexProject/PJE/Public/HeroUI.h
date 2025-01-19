@@ -22,17 +22,28 @@ public:
 	
 	// HP
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* HP;
+	class UTextBlock* Hp;
+
+	UPROPERTY(BlueprintReadWrite)
+	FString HpString;
 	
 	// Max HP
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* MaxHP;
+	UTextBlock* MaxHp;
+
+	UPROPERTY(BlueprintReadWrite)
+	FString MaxHpString;
 
 	// HP Bar
 	UPROPERTY(meta = (BindWidget))
-	class UProgressBar* HPBar;
+	class UProgressBar* HpBar;
+
+	UPROPERTY(BlueprintReadWrite)
+	float HpPercent;
 	
-	// Hero Image
+	// Hero Image // customize by hero in blueprint
+	// UPROPERTY(meta = (BindWidget))
+	// UUserWidget* HeroImage;
 
 	// Skill Image
 	UPROPERTY(meta = (BindWidget))
