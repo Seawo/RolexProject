@@ -51,7 +51,7 @@ void AActor_Point::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor
 
 	if (character and character->Data.Team == bIsATeam)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[Point] OnOverlapEnd"));
+		//UE_LOG(LogTemp, Warning, TEXT("[Point] OnOverlapEnd"));
 	}
 }
 

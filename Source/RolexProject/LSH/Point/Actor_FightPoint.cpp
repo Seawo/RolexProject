@@ -48,16 +48,20 @@ void AActor_FightPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 	UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapBegin"));
 
 	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
-	if (character and character->Data.Team == true)
+	if (character)
 	{
-		ActiveATeamCount++;
-		OnPointOverlapChanged.Broadcast(true, 1);
+		OnPointOverlapChanged.Broadcast(character->Data.Team, 1);
 	}
-	else if (character and character->Data.Team == false)
-	{
-		ActiveBTeamCount++;
-		OnPointOverlapChanged.Broadcast(false, 1);
-	}
+	//if (character and character->Data.Team == true)
+	//{
+	//	ActiveATeamCount++;
+	//	OnPointOverlapChanged.Broadcast(true, 1);
+	//}
+	//else if (character and character->Data.Team == false)
+	//{
+	//	ActiveBTeamCount++;
+	//	OnPointOverlapChanged.Broadcast(false, 1);
+	//}
 }
 
 void AActor_FightPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -70,17 +74,20 @@ void AActor_FightPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, A
 	UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapEnd"));
 
 	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
-	if (character and character->Data.Team == true)
+	if (character)
 	{
-		ActiveATeamCount--;
-		OnPointOverlapChanged.Broadcast(true, -1);
+		OnPointOverlapChanged.Broadcast(character->Data.Team, -1);
 	}
-	else if (character and character->Data.Team == false)
-	{
-		ActiveBTeamCount--;
-		OnPointOverlapChanged.Broadcast(false, -1);
-	}
-
+	//if (character and character->Data.Team == true)
+	//{
+	//	ActiveATeamCount--;
+	//	OnPointOverlapChanged.Broadcast(true, -1);
+	//}
+	//else if (character and character->Data.Team == false)
+	//{
+	//	ActiveBTeamCount--;
+	//	OnPointOverlapChanged.Broadcast(false, -1);
+	//}
 }
 
 void AActor_FightPoint::DrawDebugS(float DeltaTime)

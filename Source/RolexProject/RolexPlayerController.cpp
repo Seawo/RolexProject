@@ -25,10 +25,19 @@ void ARolexPlayerController::BeginPlay()
 	
 	WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetWorld()->GetGameState()); 
 
-	if (UI_ZoneClass)
-	{
-		UI_Zone = CreateWidget<UUI_Zone>(this, UI_ZoneClass);
-	}
+	//if (UI_ZoneClass)
+	//{
+	//	UI_Zone = CreateWidget<UUI_Zone>(this, UI_ZoneClass);
+	//	if (UI_Zone)
+	//	{
+	//		//UI_Zone->AddToViewport();
+	//		UE_LOG(LogTemp, Warning, TEXT("UI_Zone is created"));
+	//	}
+	//	else
+	//	{
+	//		UE_LOG(LogTemp, Warning, TEXT("UI_Zone is nullptr"));
+	//	}
+	//}
 }
 // 서버 RPC : 플레이어가 선택한 영웅 정보를 서버에 전달
 void ARolexPlayerController::ServerRPC_SetSelectedHero_Implementation(const FString& ID,
@@ -176,10 +185,25 @@ void ARolexPlayerController::ClientRPC_SetPlayerSlotUI_Implementation(int32 Play
 
 void ARolexPlayerController::InitUI()
 {
-	if (IsLocalController())
+	if (IsLocalController() && UI_ZoneClass)
 	{
-		UI_Zone->AddToViewport();
-		UI_Zone->UIInit();
+		UI_Zone = CreateWidget<UUI_Zone>(this, UI_ZoneClass);
+
+		if (UI_Zone)
+		{
+			UI_Zone->AddToViewport();
+			UI_Zone->UIInit();
+
+			UE_LOG(LogTemp, Warning, TEXT("[RolexPlayerController InitUI] UI_Zone is created"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("[RolexPlayerController InitUI] UI_Zone is nullptr"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[RolexPlayerController InitUI] UI_ZoneClass is nullptr"));
 	}
 }
 
@@ -201,7 +225,9 @@ void ARolexPlayerController::SetTakingGuage(float Agauge, float Bgauge)
 {
 	if (IsLocalController() && UI_Zone)
 	{
-		UI_Zone->SetTakingGuage(Agauge, Bgauge);
+		float A = (int)Agauge / 100.0f;
+		float B = (int)Bgauge / 100.0f;
+		UI_Zone->SetTakingGuage(A, B);
 	}
 }
 void ARolexPlayerController::SetATeamCount(int32 Count)

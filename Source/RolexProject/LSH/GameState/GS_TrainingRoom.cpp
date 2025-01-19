@@ -24,6 +24,9 @@ void AGS_TrainingRoom::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (HasAuthority()) return;
+
+
 	PC = Cast<ARolexPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (PC)
 	{
