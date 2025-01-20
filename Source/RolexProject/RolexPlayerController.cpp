@@ -185,26 +185,51 @@ void ARolexPlayerController::ClientRPC_SetPlayerSlotUI_Implementation(int32 Play
 
 void ARolexPlayerController::InitUI()
 {
-	if (IsLocalController() && UI_ZoneClass)
-	{
-		UI_Zone = CreateWidget<UUI_Zone>(this, UI_ZoneClass);
+	if (not IsLocalController()) return;
 
-		if (UI_Zone)
-		{
-			UI_Zone->AddToViewport();
-			UI_Zone->UIInit();
 
-			UE_LOG(LogTemp, Warning, TEXT("[RolexPlayerController InitUI] UI_Zone is created"));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("[RolexPlayerController InitUI] UI_Zone is nullptr"));
-		}
-	}
-	else
+	GetWorld()->GetTimerManager().SetTimer(TimerHandleUI, [this]()
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[RolexPlayerController InitUI] UI_ZoneClass is nullptr"));
-	}
+			if (UI_ZoneClass)
+			{
+				UI_Zone = CreateWidget<UUI_Zone>(this, UI_ZoneClass);
+				if (UI_Zone)
+				{
+					UI_Zone->AddToViewport();
+					UE_LOG(LogTemp, Warning, TEXT("UI_Zone is created"));
+					GetWorld()->GetTimerManager().ClearTimer(TimerHandleUI);
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("UI_Zone is nullptr"));
+				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("UI_ZoneClass is nullptr"));
+			}
+	}, 0.1f, true);
+
+	//if (IsLocalController() && UI_ZoneClass)
+	//{
+	//	UI_Zone = CreateWidget<UUI_Zone>(this, UI_ZoneClass);
+
+	//	if (UI_Zone)
+	//	{
+	//		UI_Zone->AddToViewport();
+	//		UI_Zone->UIInit();
+
+	//		UE_LOG(LogTemp, Warning, TEXT("[RolexPlayerController InitUI] UI_Zone is created"));
+	//	}
+	//	else
+	//	{
+	//		UE_LOG(LogTemp, Warning, TEXT("[RolexPlayerController InitUI] UI_Zone is nullptr"));
+	//	}
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("[RolexPlayerController InitUI] UI_ZoneClass is nullptr"));
+	//}
 }
 
 void ARolexPlayerController::SetPlayTime(float Time)
