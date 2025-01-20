@@ -10,7 +10,7 @@
 #include "GameState/GS_TrainingRoom.h"
 #include "Kismet/GameplayStatics.h"
 #include "Point/Actor_FightPoint.h"
-
+#include "GameFramework/PlayerStart.h"
 
 #include "UObject/ConstructorHelpers.h"
 
@@ -265,6 +265,38 @@ UClass* ARolexGameMode::GetDefaultPawnClassForController_Implementation(AControl
 	UE_LOG(LogTemp, Warning, TEXT("Failed to find BaseCharacter"));
 	return Super::GetDefaultPawnClassForController_Implementation(InController);
 }
+
+//AActor* ARolexGameMode::ChoosePlayerStart_Implementation(AController* Player)
+//{
+//	// True == A팀, False == B팀
+//	TArray<AActor*> foundPlayerStarts;
+//	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), foundPlayerStarts);
+//	for (AActor* playerStart : foundPlayerStarts)
+//	{
+//		ABaseCharacter* player = Cast<ABaseCharacter>(Player->GetPawn());
+//		ARolexPlayerState* RolexPlayerState = Player->GetPlayerState<ARolexPlayerState>();
+//		if (RolexPlayerState and RolexPlayerState->Team) // A팀
+//		{
+//			if (playerStart->GetName().Contains(TEXT("PlayerStart_A")))
+//			{
+//				return playerStart;
+//			}
+//		}
+//		else if (RolexPlayerState and RolexPlayerState->Team) // B팀
+//		{
+//			if (playerStart->GetName().Contains(TEXT("PlayerStart_B")))
+//			{
+//				return playerStart;
+//			}
+//		}
+//		else
+//		{
+//			UE_LOG(LogTemp, Warning, TEXT("player is nullptr"));
+//		}
+//	}
+//
+//	//return nullptr;
+//}
 
 void ARolexGameMode::UpdatePointGauge(float DeltaTime)
 {

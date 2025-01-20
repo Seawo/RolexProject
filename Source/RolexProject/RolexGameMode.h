@@ -45,6 +45,8 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
+	//virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+
 
 	void UpdatePointGauge(float DeltaTime);
 
