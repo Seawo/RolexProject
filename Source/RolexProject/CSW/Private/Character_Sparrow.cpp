@@ -51,6 +51,8 @@ void ACharacter_Sparrow::BeginPlay()
 	// 데칼
 	AimIndicator = FindComponentByClass<UDecalComponent>();
 	AimIndicator->SetVisibility(false);
+
+	
 }
 
 void ACharacter_Sparrow::Tick(float DeltaTime)
