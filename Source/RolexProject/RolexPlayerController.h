@@ -91,4 +91,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "UI")
 	class UUI_Zone* UI_Zone;
 
+	FTimerHandle TimerHandleUI;
+
 };
