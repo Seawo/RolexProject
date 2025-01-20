@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "LSH/Actor_Point.h"
+#include "Actor_Point.h"
 
 
 #include "Components/BoxComponent.h"
@@ -51,7 +51,7 @@ void AActor_Point::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor
 
 	if (character and character->Data.Team == bIsATeam)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[Point] OnOverlapEnd"));
+		//UE_LOG(LogTemp, Warning, TEXT("[Point] OnOverlapEnd"));
 	}
 }
 

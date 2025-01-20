@@ -66,7 +66,7 @@ protected:
 
 public:
 	UPROPERTY(VisibleAnywhere, Category = "Info")
-	class APlayerController_TrainingRoom* PC;
+	class ARolexPlayerController* PC;
 
 	UPROPERTY(ReplicatedUsing = OnRep_PlayTime)
 	float PlayTime = 0.0f;

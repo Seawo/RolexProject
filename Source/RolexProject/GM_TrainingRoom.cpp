@@ -3,13 +3,16 @@
 
 #include "GM_TrainingRoom.h"
 
-#include "GS_TrainingRoom.h"
-#include "PlayerController_TrainingRoom.h"
+#include "GameState/GS_TrainingRoom.h"
+#include "PlayerController/PlayerController_TrainingRoom.h"
+#include "RolexPlayerController.h"
+#include "RolexPlayerState.h"
+#include "RolexGameInstance.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "BaseCharacter.h"
-#include "Actor_Point.h"
-#include "Actor_FightPoint.h"
+#include "Point/Actor_Point.h"
+#include "Point/Actor_FightPoint.h"
 
 #include "Character_Phase.h"
 #include "Character_Rampage.h"
@@ -18,13 +21,15 @@
 AGM_TrainingRoom::AGM_TrainingRoom()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	bUseSeamlessTravel = true;
 
 }
 
 void AGM_TrainingRoom::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] BeginPlay start"));
 
 	IsActiveBsePoint = false;
 
@@ -34,6 +39,11 @@ void AGM_TrainingRoom::BeginPlay()
 	for (AActor* foundActor : foundActors)
 	{
 		ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(foundActor);
+		if (baseCharacter == nullptr)
+		{
+			UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] baseCharacter is nullptr"));
+		}
+
 		if (baseCharacter->Data.Team == true)
 		{
 			ATeamChracters.Add(baseCharacter);
@@ -51,9 +61,35 @@ void AGM_TrainingRoom::BeginPlay()
 		AActor_FightPoint* fightPoint = Cast<AActor_FightPoint>(foundActor);
 		fightPoint->OnPointOverlapChanged.AddDynamic(this, &AGM_TrainingRoom::ChangeNumberOfTeam);
 
+		if (not fightPoint)
+		{
+			UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] fightPoint is nullptr"));
+		}
+
 		Points.Add(fightPoint);
 	}
-	PC = Cast<APlayerController_TrainingRoom>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+
+	FTimerHandle timerHandle;
+	// 람다식으로
+	GetWorld()->GetTimerManager().SetTimer(timerHandle, [this]()
+		{
+			PC = Cast<ARolexPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+			
+			if (PC)
+			{
+				UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] PC : %s"), *PC->GetName());
+				PC->InitUI();
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] PC is nullptr"));
+			}
+
+
+		}, 1.0f, false);
+
+
+
 
 	// GameState의 변수 값 초기화
 	GS = Cast<AGS_TrainingRoom>(UGameplayStatics::GetGameState(GetWorld()));
@@ -90,6 +126,13 @@ void AGM_TrainingRoom::BeginPlay()
 		GS->IsGetATeamExtraTime = false;
 		GS->IsGetBTeamExtraTime = false;
 	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] GS is nullptr"));
+	}
+
+	UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] BeginPlay end"));
+
 
 }
 
@@ -108,18 +151,25 @@ void AGM_TrainingRoom::Tick(float DeltaTime)
 
 	if (PlayTime >= 10.0f)
 	{
+		// 거점 활성화
 		if (IsActiveBsePoint == false)
 		{
 			int32 random = FMath::RandRange(0, Points.Num() - 1);
 
 			Points[random]->SetActivePoint(EActivePoint::Active);
+
+			UE_LOG(LogTemp, Warning, TEXT("[AGM_TrainingRoom] PC : %s"), *PC->GetName());
+
 			PC->SetPoint(random);
 			IsActiveBsePoint = true;
 		}
 
+		// 결과가 안나왔을 경우
 		if (Result == EResult::None)
 		{
+			// 거점 게이지 업데이트
 			UpdatePointGauge(DeltaTime);
+			// 거점 게이트 GameState에 업데이트
 			if (GS)
 			{
 				GS->PlayTime = PlayTime;
@@ -151,7 +201,8 @@ void AGM_TrainingRoom::Tick(float DeltaTime)
 				GS->IsGetATeamExtraTime = IsGetATeamExtraTime;
 				GS->IsGetBTeamExtraTime = IsGetBTeamExtraTime;
 			}
-			if (PC) // 서버의 UI값 업데이트
+			// 서버의 UI값 업데이트
+			if (PC) 
 			{
 				PC->SetPlayTime(PlayTime);
 				PC->SetATeamCount(PointATeamCount);
@@ -194,6 +245,29 @@ void AGM_TrainingRoom::Tick(float DeltaTime)
 //		return GetWorld()->SpawnActor<ACharacter_Muriel>(ACharacter_Muriel::StaticClass(), StartSpot->GetActorLocation(), StartSpot->GetActorRotation());
 //	}
 //}
+
+UClass* AGM_TrainingRoom::GetDefaultPawnClassForController_Implementation(AController* InController)
+{
+	// 서버의 UI값 업데이트
+	ARolexPlayerState* RolexPlayerState = InController->GetPlayerState<ARolexPlayerState>();
+	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
+
+	if (RolexPlayerState && RolexGameInstance)
+	{
+		//find selected hero class based on the UniqueID key
+		RolexPlayerState->FindUniqueID();
+		if (TSubclassOf<ABaseCharacter>* BaseCharacterFactory = RolexGameInstance->PlayerHeroSelections.Find(RolexPlayerState->UniqueID))
+		{
+			return *BaseCharacterFactory;
+
+			UE_LOG(LogTemp, Warning, TEXT("Find BaseCharacter"));
+		}
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Failed to find BaseCharacter"));
+
+	return Super::GetDefaultPawnClassForController_Implementation(InController);
+}
 
 void AGM_TrainingRoom::UpdatePointGauge(float DeltaTime)
 {

@@ -64,14 +64,8 @@ public:
 
 	void DrawDebugS(float DeltaTime);
 
-	UFUNCTION()
-	void SetPointGauge(float DeltaTime);
-
 	UFUNCTION(NetMulticast, Reliable)
 	void Multi_SetPointGauge(float DeltaTime);
-
-	UFUNCTION()
-	void OnRep_Team();
 
 
 	void SetActivePoint(EActivePoint activePoint) { ActivePoint = activePoint; }
@@ -107,7 +101,6 @@ private:
 	bool IsAddBTeamExtraTime = false;			// B팀 추가 시간여부 (A팀 거점일 경우)
 
 	EActivePoint ActivePoint = EActivePoint::Deactivate;
-	UPROPERTY(ReplicatedUsing = OnRep_Team)
 	ETeam Team = ETeam::None;
 
 	EFinish Finish = EFinish::None;

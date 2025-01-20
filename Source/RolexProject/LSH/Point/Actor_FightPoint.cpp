@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "LSH/Actor_FightPoint.h"
+#include "Actor_FightPoint.h"
 
 #include "BaseCharacter.h"
 #include "Net/UnrealNetwork.h"
@@ -27,32 +27,16 @@ void AActor_FightPoint::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//if (HasAuthority())
-	//{
-	//	DrawDebugS(DeltaTime);
-	//}
-	//else
-	//{
-	//	DrawDebugS(DeltaTime);
-	//}
-
-
 	// 게임이 끝났거나, 거점이 비활성화라면 리턴해줘
 	if (Finish != EFinish::None or ActivePoint == EActivePoint::Deactivate) return;
 	DrawDebugS(DeltaTime);
 
-	// 서버가 아니라면 계산 x
-	//if (not HasAuthority()) return;
-
-	//SetPointGauge(DeltaTime);
 }
 
 void AActor_FightPoint::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-
-	//DOREPLIFETIME(AActor_FightPoint, MoveState);
 }
 
 void AActor_FightPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -64,19 +48,20 @@ void AActor_FightPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 	UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapBegin"));
 
 	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
-	if (character and character->Data.Team == true)
+	if (character)
 	{
-		ActiveATeamCount++;
-		OnPointOverlapChanged.Broadcast(true, 1);
+		OnPointOverlapChanged.Broadcast(character->Data.Team, 1);
 	}
-	else if (character and character->Data.Team == false)
-	{
-		ActiveBTeamCount++;
-		OnPointOverlapChanged.Broadcast(false, 1);
-	}
-
-
-	//SetTeam();
+	//if (character and character->Data.Team == true)
+	//{
+	//	ActiveATeamCount++;
+	//	OnPointOverlapChanged.Broadcast(true, 1);
+	//}
+	//else if (character and character->Data.Team == false)
+	//{
+	//	ActiveBTeamCount++;
+	//	OnPointOverlapChanged.Broadcast(false, 1);
+	//}
 }
 
 void AActor_FightPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -89,49 +74,44 @@ void AActor_FightPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, A
 	UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapEnd"));
 
 	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
-	if (character and character->Data.Team == true)
+	if (character)
 	{
-		ActiveATeamCount--;
-		OnPointOverlapChanged.Broadcast(true, -1);
+		OnPointOverlapChanged.Broadcast(character->Data.Team, -1);
 	}
-	else if (character and character->Data.Team == false)
-	{
-		ActiveBTeamCount--;
-		OnPointOverlapChanged.Broadcast(false, -1);
-	}
-
-	//SetTeam();
+	//if (character and character->Data.Team == true)
+	//{
+	//	ActiveATeamCount--;
+	//	OnPointOverlapChanged.Broadcast(true, -1);
+	//}
+	//else if (character and character->Data.Team == false)
+	//{
+	//	ActiveBTeamCount--;
+	//	OnPointOverlapChanged.Broadcast(false, -1);
+	//}
 }
 
 void AActor_FightPoint::DrawDebugS(float DeltaTime)
 {
 	DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 500), FString::Printf(TEXT("ActivePoint : %d"), ActivePoint), nullptr, FColor::Yellow, DeltaTime);
 
-	DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 450), FString::Printf(TEXT("TakePointGauge : %.1f"), TakePointATeamGauge), nullptr, FColor::Red, DeltaTime);
-	DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 400), FString::Printf(TEXT("TakePointGauge : %.1f"), TakePointBTeamGauge), nullptr, FColor::Blue, DeltaTime);
-	DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 375), FString::Printf(TEXT("TakePointGauge : %.1f"), ExtraTimer), nullptr, FColor::Green, DeltaTime);
-	DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 350), FString::Printf(TEXT("TakePointGauge : %.1f"), ExtraTimerDecrease), nullptr, FColor::Green, DeltaTime);
+	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 450), FString::Printf(TEXT("TakePointGauge : %.1f"), TakePointATeamGauge), nullptr, FColor::Red, DeltaTime);
+	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 400), FString::Printf(TEXT("TakePointGauge : %.1f"), TakePointBTeamGauge), nullptr, FColor::Blue, DeltaTime);
+	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 375), FString::Printf(TEXT("TakePointGauge : %.1f"), ExtraTimer), nullptr, FColor::Green, DeltaTime);
+	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 350), FString::Printf(TEXT("TakePointGauge : %.1f"), ExtraTimerDecrease), nullptr, FColor::Green, DeltaTime);
 
 
 
 
-	DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 300), FString::Printf(TEXT("Team : %d"), Team), nullptr, FColor::Green, DeltaTime);
+	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 300), FString::Printf(TEXT("Team : %d"), Team), nullptr, FColor::Green, DeltaTime);
 
 
-	DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 250), FString::Printf(TEXT("ATeamPointGauge : %.1f"), ATeamPointGauge / 120 * 100), nullptr, FColor::Red, DeltaTime);
-	DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 225), FString::Printf(TEXT("ATeamPointGauge : %d"), IsAddATeamExtraTime), nullptr, FColor::Red, DeltaTime);
-	DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 200), FString::Printf(TEXT("ActiveATeamCount : %d"), ActiveATeamCount), nullptr, FColor::Red, DeltaTime);
+	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 250), FString::Printf(TEXT("ATeamPointGauge : %.1f"), ATeamPointGauge / 120 * 100), nullptr, FColor::Red, DeltaTime);
+	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 225), FString::Printf(TEXT("ATeamPointGauge : %d"), IsAddATeamExtraTime), nullptr, FColor::Red, DeltaTime);
+	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 200), FString::Printf(TEXT("ActiveATeamCount : %d"), ActiveATeamCount), nullptr, FColor::Red, DeltaTime);
 
-	DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 100), FString::Printf(TEXT("BTeamPointGauge : %.1f"), BTeamPointGauge / 120 * 100), nullptr, FColor::Blue, DeltaTime);
-	DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 75), FString::Printf(TEXT("BTeamPointGauge : %d"), IsAddBTeamExtraTime), nullptr, FColor::Blue, DeltaTime);
-	DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 50), FString::Printf(TEXT("ActiveBTeamCount : %d"), ActiveBTeamCount), nullptr, FColor::Blue, DeltaTime);
-}
-
-void AActor_FightPoint::SetPointGauge(float DeltaTime)
-{
-	{
-		Multi_SetPointGauge(DeltaTime);
-	}
+	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 100), FString::Printf(TEXT("BTeamPointGauge : %.1f"), BTeamPointGauge / 120 * 100), nullptr, FColor::Blue, DeltaTime);
+	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 75), FString::Printf(TEXT("BTeamPointGauge : %d"), IsAddBTeamExtraTime), nullptr, FColor::Blue, DeltaTime);
+	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 50), FString::Printf(TEXT("ActiveBTeamCount : %d"), ActiveBTeamCount), nullptr, FColor::Blue, DeltaTime);
 }
 
 void AActor_FightPoint::Multi_SetPointGauge_Implementation(float DeltaTime)
@@ -410,8 +390,3 @@ void AActor_FightPoint::Multi_SetPointGauge_Implementation(float DeltaTime)
 	{
 	}
 }
-
-void AActor_FightPoint::OnRep_Team()
-{
-}
-

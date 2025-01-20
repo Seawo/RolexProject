@@ -23,7 +23,7 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	UButton* RightButton;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, EditAnywhere)
 	UButton* MedivalAsia;
 	
 	UFUNCTION()
