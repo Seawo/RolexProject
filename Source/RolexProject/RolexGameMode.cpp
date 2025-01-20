@@ -171,7 +171,8 @@ void ARolexGameMode::Tick(float DeltaTime)
 		// 거점 활성화 (한번만 실행되도록)
 		if (IsActiveBsePoint == false)
 		{
-			int32 random = FMath::RandRange(0, Points.Num() - 1);
+			//int32 random = FMath::RandRange(0, Points.Num() - 1);
+			int32 random = 0;
 
 			Points[random]->SetActivePoint(EActivePoint::Active);
 			if (RolexPC)
