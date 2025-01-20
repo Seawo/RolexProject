@@ -25,10 +25,10 @@ public:
 	UFUNCTION()
 	void CreateSession();
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, EditAnywhere)
 	class UCreateSessionUI* CreateSessionUI;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, EditAnywhere)
 	class UMapSelectUI* MapSelectUI;
 	
 	UPROPERTY(meta = (BindWidget))

@@ -28,4 +28,10 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UComboBoxString* NumberofPlayers;
+
+	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, EditAnywhere)
+	class UTextBlock* MapString;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FString MapName;
 };

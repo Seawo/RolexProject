@@ -70,6 +70,7 @@ void ABaseCharacter::BeginPlay()
 	// startPos 저장
 	StartPos = GetActorLocation();
 
+	// create widget
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABaseCharacter::InitHeroUI, 5.0f, false);
 }
