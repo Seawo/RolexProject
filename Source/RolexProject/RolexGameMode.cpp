@@ -47,23 +47,28 @@ void ARolexGameMode::BeginPlay()
 	}
 
 	// PlayerController 가져오기
-	RolexPC = Cast<ARolexPlayerController>(GetWorld()->GetFirstPlayerController());
-	if (RolexPC)
-	{
-		RolexPC->InitUI();
-		UE_LOG(LogTemp, Warning, TEXT("[ARolexGameMode BeginPlay] RolexPC is valid"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("[ARolexGameMode BeginPlay] RolexPC is invalid"));
-	}
+	//RolexPC = Cast<ARolexPlayerController>(GetWorld()->GetFirstPlayerController());
+	//if (RolexPC)
+	//{
+	//	RolexPC->InitUI();
+	//	UE_LOG(LogTemp, Warning, TEXT("[ARolexGameMode BeginPlay] RolexPC is valid"));
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("[ARolexGameMode BeginPlay] RolexPC is invalid"));
+	//}
 
 	
 	GetWorld()->GetTimerManager().SetTimer(TimerHandleGS, [this]()
 				{
-					if (RolexGS)
+					if (RolexPC and RolexGS)
 					{
 						GetWorld()->GetTimerManager().ClearTimer(TimerHandleGS);
+					}
+
+					if (RolexGS)
+					{
+						
 
 						UE_LOG(LogTemp, Warning, TEXT("[ARolexGameMode BeginPlay] RolexGS is valid"));
 						RolexGS->PlayTime = PlayTime;
@@ -102,6 +107,20 @@ void ARolexGameMode::BeginPlay()
 
 						RolexGS = Cast<AGS_TrainingRoom>(GetWorld()->GetGameState());
 					}
+
+					if (RolexPC)
+					{
+						RolexPC->InitUI();
+						UE_LOG(LogTemp, Warning, TEXT("[ARolexGameMode BeginPlay] RolexPC is valid"));
+					}
+					else
+					{
+						UE_LOG(LogTemp, Warning, TEXT("[ARolexGameMode BeginPlay] RolexPC is invalid"));
+						RolexPC = Cast<ARolexPlayerController>(GetWorld()->GetFirstPlayerController());
+					}
+
+					
+
 				}, 0.1f, true);
 
 	// GameState 가져오고 초기화 시켜주기
@@ -171,7 +190,8 @@ void ARolexGameMode::Tick(float DeltaTime)
 		// 거점 활성화 (한번만 실행되도록)
 		if (IsActiveBsePoint == false)
 		{
-			int32 random = FMath::RandRange(0, Points.Num() - 1);
+			//int32 random = FMath::RandRange(0, Points.Num() - 1);
+			int32 random = 0;
 
 			Points[random]->SetActivePoint(EActivePoint::Active);
 			if (RolexPC)
