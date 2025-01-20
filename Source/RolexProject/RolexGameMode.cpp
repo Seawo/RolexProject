@@ -61,6 +61,11 @@ void ARolexGameMode::BeginPlay()
 	
 	GetWorld()->GetTimerManager().SetTimer(TimerHandleGS, [this]()
 				{
+					if (RolexPC and RolexGS)
+					{
+						GetWorld()->GetTimerManager().ClearTimer(TimerHandleGS);
+					}
+
 					if (RolexGS)
 					{
 						
@@ -114,10 +119,7 @@ void ARolexGameMode::BeginPlay()
 						RolexPC = Cast<ARolexPlayerController>(GetWorld()->GetFirstPlayerController());
 					}
 
-					if (RolexPC and RolexGS)
-					{
-						GetWorld()->GetTimerManager().ClearTimer(TimerHandleGS);
-					}
+					
 
 				}, 0.1f, true);
 
