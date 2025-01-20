@@ -8,6 +8,9 @@
 #include "Components\CapsuleComponent.h"
 #include "GameFramework/PlayerController.h"
 
+#include "Components/SkeletalMeshComponent.h"
+#include "EffectActor.h"
+
 ACharacter_Steel::ACharacter_Steel()
 {
 	// character setting 
@@ -63,9 +66,13 @@ void ACharacter_Steel::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		characterInput->BindAction(IA_LBM, ETriggerEvent::Started, this, &ACharacter_Steel::InputAttack);
 		characterInput->BindAction(IA_RBM, ETriggerEvent::Started, this, &ACharacter_Steel::InputAttack);
 
+		// triggered
+		characterInput->BindAction(IA_RBM, ETriggerEvent::Triggered, this, &ACharacter_Steel::RMBTriggered);
+
+
 		// Completed
 		characterInput->BindAction(IA_RBM, ETriggerEvent::Completed, this, &ACharacter_Steel::RMBCompleted);
-		characterInput->BindAction(IA_Q, ETriggerEvent::Completed, this, &ACharacter_Steel::QCompleted);
+		characterInput->BindAction(IA_E, ETriggerEvent::Completed, this, &ACharacter_Steel::ECompleted);
 		
 	}
 }
@@ -178,11 +185,37 @@ void ACharacter_Steel::RMBAttack()
 
 	bIsShield = true;
 
+	Data.Shield = 300.0f;
+
 	FName sectionName = FName("Start");
 	PlayAnimMontage(AttackMontages[TEXT("RMB")], 1.0f, *sectionName.ToString());
+
+
+	USkeletalMeshComponent* skeletalMesh = GetMesh();
+
+	if (!skeletalMesh) return;
+
+	SpringArmComp->SetRelativeLocation(FVector(-200, 10, 90));
+
+	// 소켓 위치 가져오기
+	FVector SocketLocation = skeletalMesh->GetSocketLocation(TEXT("sheild_main"));
+	FRotator SocketRotation = skeletalMesh->GetSocketRotation(TEXT("sheild_main"));
+
+	//SpawnActor(SocketLocation, SocketRotation, ShieldClass);
+
+	// 돌 액터 붙착
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	Shield = GetWorld()->SpawnActor<AEffectActor>(ShieldClass, SocketLocation, SocketRotation, SpawnParams);
+
+	if (Shield)
+	{
+		// 소켓의 부착
+		Shield->AttachToComponent(skeletalMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("sheild_main"));
+	}
 }
 
-void ACharacter_Steel::QAttack()
+void ACharacter_Steel::EAttack()
 {
 	for (const TPair<FString, UAnimMontage*>& Pair : AttackMontages)
 	{
@@ -190,11 +223,22 @@ void ACharacter_Steel::QAttack()
 			return;
 	}
 
+	
+
+	SpringArmComp->SetRelativeLocation(FVector(-200, 10, 90));
 	FName sectionName = FName("Ready");
-	PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());
+	PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f, *sectionName.ToString());
 }
 
-void ACharacter_Steel::EAttack()
+void ACharacter_Steel::RMBTriggered()
+{
+	if (Data.Shield <= 0)
+	{
+		ShieldBreak();
+	}
+}
+
+void ACharacter_Steel::QAttack()
 {
 	for (const TPair<FString, UAnimMontage*>& Pair : AttackMontages)
 	{
@@ -210,10 +254,32 @@ void ACharacter_Steel::EAttack()
 
 	// 몽타주 재생 하고
 	FName sectionName = FName("Start");
-	PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f, *sectionName.ToString());
+	PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());
 
 	// 충돌 처리 활성화
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ACharacter_Steel::OnDashCollision);
+
+	USkeletalMeshComponent* skeletalMesh = GetMesh();
+
+	if (!skeletalMesh) return;
+
+	// 소켓 위치 가져오기
+	FVector SocketLocation = skeletalMesh->GetSocketLocation(TEXT("midline"));
+	FRotator SocketRotation = skeletalMesh->GetSocketRotation(TEXT("midline"));
+
+	//SpawnActor(SocketLocation, SocketRotation, ShieldClass);
+
+	// 돌 액터 붙착
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	Dash1 = GetWorld()->SpawnActor<AEffectActor>(DashClass1, SocketLocation, SocketRotation, SpawnParams);
+	Dash2 = GetWorld()->SpawnActor<AEffectActor>(DashClass2, SocketLocation, SocketRotation, SpawnParams);
+	if (Dash1 && Dash2)
+	{
+		// 소켓의 부착
+		Dash1->AttachToComponent(skeletalMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("midline"));
+		Dash2->AttachToComponent(skeletalMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("midline"));
+	}
 
 }
 
@@ -243,6 +309,9 @@ void ACharacter_Steel::OnDashCollision(UPrimitiveComponent* HitComponent, AActor
 				
 				// 힘적용
 				character->LaunchCharacter(dir * 5000, true, true);
+				
+				// collision Effect spawn
+
 			}
 		}
 	}
@@ -258,30 +327,63 @@ void ACharacter_Steel::StopEDash()
 
 	// End 몽타주 재생하고,
 	FName sectionName = FName("End");
-	PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f, *sectionName.ToString());
+	PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());
 
 	SpringArmComp->SetRelativeLocation(FVector(0, 10, 90));
 
 	// 적과 층돌후 충돌 처리 비활성화
 	GetCapsuleComponent()->OnComponentHit.RemoveDynamic(this, &ACharacter_Steel::OnDashCollision);
+
+	// Dash 임팩트 지우고
+	if (Dash1 && Dash2)
+	{
+		Dash1->Destroy();
+		Dash2->Destroy();
+	}
+}
+
+void ACharacter_Steel::ShieldBreak()
+{
+	bIsShield = false;
+
+	Data.Shield = 0;
+
+	FName sectionName = FName("End");
+	PlayAnimMontage(AttackMontages[TEXT("RMB")], 1.0f, *sectionName.ToString());
+	
+	if (Shield)
+	{
+		// 소켓에서 불리
+		Shield->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+		// 파괴
+		Shield->Destroy();
+		
+		SpringArmComp->SetRelativeLocation(FVector(0, 10, 90));
+	}
 }
 
 void ACharacter_Steel::RMBCompleted()
 {
 	if (!bIsShield) return;
 
-	bIsShield = false;
-	FName sectionName = FName("End");
-	PlayAnimMontage(AttackMontages[TEXT("RMB")], 1.0f, *sectionName.ToString());
+	ShieldBreak();
 }
 
-void ACharacter_Steel::QCompleted()
+void ACharacter_Steel::ECompleted()
 {
 
 	FName sectionName = FName("Start");
-	PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());
+	PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f, *sectionName.ToString());
+
+	SpringArmComp->SetRelativeLocation(FVector(0, 10, 90));
 }
 
+void ACharacter_Steel::SpawnActor(FVector pos, FRotator rot, TSubclassOf<class AEffectActor> actorClass)
+{
+
+
+}
 
 
 

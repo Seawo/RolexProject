@@ -29,8 +29,20 @@ class ROLEXPROJECT_API ACharacter_Steel : public ABaseCharacter
 public:
 	EAttackState CurrAttackState;
 
+	// RMB
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AEffectActor> ShieldClass;
 
+	class AEffectActor* Shield;
 
+	// Q
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AEffectActor> DashClass1;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AEffectActor> DashClass2;
+
+	class AEffectActor* Dash1;
+	class AEffectActor* Dash2;
 
 
 private:
@@ -56,7 +68,8 @@ private:
 	UFUNCTION()
 	void OnDashCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	void StopEDash();
-	
+	void ShieldBreak();
+
 	// input
 	void InputJump();
 	void InputRun();
@@ -65,7 +78,13 @@ private:
 	void QAttack();
 	void EAttack();
 	
+	// triggered
+	void RMBTriggered();
+
 	// completed
 	void RMBCompleted();
-	void QCompleted();
+	void ECompleted();
+
+	// spawnActor
+	void SpawnActor(FVector pos, FRotator rot, TSubclassOf<class AEffectActor> actorClass);
 };
