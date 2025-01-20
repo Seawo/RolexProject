@@ -86,7 +86,7 @@ void ACharacter_Phase::Tick(float DeltaTime)
 	// 임시로 UI 출력
 	if (UI_InGame)
 	{
-		UpdateUI();
+		//UpdateUI();
 	}
 }
 

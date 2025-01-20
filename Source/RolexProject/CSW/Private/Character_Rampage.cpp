@@ -28,7 +28,7 @@ ACharacter_Rampage::ACharacter_Rampage()
 	Data.Name = "Phase";
 	Data.Team = true;
 	Data.MaxHp = 500;
-	Data.Hp = 250;
+	Data.Hp = 500;
 	Data.Shield = 0;
 	Data.Speed = 400.0f;
 	Data.Power = 20;
