@@ -45,27 +45,31 @@ struct FCharacterData
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	ERoleType RoleType;		// 역할
-
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FString Name;			// 캐릭터 이름
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool Team;				// 팀 여부 (true = Red , false = Blue)
 
 	// Stat
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int MaxHp;				// 최대 체력
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int Hp;					// 현재 체력
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int Shield = -1;		// 쉴드
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float Speed;			// 이동속도
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int Power;				// 공격력
 
 	// CoolTime
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float RMBCoolTime = 0.0f;		// 우클릭 쿨타임
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float ESkillCoolTime = 0.0f;	// E스킬 쿨타임
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float QSkillCoolTime = 0.0f;	// Q스킬 쿨타임
 };
 
@@ -99,7 +103,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 
-	UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_CharacterData)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_CharacterData)
 	FCharacterData Data;				// 캐릭터 데이터를 가지고있을 구조체
 	
 	UPROPERTY(ReplicatedUsing = OnRep_MoveState)
