@@ -12,19 +12,15 @@ void UHeroUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	// HP
-	// HpString = FString::FromInt(BaseCharacter->Data.Hp);
-	// MaxHpString = FString::FromInt(BaseCharacter->Data.MaxHp);
-	// HpPercent = static_cast<float>(BaseCharacter->Data.Hp)/static_cast<float>(BaseCharacter->Data.MaxHp);
-	// UE_LOG(LogTemp, Warning, TEXT("Hp Percent: %f"), HpPercent);
-	//
-	// Hp->SetText(FText::FromString(HpString));
-	// MaxHp->SetText(FText::FromString(MaxHpString));
-	// HpBar->SetPercent(HpPercent);
+	// HP is bind in the blueprint
 	
-	//
-	SkillImage->SetBrushFromTexture(BaseCharacter->SkillImage);
-	WeaponImage->SetBrushFromTexture(BaseCharacter->WeaponImage);
+	// bind skill and weapon Image
+	if (BaseCharacter->RMBSkillImage)
+		SkillImage->SetBrushFromTexture(BaseCharacter->RMBSkillImage);
+	if (BaseCharacter->ESkillImage)
+		SkillImage->SetBrushFromTexture(BaseCharacter->ESkillImage);
+	if (BaseCharacter->WeaponImage)
+		WeaponImage->SetBrushFromTexture(BaseCharacter->WeaponImage);
 
 	CoolTime = BaseCharacter->Data.ESkillCoolTime;
 }
