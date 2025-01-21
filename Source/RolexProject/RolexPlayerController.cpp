@@ -87,10 +87,10 @@ void ARolexPlayerController::ServerRPC_SetSelectedHero_Implementation(const FStr
 // 		// }
 // 	}
 // }
-void ARolexPlayerController::ServerRPC_SetPlayerHeroImage_Implementation(UTexture2D* PlayerHeroTexture, int32 Index)
+void ARolexPlayerController::ServerRPC_SetPlayerSlotHeroImage_Implementation(UTexture2D* PlayerHeroTexture, int32 Index)
 {
 	// cannot implement MulticastRPC_SetPlayerHeroImage in RolexPlayerController since clients only have its own controller
-	// client GameStateBase cannot call RPC functions but server can
+	// client GameStateBase cannot call RPC functions since clients doesn't have an ownership for GameStateBase
 	WaitingRoomGameStateBase->MulticastRPC_SetPlayerHeroImage(PlayerHeroTexture, Index); 
 }
 void ARolexPlayerController::ServerRPC_InformClientPlayerSlotIndex_Implementation(int32 PlayerNumber, UPlayerSlotUI* PlayerSlotUI)
@@ -179,6 +179,10 @@ void ARolexPlayerController::ClientRPC_SetPlayerSlotUI_Implementation(int32 Play
 		ServerRPC_UpdateWholePlayerNumber();
 }
 
+void ARolexPlayerController::ServerRPC_BlockHero_Implementation(int32 HeroIndex, int32 PlayerIndex)
+{
+	WaitingRoomGameStateBase->MulticastRPC_BlockHero(HeroIndex, PlayerIndex);
+}
 
 //////////////////////////////////////////////////////////////////////////
 

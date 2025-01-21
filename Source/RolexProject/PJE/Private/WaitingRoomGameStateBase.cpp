@@ -3,6 +3,7 @@
 
 #include "WaitingRoomGameStateBase.h"
 
+#include "HeroSlotUI.h"
 #include "PlayerSlotUI.h"
 #include "RolexPlayerController.h"
 #include "RolexPlayerState.h"
@@ -32,7 +33,7 @@ void AWaitingRoomGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimePrope
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
 	DOREPLIFETIME(AWaitingRoomGameStateBase, WholePlayerNumber);
-	DOREPLIFETIME(AWaitingRoomGameStateBase, CountdownTime);
+	DOREPLIFETIME(AWaitingRoomGameStateBase, HeroSelectionCountdownTime);
 }
 
 // update new player ID on slot 
@@ -55,7 +56,6 @@ void AWaitingRoomGameStateBase::MulticastRPC_UpdatePlayerTeam_Implementation(int
 {
 	if (WaitingRoomUI)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("PlayerSlotIndex: %d"), PlayerSlotIndex);
 		WaitingRoomUI->PlayerSlots[PlayerSlotIndex]->TeamColor->SetColorAndOpacity(Color);
 	}
 }
@@ -73,15 +73,12 @@ void AWaitingRoomGameStateBase::MatchPlayers()
 		ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(PlayerArray[i]);
 		if (RolexPlayerState)
 		{
-			//UE_LOG(LogTemp, Warning, TEXT("Rolex Player State Exists, %d player"), i);
 			if (i < HalfPlayers)
 			{
 				RolexPlayerState->Team = true;
 				ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(RolexPlayerState->GetPlayerController());
 				if (RolexPlayerController)
 				{
-					// UE_LOG(LogTemp, Warning, TEXT("Rolex Player Controller Exists, Player %d, Name: %s, PlayerSlotIndex: %d"),
-					// 	i, *RolexPlayerController->GetName(), RolexPlayerController->PlayerSlotIndex);
 					MulticastRPC_UpdatePlayerTeam(RolexPlayerController->PlayerSlotIndex, FLinearColor::Red);
 				}
 			}
@@ -91,7 +88,6 @@ void AWaitingRoomGameStateBase::MatchPlayers()
 				ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(RolexPlayerState->GetPlayerController());
 				if (RolexPlayerController)
 				{
-					//UE_LOG(LogTemp, Warning, TEXT("Rolex Player Controller Exists, %d player, Name: %s"), i, *RolexPlayerController->GetName());
 					MulticastRPC_UpdatePlayerTeam(RolexPlayerController->PlayerSlotIndex, FLinearColor::Blue);
 				}
 			}
@@ -119,15 +115,71 @@ void AWaitingRoomGameStateBase::StartHeroSelectionCountdown()
 	GetWorld()->GetTimerManager().SetTimer(CountdownTimerHandle, this, &AWaitingRoomGameStateBase::MulticastRPC_Countdown, 1.0f, true);
 }
 
-// void AWaitingRoomGameStateBase::ServerRPC_SetPlayerHeroImage_Implementation(UTexture2D* PlayerHeroTexture, int32 Index)
-// {
-// 	MulticastRPC_SetPlayerHeroImage(PlayerHeroTexture, Index);
-// }
-//
-void AWaitingRoomGameStateBase::MulticastRPC_SetPlayerHeroImage_Implementation(UTexture2D* PlayerHeroTexture, int32 Index)
+void AWaitingRoomGameStateBase::SelcetRandomHero()
 {
-	WaitingRoomUI->PlayerSlots[Index]->PlayerHeroImage->SetColorAndOpacity(FLinearColor(1.0, 1.0, 1.0, 1.0));
-	WaitingRoomUI->PlayerSlots[Index]->PlayerHeroImage->SetBrushFromTexture(PlayerHeroTexture);
+	ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (RolexPlayerController)
+	{
+		if  (RolexPlayerController->OwnPlayerSlot->SelectHero) return;	// already selected a hero
+	}
+	
+	TArray<UHeroSlotUI*> RemainHeroArray;
+	for (int32 i = 0; i < WaitingRoomUI->HeroButtonArray.Num(); i++)
+	{
+		if (!WaitingRoomUI->HeroButtonArray[i]->AlreadySelected)
+		{
+			RemainHeroArray.Add(WaitingRoomUI->HeroButtonArray[i]);
+		}
+	}
+	
+	Algo::RandomShuffle(RemainHeroArray);
+	
+	ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(RolexPlayerController->PlayerState);
+	if (RolexPlayerState)
+	{
+		RolexPlayerState->SelectedHero = RemainHeroArray[0]->BaseCharacter;
+		RolexPlayerState->FindUniqueID();
+	}
+
+	RolexPlayerController->OwnPlayerSlot->SelectHero = true;
+	
+	// set the selected hero image to its own player slot
+	RolexPlayerController->ServerRPC_SetPlayerSlotHeroImage(RemainHeroArray[0]->HeroTexture, RemainHeroArray[0]->OwnerPlayerSlotIndex);
+
+	// block the hero being selected again from the other players in the same team
+	RolexPlayerController->ServerRPC_BlockHero(RemainHeroArray[0]->HeroSlotIndex, RemainHeroArray[0]->OwnerPlayerSlotIndex);
+	
+	//  add information of "player - selected hero" pair to the server
+	RolexPlayerController->ServerRPC_SetSelectedHero(RolexPlayerState->UniqueID, RemainHeroArray[0]->BaseCharacter);
+}
+
+void AWaitingRoomGameStateBase::MulticastRPC_BlockHero_Implementation(int32 HeroIndex, int32 PlayerIndex)
+{
+	ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(GetWorld()->GetFirstPlayerController());
+	UHeroSlotUI* HeroSlotUI = WaitingRoomUI->HeroButtonArray[HeroIndex];
+	// if another player from the same team selected the specific Hero, it cannot be selected again
+	if (HeroSlotUI)
+	{
+		if (RolexPlayerController->OwnPlayerSlot->TeamColor->GetColorAndOpacity() == WaitingRoomUI->PlayerSlots[PlayerIndex]->TeamColor->GetColorAndOpacity())
+		{
+			HeroSlotUI->AlreadySelected = true;
+			HeroSlotUI->HeroImage->SetColorAndOpacity(FLinearColor(0.0, 0.0, 0.0, 0.4));
+		}
+	}
+}
+
+void AWaitingRoomGameStateBase::MulticastRPC_SetPlayerHeroImage_Implementation(UTexture2D* PlayerHeroTexture, int32 PlayerIndex)
+{
+	ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(GetWorld()->GetFirstPlayerController());
+
+	// make invisible if opponent from the other team selected
+	if (RolexPlayerController->OwnPlayerSlot->TeamColor->GetColorAndOpacity() != WaitingRoomUI->PlayerSlots[PlayerIndex]->TeamColor->GetColorAndOpacity())
+	{
+		return;
+	}
+	
+	WaitingRoomUI->PlayerSlots[PlayerIndex]->PlayerHeroImage->SetColorAndOpacity(FLinearColor(1.0, 1.0, 1.0, 1.0));
+	WaitingRoomUI->PlayerSlots[PlayerIndex]->PlayerHeroImage->SetBrushFromTexture(PlayerHeroTexture);
 }
 
 void AWaitingRoomGameStateBase::MulticastRPC_Countdown_Implementation()
@@ -138,17 +190,22 @@ void AWaitingRoomGameStateBase::MulticastRPC_Countdown_Implementation()
 		WaitingRoomUI->HeroSelectionVisible = true;
 	}
 	
-	if (CountdownTime <= 0)
+	if (HeroSelectionCountdownTime <= 0)
 	{
 		WaitingRoomUI->CountDown->SetVisibility(ESlateVisibility::Hidden);		
 		GetWorld()->GetTimerManager().ClearTimer(CountdownTimerHandle);
-		ServerRPC_StartButtonVisible();
+
+		// if a player didn't select any hero, select randomly
+		SelcetRandomHero();
+
+		if (HasAuthority())
+			WaitingRoomUI->TravelToMain();
 	}
 	
 	WaitingRoomUI->CountDown->SetVisibility(ESlateVisibility::Visible);
-	WaitingRoomUI->CountDown->SetText(FText::AsNumber(CountdownTime));
+	WaitingRoomUI->CountDown->SetText(FText::AsNumber(HeroSelectionCountdownTime));
 
-	CountdownTime--;
+	HeroSelectionCountdownTime--;
 }
 
 void AWaitingRoomGameStateBase::MulticastRPC_StartHeroSelection_Implementation()
