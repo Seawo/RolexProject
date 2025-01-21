@@ -28,6 +28,9 @@ void UHeroSlotUI::NativeConstruct()
 
 void UHeroSlotUI::OnHeroSelectButtonClicked()
 {
+	// if someone in the same team already selected this hero, return
+	if (AlreadySelected) return;
+		
 	if (WaitingRoomGameStateBase== nullptr)
 		WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetWorld()->GetGameState());
 
@@ -44,11 +47,16 @@ void UHeroSlotUI::OnHeroSelectButtonClicked()
 		RolexPlayerState->FindUniqueID();
 		UE_LOG(LogTemp, Warning, TEXT("UniqueID: %s"), *RolexPlayerState->UniqueID);
 	}
+
+	RolexPlayerController->OwnPlayerSlot->SelectHero = true;
 	
-	//HeroSelectButtonClickedDelegate.ExecuteIfBound(HeroTexture, OwnerPlayerSlotIndex);
-	RolexPlayerController->ServerRPC_SetPlayerHeroImage(HeroTexture, OwnerPlayerSlotIndex);
+	// set the selected hero image to its own player slot
+	RolexPlayerController->ServerRPC_SetPlayerSlotHeroImage(HeroTexture, OwnerPlayerSlotIndex);
+
+	// block the hero being selected again from the other players in the same team
+	RolexPlayerController->ServerRPC_BlockHero(HeroSlotIndex, OwnerPlayerSlotIndex);
+	
+	//  add information of "player - selected hero" pair to the server
 	RolexPlayerController->ServerRPC_SetSelectedHero(RolexPlayerState->UniqueID, BaseCharacter);
-	//RolexPlayerController->ServerRPC_SetSelectedHero(RolexPlayerState, BaseCharacter);
-	
 	//  map <player, pawn class> for the main level 
 }

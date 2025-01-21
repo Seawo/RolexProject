@@ -39,7 +39,7 @@ public:
 	void MatchPlayers();
 
 	UPROPERTY(Replicated, BlueprintReadWrite)
-	int32 CountdownTime = 5;
+	int32 HeroSelectionCountdownTime = 15;
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_Countdown();	
@@ -55,9 +55,17 @@ public:
 	void StartHeroSelectionCountdown();
 
 // public:
+//    client GameStateBase cannot call RPC functions since clients doesn't have an ownership for GameStateBase
 // 	UFUNCTION(Server, Reliable)
 // 	void ServerRPC_SetPlayerHeroImage(UTexture2D* PlayerHeroTexture, int32 Index);
 //
+	
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastRPC_SetPlayerHeroImage(UTexture2D* PlayerHeroTexture, int32 Index);
+	void MulticastRPC_SetPlayerHeroImage(UTexture2D* PlayerHeroTexture, int32 PlayerIndex);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPC_BlockHero(int32 HeroIndex, int32 PlayerIndex);
+
+public:
+	void SelcetRandomHero();
 };
