@@ -34,12 +34,16 @@ public:
 	
 	FHeroSelectButtonClikcedDelegate HeroSelectButtonClickedDelegate;
 
+	bool AlreadySelected = false;
+	
 	UFUNCTION()
 	void OnHeroSelectButtonClicked();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class ABaseCharacter> BaseCharacter;
 
+	int32 HeroSlotIndex;
+	
 	int32 OwnerPlayerSlotIndex;
 
 	class AWaitingRoomGameStateBase*  WaitingRoomGameStateBase;

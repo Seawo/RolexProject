@@ -92,6 +92,9 @@ private:
 	bool bRBMIsCharging = false;
 	
 	// E
+	FTimerHandle SkillETimer;
+	int32 RepeatCount = 0;     // 반복 횟수 카운터
+	int32 MaxRepeat = 4;       // 최대 반복 횟수
 
 	// 조준점을 위한 핸들러
 	FTimerHandle LBMAimTimerHandle;
@@ -113,5 +116,6 @@ private:
 	void Server_SpawnArrow(FName arrowName);
 
 	void SpawnArrow(FName arrowName);
+
 	void SpawnCharge(FName chargeName);
 };

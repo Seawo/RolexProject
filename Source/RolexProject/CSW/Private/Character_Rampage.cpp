@@ -27,10 +27,10 @@ ACharacter_Rampage::ACharacter_Rampage()
 	Data.RoleType = ERoleType::Dealer;
 	Data.Name = "Phase";
 	Data.Team = true;
-	Data.MaxHp = 500;
-	Data.Hp = 500;
+	Data.MaxHp = 550;
+	Data.Hp = 550;
 	Data.Shield = 0;
-	Data.Speed = 400.0f;
+	Data.Speed = 850.0f;
 	Data.Power = 20;
 
 	//SpringArmComp Setting 
@@ -170,12 +170,15 @@ void ACharacter_Rampage::InputAttack(const FInputActionValue& inputValue)
 
 	int inputVector = inputValue.Get<float>();
 	inputVector--;
-	CurrAttackState = static_cast<EAttackState>(inputVector);
-	ChangeAttackState(CurrAttackState);
+	
 
+	if (bIsSkillOn[inputVector])
+	{
+		CurrAttackState = static_cast<EAttackState>(inputVector);
+		ChangeAttackState(CurrAttackState);
+		StartSkillCool(inputVector);
+	}
 }
-
-
 
 void ACharacter_Rampage::InputJump()
 {
@@ -184,20 +187,19 @@ void ACharacter_Rampage::InputJump()
 
 void ACharacter_Rampage::InputRun()
 {
-	URampageAnimInstance* anim = Cast<URampageAnimInstance>(GetMesh()->GetAnimInstance());
-
+	
 	if (bIsRun)
 	{
 		bIsRun = false;
 		
-		GetCharacterMovement()->MaxWalkSpeed = 800.0f;
-		anim->SlopeForwardAngle = 3;
+		GetCharacterMovement()->MaxWalkSpeed = 850.0f;
+		
 	}
 	else
 	{
 		bIsRun = true;
-		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
-		anim->SlopeForwardAngle = 0;
+		GetCharacterMovement()->MaxWalkSpeed = Data.Speed;
+		
 	}
 
 }

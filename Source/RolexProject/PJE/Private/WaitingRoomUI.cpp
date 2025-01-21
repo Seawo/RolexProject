@@ -54,6 +54,13 @@ void UWaitingRoomUI::NativeConstruct()
 		GetAllDescendants(HeroSelectionPanel, HeroButtonArray);
 		UE_LOG(LogTemp, Warning, TEXT("Number of Hero Buttons: %d"), HeroButtonArray.Num());
 	}
+
+	// set its own index to each hero slit 
+	if (HeroButtonArray.Num() > 0)
+	{
+		for (int32 i = 0; i < HeroButtonArray.Num(); i++)
+			HeroButtonArray[i]->HeroSlotIndex = i;
+	}
 }
 
 void UWaitingRoomUI::GetAllDescendants(UPanelWidget* ParentWidget, TArray<UHeroSlotUI*>& Descendants)
@@ -63,7 +70,9 @@ void UWaitingRoomUI::GetAllDescendants(UPanelWidget* ParentWidget, TArray<UHeroS
 		UWidget* Child = ParentWidget->GetChildAt(i);
 		
 		if (UHeroSlotUI* HeroSlotUI = Cast<UHeroSlotUI>(Child))
+		{
 			Descendants.Add(HeroSlotUI);
+		}
 
 		// if  it has its own child
 		if (UPanelWidget* Panel = Cast<UPanelWidget>(Child))

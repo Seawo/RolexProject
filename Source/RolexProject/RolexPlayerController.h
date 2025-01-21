@@ -7,6 +7,7 @@
 #include "GameState/GS_TrainingRoom.h"
 #include "RolexPlayerController.generated.h"
 
+
 /**
  * 
  */
@@ -50,15 +51,11 @@ public:
 
 public:
 	UFUNCTION(Server, Reliable)
-	void ServerRPC_SetPlayerHeroImage(UTexture2D* PlayerHeroTexture, int32 Index);
+	void ServerRPC_SetPlayerSlotHeroImage(UTexture2D* PlayerHeroTexture, int32 Index);
 
-	// UFUNCTION(NetMulticast, Reliable)
-	// void MulticastRPC_SetPlayerHeroImage(UTexture2D* PlayerHeroTexture, int32 Index);
-
-public:
-	// UFUNCTION(Server, Reliable)
-	// void ServerRPC_SetSelectedHero(class ARolexPlayerState* RolexPlayerState, TSubclassOf<class ABaseCharacter> BaseCharacter);
-
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_BlockHero(int32 HeroIndex, int32 PlayerIndex);
+	
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_SetSelectedHero(const FString& ID, TSubclassOf<class ABaseCharacter> BaseCharacter);
 

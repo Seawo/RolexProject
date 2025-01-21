@@ -45,6 +45,11 @@ public:
 	class AEffectActor* Dash2;
 
 
+	UFUNCTION(Server, Reliable)
+	void Server_ChangeAttackState(EAttackState attackState);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multi_ChangeAttackState(EAttackState attackState);
+
 private:
 	bool bIsRun = false;
 
@@ -83,8 +88,6 @@ private:
 
 	// completed
 	void RMBCompleted();
-	void ECompleted();
 
-	// spawnActor
-	void SpawnActor(FVector pos, FRotator rot, TSubclassOf<class AEffectActor> actorClass);
+
 };

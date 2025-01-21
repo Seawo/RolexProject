@@ -17,10 +17,10 @@ ACharacter_Steel::ACharacter_Steel()
 	Data.RoleType = ERoleType::Dealer;
 	Data.Name = "Sparrow";
 	Data.Team = true;
-	Data.MaxHp = 250;
-	Data.Hp = 250;
+	Data.MaxHp = 450;
+	Data.Hp = 450;
 	Data.Shield = 0;
-	Data.Speed = 400.0f;
+	Data.Speed = 600.0f;
 	Data.Power = 20;
 
 	SpringArmComp->SetRelativeLocation(FVector(0, 10, 90));
@@ -72,14 +72,49 @@ void ACharacter_Steel::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		// Completed
 		characterInput->BindAction(IA_RBM, ETriggerEvent::Completed, this, &ACharacter_Steel::RMBCompleted);
-		characterInput->BindAction(IA_E, ETriggerEvent::Completed, this, &ACharacter_Steel::ECompleted);
 		
 	}
 }
 
 void ACharacter_Steel::ChangeAttackState(EAttackState state)
 {
-	switch (state)
+	if (IsLocallyControlled())
+	{
+		Server_ChangeAttackState(state);
+	}
+}
+
+void ACharacter_Steel::InputAttack(const FInputActionValue& inputValue)
+{
+	for (const TPair<FString, UAnimMontage*>& Pair : AttackMontages)
+	{
+		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(Pair.Value))
+		{
+			return;
+		}
+	}
+
+	//UE_LOG(LogTemp, Warning, TEXT("attack in"));
+
+	int inputVector = inputValue.Get<float>();
+	inputVector--;
+
+	if (bIsSkillOn[inputVector])
+	{
+		CurrAttackState = static_cast<EAttackState>(inputVector);
+		ChangeAttackState(CurrAttackState);
+		StartSkillCool(inputVector);
+	}
+}
+
+void ACharacter_Steel::Server_ChangeAttackState_Implementation(EAttackState attackState)
+{
+	Multi_ChangeAttackState(attackState);
+}
+
+void ACharacter_Steel::Multi_ChangeAttackState_Implementation(EAttackState attackState)
+{
+	switch (attackState)
 	{
 	case EAttackState::QSkill:
 		QAttack();
@@ -100,29 +135,11 @@ void ACharacter_Steel::ChangeAttackState(EAttackState state)
 	case EAttackState::LMB_Completed:
 		break;
 	case EAttackState::RMB_Completed:
+		ShieldBreak();
 		break;
 	default:
 		break;
 	}
-}
-
-void ACharacter_Steel::InputAttack(const FInputActionValue& inputValue)
-{
-	for (const TPair<FString, UAnimMontage*>& Pair : AttackMontages)
-	{
-		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(Pair.Value))
-		{
-			return;
-		}
-	}
-
-	//UE_LOG(LogTemp, Warning, TEXT("attack in"));
-
-	int inputVector = inputValue.Get<float>();
-	inputVector--;
-	CurrAttackState = static_cast<EAttackState>(inputVector);
-	ChangeAttackState(CurrAttackState);
-
 }
 
 void ACharacter_Steel::InputJump()
@@ -136,7 +153,7 @@ void ACharacter_Steel::InputRun()
 	{
 		bIsRun = false;
 
-		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+		GetCharacterMovement()->MaxWalkSpeed = Data.Speed;
 	}
 	else
 	{
@@ -226,15 +243,18 @@ void ACharacter_Steel::EAttack()
 	
 
 	SpringArmComp->SetRelativeLocation(FVector(-200, 10, 90));
-	FName sectionName = FName("Ready");
+	FName sectionName = FName("Start");
 	PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f, *sectionName.ToString());
 }
 
 void ACharacter_Steel::RMBTriggered()
 {
+	if (!bIsShield) return;
+
 	if (Data.Shield <= 0)
 	{
-		ShieldBreak();
+		CurrAttackState = EAttackState::RMB_Completed;
+		ChangeAttackState(CurrAttackState);
 	}
 }
 
@@ -344,21 +364,20 @@ void ACharacter_Steel::StopEDash()
 
 void ACharacter_Steel::ShieldBreak()
 {
+	if (!bIsShield) return;
+
 	bIsShield = false;
 
 	Data.Shield = 0;
 
 	FName sectionName = FName("End");
 	PlayAnimMontage(AttackMontages[TEXT("RMB")], 1.0f, *sectionName.ToString());
-	
+
 	if (Shield)
 	{
-		// 소켓에서 불리
-		Shield->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-
 		// 파괴
 		Shield->Destroy();
-		
+
 		SpringArmComp->SetRelativeLocation(FVector(0, 10, 90));
 	}
 }
@@ -367,23 +386,11 @@ void ACharacter_Steel::RMBCompleted()
 {
 	if (!bIsShield) return;
 
-	ShieldBreak();
+	CurrAttackState = EAttackState::RMB_Completed;
+	ChangeAttackState(CurrAttackState);
 }
 
-void ACharacter_Steel::ECompleted()
-{
 
-	FName sectionName = FName("Start");
-	PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f, *sectionName.ToString());
-
-	SpringArmComp->SetRelativeLocation(FVector(0, 10, 90));
-}
-
-void ACharacter_Steel::SpawnActor(FVector pos, FRotator rot, TSubclassOf<class AEffectActor> actorClass)
-{
-
-
-}
 
 
 
