@@ -37,7 +37,9 @@ public class RolexProject : ModuleRules
             "UMG",
             "OnlineSubsystem",
             "OnlineSubsystemSteam",
-            "Niagara"
+            "Niagara",
+            "Slate",
+            "SlateCore"
         });
 	}
 }

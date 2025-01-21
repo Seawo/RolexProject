@@ -20,10 +20,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class ABaseCharacter* BaseCharacter;
 
-	// Skill Image
+	// Skill CoolTime Bar
 	UPROPERTY(meta = (BindWidget))
-	class UImage* SkillImage;
+	class UProgressBar* RMBSkillCoolTimeBar;
 	
+	UPROPERTY(meta = (BindWidget))
+	UProgressBar* ESkillCoolTimeBar;
+
 	// Skill CoolTime
 	int32 CoolTime;
 
@@ -37,7 +40,7 @@ public:
 	
 	// Weapon Image
 	UPROPERTY(meta = (BindWidget))
-	UImage* WeaponImage;
+	class UImage* WeaponImage;
 	
 	
 };

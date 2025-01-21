@@ -16,9 +16,27 @@ void UHeroUI::NativeConstruct()
 	
 	// bind skill and weapon Image
 	if (BaseCharacter->RMBSkillImage)
-		SkillImage->SetBrushFromTexture(BaseCharacter->RMBSkillImage);
+	{
+		FSlateBrush BackGroundBrush;
+		BackGroundBrush.SetResourceObject(BaseCharacter->RMBSkillImage);
+	
+		FProgressBarStyle ProgressBarStyle = RMBSkillCoolTimeBar->GetWidgetStyle();
+		ProgressBarStyle.SetBackgroundImage(BackGroundBrush);
+		ProgressBarStyle.SetFillImage(BackGroundBrush);
+		RMBSkillCoolTimeBar->SetWidgetStyle(ProgressBarStyle);
+	}
+	
 	if (BaseCharacter->ESkillImage)
-		SkillImage->SetBrushFromTexture(BaseCharacter->ESkillImage);
+	{
+		FSlateBrush BackGroundBrush;
+		BackGroundBrush.SetResourceObject(BaseCharacter->ESkillImage);
+
+		FProgressBarStyle ProgressBarStyle = ESkillCoolTimeBar->GetWidgetStyle();
+		ProgressBarStyle.SetBackgroundImage(BackGroundBrush);
+		ProgressBarStyle.SetFillImage(BackGroundBrush);
+		ESkillCoolTimeBar->SetWidgetStyle(ProgressBarStyle);
+	}
+	
 	if (BaseCharacter->WeaponImage)
 		WeaponImage->SetBrushFromTexture(BaseCharacter->WeaponImage);
 

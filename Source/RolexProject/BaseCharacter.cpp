@@ -72,7 +72,7 @@ void ABaseCharacter::BeginPlay()
 
 	// create widget
 	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABaseCharacter::InitHeroUI, 5.0f, false);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABaseCharacter::InitHeroUI, 3.0f, false);
 }
 
 void ABaseCharacter::InitHeroUI()
