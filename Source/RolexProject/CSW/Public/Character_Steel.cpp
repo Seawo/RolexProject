@@ -5,6 +5,11 @@
 #include "EnhancedInputComponent.h"
 #include <GameFramework\SpringArmComponent.h>
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components\CapsuleComponent.h"
+#include "GameFramework/PlayerController.h"
+
+#include "Components/SkeletalMeshComponent.h"
+#include "EffectActor.h"
 
 ACharacter_Steel::ACharacter_Steel()
 {
@@ -30,6 +35,19 @@ void ACharacter_Steel::BeginPlay()
 void ACharacter_Steel::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (bIsDashing)
+	{
+		DashTimeElapsed += DeltaTime;
+
+		if (DashTimeElapsed >= DashTimer)
+		{
+			StopEDash();
+		}
+
+		DashDirection = GetActorForwardVector();
+		AddMovementInput(DashDirection, DashSpeed * DeltaTime);
+	}
 }
 
 void ACharacter_Steel::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -42,10 +60,20 @@ void ACharacter_Steel::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		characterInput->BindAction(IA_LShift, ETriggerEvent::Started, this, &ACharacter_Steel::InputRun);
 		characterInput->BindAction(IA_LShift, ETriggerEvent::Completed, this, &ACharacter_Steel::InputRun);
 
+		// input
 		characterInput->BindAction(IA_Q, ETriggerEvent::Started, this, &ACharacter_Steel::InputAttack);
 		characterInput->BindAction(IA_E, ETriggerEvent::Started, this, &ACharacter_Steel::InputAttack);
 		characterInput->BindAction(IA_LBM, ETriggerEvent::Started, this, &ACharacter_Steel::InputAttack);
 		characterInput->BindAction(IA_RBM, ETriggerEvent::Started, this, &ACharacter_Steel::InputAttack);
+
+		// triggered
+		characterInput->BindAction(IA_RBM, ETriggerEvent::Triggered, this, &ACharacter_Steel::RMBTriggered);
+
+
+		// Completed
+		characterInput->BindAction(IA_RBM, ETriggerEvent::Completed, this, &ACharacter_Steel::RMBCompleted);
+		characterInput->BindAction(IA_E, ETriggerEvent::Completed, this, &ACharacter_Steel::ECompleted);
+		
 	}
 }
 
@@ -147,17 +175,215 @@ void ACharacter_Steel::LMBAttack()
 
 void ACharacter_Steel::RMBAttack()
 {
-	UE_LOG(LogTemp, Warning, TEXT("RMB"));
-}
+	for (const TPair<FString, UAnimMontage*>& Pair : AttackMontages)
+	{
+		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(Pair.Value))
+			return;
+	}
 
-void ACharacter_Steel::QAttack()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Q"));
+	if (bIsShield) return;
+
+	bIsShield = true;
+
+	Data.Shield = 300.0f;
+
+	FName sectionName = FName("Start");
+	PlayAnimMontage(AttackMontages[TEXT("RMB")], 1.0f, *sectionName.ToString());
+
+
+	USkeletalMeshComponent* skeletalMesh = GetMesh();
+
+	if (!skeletalMesh) return;
+
+	SpringArmComp->SetRelativeLocation(FVector(-200, 10, 90));
+
+	// 소켓 위치 가져오기
+	FVector SocketLocation = skeletalMesh->GetSocketLocation(TEXT("sheild_main"));
+	FRotator SocketRotation = skeletalMesh->GetSocketRotation(TEXT("sheild_main"));
+
+	//SpawnActor(SocketLocation, SocketRotation, ShieldClass);
+
+	// 돌 액터 붙착
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	Shield = GetWorld()->SpawnActor<AEffectActor>(ShieldClass, SocketLocation, SocketRotation, SpawnParams);
+
+	if (Shield)
+	{
+		// 소켓의 부착
+		Shield->AttachToComponent(skeletalMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("sheild_main"));
+	}
 }
 
 void ACharacter_Steel::EAttack()
 {
-	UE_LOG(LogTemp, Warning, TEXT("E"));
+	for (const TPair<FString, UAnimMontage*>& Pair : AttackMontages)
+	{
+		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(Pair.Value))
+			return;
+	}
+
+	
+
+	SpringArmComp->SetRelativeLocation(FVector(-200, 10, 90));
+	FName sectionName = FName("Ready");
+	PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f, *sectionName.ToString());
 }
+
+void ACharacter_Steel::RMBTriggered()
+{
+	if (Data.Shield <= 0)
+	{
+		ShieldBreak();
+	}
+}
+
+void ACharacter_Steel::QAttack()
+{
+	for (const TPair<FString, UAnimMontage*>& Pair : AttackMontages)
+	{
+		if (GetMesh()->GetAnimInstance()->Montage_IsPlaying(Pair.Value))
+			return;
+	}
+
+	if (bIsDashing) return;
+
+	bIsDashing = true;
+	GetCharacterMovement()->MaxWalkSpeed = DashSpeed;
+	SpringArmComp->SetRelativeLocation(FVector(-200, 10, 90));
+
+	// 몽타주 재생 하고
+	FName sectionName = FName("Start");
+	PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());
+
+	// 충돌 처리 활성화
+	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ACharacter_Steel::OnDashCollision);
+
+	USkeletalMeshComponent* skeletalMesh = GetMesh();
+
+	if (!skeletalMesh) return;
+
+	// 소켓 위치 가져오기
+	FVector SocketLocation = skeletalMesh->GetSocketLocation(TEXT("midline"));
+	FRotator SocketRotation = skeletalMesh->GetSocketRotation(TEXT("midline"));
+
+	//SpawnActor(SocketLocation, SocketRotation, ShieldClass);
+
+	// 돌 액터 붙착
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	Dash1 = GetWorld()->SpawnActor<AEffectActor>(DashClass1, SocketLocation, SocketRotation, SpawnParams);
+	Dash2 = GetWorld()->SpawnActor<AEffectActor>(DashClass2, SocketLocation, SocketRotation, SpawnParams);
+	if (Dash1 && Dash2)
+	{
+		// 소켓의 부착
+		Dash1->AttachToComponent(skeletalMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("midline"));
+		Dash2->AttachToComponent(skeletalMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("midline"));
+	}
+
+}
+
+void ACharacter_Steel::OnDashCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	StopEDash();
+
+	if (OtherActor && OtherActor != this)
+	{
+		ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
+
+		if (character)
+		{
+			if (character->Data.Team == Data.Team || character->MoveState == EMoveState::Die)
+			{
+				// 팀이 맞음...
+			}
+			else
+			{
+				// 추가 딜 주고
+				character->ModifyHP(-40);
+				
+				FVector myLoc = GetActorLocation();
+				FVector targetLoc = character->GetActorLocation();
+				FVector dir = (targetLoc - myLoc).GetSafeNormal();
+				
+				
+				// 힘적용
+				character->LaunchCharacter(dir * 5000, true, true);
+				
+				// collision Effect spawn
+
+			}
+		}
+	}
+}
+
+void ACharacter_Steel::StopEDash()
+{
+	bIsDashing = false;
+	DashTimeElapsed = 0.0f;
+
+	// 기본 속도로 되돌리기
+	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+
+	// End 몽타주 재생하고,
+	FName sectionName = FName("End");
+	PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());
+
+	SpringArmComp->SetRelativeLocation(FVector(0, 10, 90));
+
+	// 적과 층돌후 충돌 처리 비활성화
+	GetCapsuleComponent()->OnComponentHit.RemoveDynamic(this, &ACharacter_Steel::OnDashCollision);
+
+	// Dash 임팩트 지우고
+	if (Dash1 && Dash2)
+	{
+		Dash1->Destroy();
+		Dash2->Destroy();
+	}
+}
+
+void ACharacter_Steel::ShieldBreak()
+{
+	bIsShield = false;
+
+	Data.Shield = 0;
+
+	FName sectionName = FName("End");
+	PlayAnimMontage(AttackMontages[TEXT("RMB")], 1.0f, *sectionName.ToString());
+	
+	if (Shield)
+	{
+		// 소켓에서 불리
+		Shield->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+		// 파괴
+		Shield->Destroy();
+		
+		SpringArmComp->SetRelativeLocation(FVector(0, 10, 90));
+	}
+}
+
+void ACharacter_Steel::RMBCompleted()
+{
+	if (!bIsShield) return;
+
+	ShieldBreak();
+}
+
+void ACharacter_Steel::ECompleted()
+{
+
+	FName sectionName = FName("Start");
+	PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f, *sectionName.ToString());
+
+	SpringArmComp->SetRelativeLocation(FVector(0, 10, 90));
+}
+
+void ACharacter_Steel::SpawnActor(FVector pos, FRotator rot, TSubclassOf<class AEffectActor> actorClass)
+{
+
+
+}
+
 
 

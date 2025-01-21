@@ -29,19 +29,46 @@ class ROLEXPROJECT_API ACharacter_Steel : public ABaseCharacter
 public:
 	EAttackState CurrAttackState;
 
+	// RMB
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AEffectActor> ShieldClass;
 
+	class AEffectActor* Shield;
 
+	// Q
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AEffectActor> DashClass1;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AEffectActor> DashClass2;
+
+	class AEffectActor* Dash1;
+	class AEffectActor* Dash2;
 
 
 private:
 	bool bIsRun = false;
 
-	// LBM
+	// LMB
 	int32 MaxCnt = 5;
 	int32 ComboCnt = 0;
 	float MontageEndTime = 0.6f;
 	FTimerHandle ComboResetTimerHandle;
 	float ComboResetDelay = 1.5f;
+
+	// RMB
+	bool bIsShield = false;
+
+	// E
+	bool bIsDashing = false;
+	float DashSpeed = 1500.0f; // 돌진 속도
+	float DashTimeElapsed = 0.0f;
+	float DashTimer = 4.0f;
+	FVector DashDirection;
+
+	UFUNCTION()
+	void OnDashCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	void StopEDash();
+	void ShieldBreak();
 
 	// input
 	void InputJump();
@@ -50,5 +77,14 @@ private:
 	void RMBAttack();
 	void QAttack();
 	void EAttack();
+	
+	// triggered
+	void RMBTriggered();
 
+	// completed
+	void RMBCompleted();
+	void ECompleted();
+
+	// spawnActor
+	void SpawnActor(FVector pos, FRotator rot, TSubclassOf<class AEffectActor> actorClass);
 };

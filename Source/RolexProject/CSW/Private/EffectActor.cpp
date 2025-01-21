@@ -64,7 +64,14 @@ void AEffectActor::BeginPlay()
 		GetWorld()->GetTimerManager().SetTimer(ContinuousDamageTimerHandle, this, &AEffectActor::CheckOverlapAndApplyDamage, 0.5f, true);
 	}
 
-	SetLifeSpan(DestroyTime);
+	if (bIsShield)
+	{
+		CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AEffectActor::ShieldOverlapBegin);
+	}
+	else
+	{
+		SetLifeSpan(DestroyTime);
+	}
 
 }
 
@@ -117,6 +124,7 @@ void AEffectActor::InititalizeThrowStone(const FVector& dir, float speed)
 	MoveDir = dir.GetSafeNormal();
 	ThrowSpeed = speed;
 }
+
 
 
 // 충돌 났을때
@@ -226,6 +234,53 @@ void AEffectActor::CheckOverlapAndApplyDamage()
 				}
 
 				character->ModifyHP(-Damage);
+			}
+
+		}
+	}
+}
+
+void AEffectActor::ShieldOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (!OtherActor || OtherActor == this || OtherActor == GetOwner() || OtherActor->IsA(AEffectActor::StaticClass()))
+	{
+		return;
+	}
+
+
+	if (OtherActor && OtherActor != this)
+	{
+		// 효과 추가: 나이아가라 변경, 파티클 추가 등
+		
+		ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
+		ABaseCharacter* onwer = Cast<ABaseCharacter>(GetOwner());
+
+
+		if (character)
+		{
+			if (character->Data.Team == onwer->Data.Team || character->MoveState == EMoveState::Die)
+				return;
+
+			UE_LOG(LogTemp, Log, TEXT("character : %s Hp : %d"), *OtherActor->GetName(), character->Data.Hp);
+		}
+		else
+		{
+			// character가 아닌다른 무언가
+			UE_LOG(LogTemp, Log, TEXT("Effect collided with: %s"), *OtherActor->GetName());
+
+			if (NiagaraCollusionEffect)
+			{
+
+			}
+			else if (ParticleCollusionEffect)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(
+					GetWorld(),
+					ParticleCollusionEffect,
+					OtherActor->GetActorLocation(),
+					FRotator::ZeroRotator,
+					true // 자동 크기 조정
+				);
 			}
 
 		}
