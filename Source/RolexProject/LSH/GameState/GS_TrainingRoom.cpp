@@ -30,12 +30,12 @@ void AGS_TrainingRoom::BeginPlay()
 	PC = Cast<ARolexPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (PC)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] PC : %s"), *PC->GetName());
+		//UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] PC : %s"), *PC->GetName());
 		PC->InitUI();
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] PC is nullptr"));
+		//UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] PC is nullptr"));
 	}
 
 
@@ -102,31 +102,35 @@ void AGS_TrainingRoom::OnRep_PlayTime()
 
 void AGS_TrainingRoom::OnRep_Points()
 {
-	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] Points"));
+	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] Points"));
 	int32 idx = 0;
-	for (AActor_FightPoint* point : Points)
-	{
-		if (point->GetActivePoint() == EActivePoint::Active)
-		{
-			PC->SetPoint(idx);
-		}
-		idx++;
-	}
+	PC->SetPoint(idx);
+
+	//for (AActor_FightPoint* point : Points)
+	//{
+	//	if (point->GetActivePoint() == EActivePoint::Active)
+	//	{
+	//		UE_LOG(LogTemp, Log, TEXT("[GS OnRep_Points] Points : %s"), *point->GetName());
+	//		UE_LOG(LogTemp, Log, TEXT("[GS OnRep_Points] idx : %d"), idx);
+	//		PC->SetPoint(idx);
+	//	}
+	//	idx++;
+	//}
 }
 
 void AGS_TrainingRoom::OnRep_Occupation()
 {
-	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] Occupation"));
+	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] Occupation"));
 }
 
 void AGS_TrainingRoom::OnRep_Result()
 {
-	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] Result"));
+	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] Result"));
 }
 
 void AGS_TrainingRoom::OnRep_Clash()
 {
-	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] Clash"));
+	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] Clash"));
 	PC->SetClashing(Clash);
 }
 
@@ -146,50 +150,50 @@ void AGS_TrainingRoom::OnRep_PointBTeamCount()
 
 void AGS_TrainingRoom::OnRep_PointTakeGauge()
 {
-	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] PointTakeATeamGauge"));
+	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] PointTakeATeamGauge"));
 	PC->SetTakingGuage(PointTakeATeamGauge, PointTakeBTeamGauge);
 }
 
 void AGS_TrainingRoom::OnRep_PointATeamGauge()
 {
-	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] PointATeamGauge"));
+	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] PointATeamGauge"));
 }
 
 void AGS_TrainingRoom::OnRep_PointBTeamGauge()
 {
-	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] PointBTeamGauge"));
+	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] PointBTeamGauge"));
 }
 
 void AGS_TrainingRoom::OnRep_PointGaugePercent()
 {
-	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] PointATeamGaugePercent"));
+	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] PointATeamGaugePercent"));
 	PC->SetPercent(Occupation ,PointATeamGaugePercent, PointBTeamGaugePercent);
 }
 
 void AGS_TrainingRoom::OnRep_WaitTime()
 {
-	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] WaitTime"));
+	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] WaitTime"));
 }
 
 void AGS_TrainingRoom::OnRep_ExtraTime()
 {
-	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] ExtraTime"));
+	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] ExtraTime"));
 	PC->SetExtraTime(ExtraTime);
 }
 
 void AGS_TrainingRoom::OnRep_ExtraTimeDecrease()
 {
-	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] ExtraTimeDecrease"));
+	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] ExtraTimeDecrease"));
 }
 
 void AGS_TrainingRoom::OnRep_IsGetATeamExtraTime()
 {
-	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] IsGetATeamExtraTime"));
+	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] IsGetATeamExtraTime"));
 	PC->SetIsATeamExtraTime(IsGetATeamExtraTime);
 }
 
 void AGS_TrainingRoom::OnRep_IsGetBTeamExtraTime()
 {
-	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] IsGetBTeamExtraTime"));
+	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] IsGetBTeamExtraTime"));
 	PC->SetIsBTeamExtraTime(IsGetBTeamExtraTime);
 }

@@ -76,7 +76,7 @@ void ARolexGameMode::BeginPlay()
 
 						//RolexGS->ATeamChracters = ATeamChracters;
 						//RolexGS->BTeamChracters = BTeamChracters;
-						RolexGS->Points = Points;
+						//RolexGS->Points = Points;
 
 						RolexGS->Occupation = EOccupation::None;
 						RolexGS->Result = EResult::None;
@@ -193,7 +193,8 @@ void ARolexGameMode::Tick(float DeltaTime)
 			//int32 random = FMath::RandRange(0, Points.Num() - 1);
 			int32 random = 0;
 
-			Points[random]->SetActivePoint(EActivePoint::Active);
+ 			Points[random]->SetActivePoint(EActivePoint::Active);
+			
 			if (RolexPC)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("[ARolexGameMode Tick] RolexPC is valid"));
@@ -203,6 +204,8 @@ void ARolexGameMode::Tick(float DeltaTime)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("[ARolexGameMode Tick] RolexPC is nullptr"));
 			}
+
+			RolexGS->Points = Points;
 			IsActiveBsePoint = true;
 		}
 
@@ -224,7 +227,7 @@ void ARolexGameMode::Tick(float DeltaTime)
 
 				//RolexGS->ATeamChracters = ATeamChracters;
 				//RolexGS->BTeamChracters = BTeamChracters;
-				RolexGS->Points = Points;
+				
 
 				RolexGS->PointATeamCount = PointATeamCount;
 				RolexGS->PointBTeamCount = PointBTeamCount;

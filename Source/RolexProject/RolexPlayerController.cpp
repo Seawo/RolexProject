@@ -196,6 +196,7 @@ void ARolexPlayerController::InitUI()
 				if (UI_Zone)
 				{
 					UI_Zone->AddToViewport();
+					UI_Zone->UIInit();
 					UE_LOG(LogTemp, Warning, TEXT("UI_Zone is created"));
 					GetWorld()->GetTimerManager().ClearTimer(TimerHandleUI);
 				}
