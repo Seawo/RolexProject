@@ -6,6 +6,35 @@
 #include "GameFramework/GameStateBase.h"
 #include "GM_TrainingRoom.h"
 #include "GS_TrainingRoom.generated.h"
+
+
+// 거점 점령 상태를 알려주는 Enum값
+UENUM(BlueprintType)
+enum class EOccupation : uint8
+{
+	None,				// 점령 안된 상태
+	TeamA,				// A팀점령
+	TeamB,				// B팀점령
+};
+
+
+// 거점 결과를 알려주는 Enum값
+UENUM(BlueprintType)
+enum class EResult : uint8
+{
+	None,
+	AWin,
+	BWin,
+	draw,
+};
+
+UENUM(BlueprintType)
+enum class EClashing : uint8
+{
+	None,				// 충돌 없는 상태	
+	Clash,				// A팀과 B팀이 충돌하는 상태
+};
+
 /**
  * 
  */
@@ -19,49 +48,47 @@ class ROLEXPROJECT_API AGS_TrainingRoom : public AGameStateBase
 	virtual void Tick(float DeltaTime) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	void UpdatePointGauge(float DeltaTime);
+
+	UFUNCTION()
+	void ChangeNumberOfTeam(bool bTeam, int32 ChangeValue);
+
+
+
+	// 클라이언트들에게 변경된 데이터 값 전달 (ReplicatedUsing 함수들)
 protected:
 	UFUNCTION()
 	void OnRep_PlayTime();
 	UFUNCTION()
 	void OnRep_Points();
-
-
 	UFUNCTION()
 	void OnRep_Occupation();
 	UFUNCTION()
 	void OnRep_Result();
 	UFUNCTION()
 	void OnRep_Clash();
-
 	UFUNCTION()
 	void OnRep_PointATeamCount();
 	UFUNCTION()
 	void OnRep_PointBTeamCount();
-
 	UFUNCTION()
 	void OnRep_PointTakeGauge();
-
 	UFUNCTION()
 	void OnRep_PointATeamGauge();
 	UFUNCTION()
 	void OnRep_PointBTeamGauge();
 	UFUNCTION()
 	void OnRep_PointGaugePercent();
-
 	UFUNCTION()
 	void OnRep_WaitTime();
 	UFUNCTION()
 	void OnRep_ExtraTime();
 	UFUNCTION()
 	void OnRep_ExtraTimeDecrease();
-
 	UFUNCTION()
 	void OnRep_IsGetATeamExtraTime();
 	UFUNCTION()
 	void OnRep_IsGetBTeamExtraTime();
-
-
-
 
 
 public:
