@@ -76,10 +76,13 @@ public:
 
 	void InititalizeThrowStone(const FVector& dir, float speed);
 
-private:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	FVector MoveDir;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	float ThrowSpeed;
 
+private:
 
 	FTimerHandle ContinuousDamageTimerHandle;
 

@@ -66,6 +66,8 @@ public:
 
 	// CoolTime
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float LMBCoolTime = 0.0f;		// 우클릭 쿨타임
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float RMBCoolTime = 0.0f;		// 우클릭 쿨타임
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float ESkillCoolTime = 0.0f;	// E스킬 쿨타임
@@ -149,6 +151,19 @@ public:
 	class UInputAction* IA_Q;
 	UPROPERTY(EditAnywhere, Category = "Input")
 	class UInputAction* IA_E;
+
+	// CoolTimer
+	FTimerHandle SkillCooldownHandles[4];  // 4개의 타이머 핸들
+	// 각 스킬별 쿨타임 플래그
+	bool bIsSkillOn[4] = { true, true, true, true };
+	
+	// Q, E, LMB, RMB순 스킬별 쿨타임 지속 시간
+	UPROPERTY(EditAnywhere, Category = "Cooltime")
+	float SkillCooldownDurations[4] = { 0, 0, 0, 0 };  
+	
+	void StartSkillCool(int32 skillIndex);
+	void ResetSkillCool(int32 skillIndex);
+
 
 	void InputMove(const struct FInputActionValue& inputValue);
 	void InputRotation(const struct FInputActionValue& inputValue);

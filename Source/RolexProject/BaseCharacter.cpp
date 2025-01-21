@@ -322,21 +322,31 @@ void ABaseCharacter::ChangeState(EMoveState newState, UAnimMontage* montage)
 
 void ABaseCharacter::UpdateCoolTime(float DeltaTime)
 {
+	Data.LMBCoolTime -= DeltaTime;
+	if (Data.LMBCoolTime < 0)
+	{
+		Data.LMBCoolTime = 0.0f;
+	}
+
 	Data.RMBCoolTime -= DeltaTime;
 	if (Data.RMBCoolTime < 0)
 	{
 		Data.RMBCoolTime = 0.0f;
 	}
+
 	Data.ESkillCoolTime -= DeltaTime;
 	if (Data.ESkillCoolTime < 0)
 	{
 		Data.ESkillCoolTime = 0.0f;
 	}
+
 	Data.QSkillCoolTime -= DeltaTime;
 	if (Data.QSkillCoolTime < 0)
 	{
 		Data.QSkillCoolTime = 0.0f;
 	}
+
+
 }
 
 // Called to bind functionality to input
@@ -362,6 +372,28 @@ void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(ABaseCharacter, MoveState);
 	DOREPLIFETIME(ABaseCharacter, Data);
 
+}
+
+void ABaseCharacter::StartSkillCool(int32 skillIndex)
+{
+	// 불가능
+	bIsSkillOn[skillIndex] = false;
+	GetWorld()->GetTimerManager().SetTimer(SkillCooldownHandles[skillIndex], FTimerDelegate::CreateUObject(
+		this,
+		&ABaseCharacter::ResetSkillCool,
+		skillIndex),
+		SkillCooldownDurations[skillIndex],
+		false
+	);
+
+}
+
+void ABaseCharacter::ResetSkillCool(int32 skillIndex)
+{
+	// 사용 가능
+	bIsSkillOn[skillIndex] = true;
+
+	UE_LOG(LogTemp, Warning, TEXT("Skill %d is ready to use again!"), skillIndex);
 }
 
 void ABaseCharacter::InputMove(const FInputActionValue& inputValue)

@@ -30,7 +30,7 @@ ACharacter_Sparrow::ACharacter_Sparrow()
 	Data.MaxHp = 250;
 	Data.Hp = 250;
 	Data.Shield = 0;
-	Data.Speed = 400.0f;
+	Data.Speed = 750.0f;
 	Data.Power = 20;
 
 	SpringArmComp->SetRelativeLocation(FVector(0, 10, 40));
@@ -171,12 +171,18 @@ void ACharacter_Sparrow::InputAttack(const FInputActionValue& inputValue)
 
 	int inputVector = inputValue.Get<float>();
 	inputVector--;
-	CurrAttackState = static_cast<EAttackState>(inputVector);
-	ChangeAttackState(CurrAttackState);
 
-	if (IsLocallyControlled())
+	if (bIsSkillOn[inputVector])
 	{
-		Server_ChangeAttackState(CurrAttackState);
+		CurrAttackState = static_cast<EAttackState>(inputVector);
+		ChangeAttackState(CurrAttackState);
+
+		if (IsLocallyControlled())
+		{
+			Server_ChangeAttackState(CurrAttackState);
+		}
+
+		StartSkillCool(inputVector);
 	}
 }
 
@@ -412,8 +418,14 @@ void ACharacter_Sparrow::InputRun()
 	{
 		bIsRun = true;
 
-		GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
+		GetCharacterMovement()->MaxWalkSpeed = 950.0f;
 		
+	}
+	else
+	{
+		bIsRun = false;
+
+		GetCharacterMovement()->MaxWalkSpeed = Data.Speed;
 	}
 
 }
@@ -491,7 +503,6 @@ void ACharacter_Sparrow::QAttack()
 
 	if (!bQIsCharging)
 	{
-
 		APlayerController* PlayerController = Cast<APlayerController>(GetController());
 		if (PlayerController)
 		{
@@ -499,23 +510,17 @@ void ACharacter_Sparrow::QAttack()
 			bQIsCharging = true;
 
 			// 마우스 커서 작동
-			PlayerController->bShowMouseCursor = true;
-			PlayerController->SetInputMode(FInputModeGameAndUI());
+			//PlayerController->bShowMouseCursor = true;
+			//PlayerController->SetInputMode(FInputModeGameAndUI());
 
 			// 움직임 막기
 			MoveDisable();
-
-			//GetCharacterMovement()->DisableMovement();
-
-		/*	FName sectionName = FName("start");
-			PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());*/
 
 			// 데칼 트루
 			AimIndicator->SetVisibility(true);
 
 		}
 	}
-
 }
 
 void ACharacter_Sparrow::EAttack()
@@ -528,7 +533,7 @@ void ACharacter_Sparrow::EAttack()
 			return;
 	}
 
-	//PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f);
+	
 
 }
 
@@ -571,17 +576,7 @@ void ACharacter_Sparrow::Server_SpawnArrow_Implementation(FName arrowName)
 void ACharacter_Sparrow::SpawnArrow(FName arrowName)
 {
 	Server_SpawnArrow(arrowName);
-	
 
-/*	if (HasAuthority())
-	{
-		Server_SpawnArrow(arrowName);
-	}
-	else if (IsLocallyControlled())
-	{
-		Server_SpawnArrow(arrowName); // 클라이언트에서 서버로 요청
-	}
-	*/
 }
 
 void ACharacter_Sparrow::SpawnCharge(FName chargeName)
