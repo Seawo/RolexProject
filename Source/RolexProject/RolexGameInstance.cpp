@@ -39,7 +39,7 @@ void URolexGameInstance::CreateSession(FName Name)
 		if (SessionInterface.IsValid())
 		{
 			SessionSettings = MakeShareable(new FOnlineSessionSettings());
-			SessionSettings->bIsLANMatch = false;
+			SessionSettings->bIsLANMatch = SubsystemName.IsEqual(FName(TEXT("NULL")));
 			SessionSettings->bUseLobbiesIfAvailable = true;
 			//SessionSettings->bUsesPresence = true; 
 			SessionSettings->NumPublicConnections = 4;
@@ -79,7 +79,9 @@ void URolexGameInstance::FindSession()
 		if (SessionInterface.IsValid())
 		{			 
 			SessionSearched = MakeShared<FOnlineSessionSearch>();
-			SessionSearched->bIsLanQuery = false;
+			FName SubsystemName = OnlineSubsystem->GetSubsystemName();
+			UE_LOG(LogTemp, Warning, TEXT("String Subsystem Name: %s"), *SubsystemName.ToString());
+			SessionSearched->bIsLanQuery = SubsystemName.IsEqual(FName(TEXT("NULL")));
 			SessionSearched->MaxSearchResults = 100;
 			SessionSearched->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 			
