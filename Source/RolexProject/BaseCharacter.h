@@ -203,7 +203,10 @@ public:
 	class UTexture2D* BaseCharacterImage;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="UI")
-	UTexture2D* SkillImage;
+	UTexture2D* RMBSkillImage;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="UI")
+	UTexture2D* ESkillImage;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="UI")
 	UTexture2D* WeaponImage;
