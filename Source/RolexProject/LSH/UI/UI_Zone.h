@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "GM_TrainingRoom.h"
+#include "../GameState/GS_TrainingRoom.h"
 #include "UI_Zone.generated.h"
 
 /**

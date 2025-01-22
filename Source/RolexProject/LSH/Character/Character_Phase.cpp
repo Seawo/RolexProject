@@ -71,23 +71,6 @@ void ACharacter_Phase::BeginPlay()
 void ACharacter_Phase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	// 화면에 출력하기
-	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("RMBSkillCoolTime : %.2f"), Data.RMBCoolTime));
-	GEngine->AddOnScreenDebugMessage(0, 0.0f, FColor::Red, FString::Printf(TEXT("ESkillCoolTime : %.2f"), Data.ESkillCoolTime));
-	GEngine->AddOnScreenDebugMessage(1, 0.0f, FColor::Red, FString::Printf(TEXT("QSkillCoolTime : %.2f"), Data.QSkillCoolTime));
-
-
-	// 쿨타임 돌리기
-	//UpdateCoolTime(DeltaTime);
-
-
-
-	// 임시로 UI 출력
-	if (UI_InGame)
-	{
-		//UpdateUI();
-	}
 }
 
 void ACharacter_Phase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -228,46 +211,22 @@ void ACharacter_Phase::InputLShift()
 /** 플레이어 공격 함수들*/
 void ACharacter_Phase::LBMAttack()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("LMB"));
-
 	// Montage
 	PlayMontage("LMB", 1.0f);
 }
 void ACharacter_Phase::RBMAttack()
 {
-	// 쿨타임
-	if (Data.RMBCoolTime > 0)
-	{
-		return;
-	}
-	Data.RMBCoolTime = RMBRefillTime;
-
-
 	// Montage
 	PlayMontage("RMB", 1.0f);
 }
 void ACharacter_Phase::EAttack()
 {
-	// 쿨타임
-	if (Data.ESkillCoolTime > 0)
-	{
-		return;
-	}
-	Data.ESkillCoolTime = ESkillRefillTime;
-
 	// Montage
 	PlayMontage("E", 1.0f);
 	GetCharacterMovement()->GravityScale = 0.7f;
 }
 void ACharacter_Phase::QAttack()
 {
-	// 쿨타임
-	if (Data.QSkillCoolTime > 0)
-	{
-		return;
-	}
-	Data.QSkillCoolTime = QSkillRefillTime;
-
 	// Montage
 	PlayMontage("Q", 1.0f);
 }

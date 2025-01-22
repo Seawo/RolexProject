@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "GM_TrainingRoom.h"
+#include "GameState/GS_TrainingRoom.h"
 #include "RolexPlayerController.generated.h"
 
 
