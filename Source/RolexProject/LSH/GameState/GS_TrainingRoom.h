@@ -53,12 +53,15 @@ class ROLEXPROJECT_API AGS_TrainingRoom : public AGameStateBase
 	UFUNCTION()
 	void ChangeNumberOfTeam(bool bTeam, int32 ChangeValue);
 
-
+	//UFUNCTION(NetMulticast, Reliable)
+	//void MulticastSetTimeDilation(float Dilation);
 
 	// 클라이언트들에게 변경된 데이터 값 전달 (ReplicatedUsing 함수들)
 protected:
 	UFUNCTION()
 	void OnRep_PlayTime();
+	UFUNCTION()
+	void OnRep_Doors();
 	UFUNCTION()
 	void OnRep_Points();
 	UFUNCTION()
@@ -99,11 +102,16 @@ public:
 	float PlayTime = 0.0f;
 	UPROPERTY(VisibleAnywhere, Category = "Info")
 	bool IsActiveBsePoint = false;
+	UPROPERTY(VisibleAnywhere, Category = "Info")
+	bool IsGameStart = false;
+
 
 	UPROPERTY(VisibleAnywhere, Category = "Info")
 	TArray<class ABaseCharacter*> ATeamChracters;		// Team == true (A팀)
 	UPROPERTY(VisibleAnywhere, Category = "Info")
 	TArray<class ABaseCharacter*> BTeamChracters;		// Team == false (B팀)
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Doors, Category = "Info")
+	TArray<class AActor_StartDoor*> Doors;				// 시작 문들
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Points, Category = "Info")
 	TArray<class AActor_FightPoint*> Points;			// 거점들
 

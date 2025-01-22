@@ -10,6 +10,7 @@
 #include "Point/Actor_FightPoint.h"
 #include "BaseCharacter.h"
 #include "UI_Zone.h"
+#include "Point/Actor_StartDoor.h"
 
 #include "Net/UnrealNetwork.h"
 
@@ -25,6 +26,7 @@ void AGS_TrainingRoom::BeginPlay()
 	Super::BeginPlay();
 
 	IsActiveBsePoint = false;
+	IsGameStart = false;
 
 	PC = Cast<ARolexPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (PC)
@@ -36,6 +38,8 @@ void AGS_TrainingRoom::BeginPlay()
 	{
 		//UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] PC is nullptr"));
 	}
+
+	GetWorld()->GetWorldSettings()->SetTimeDilation(0.1f);
 
 	//if (HasAuthority())
 	//{
@@ -51,6 +55,8 @@ void AGS_TrainingRoom::BeginPlay()
 	//	// PlayTime 1초마다 1씩 올려주기
 
 	//}
+
+
 }
 
 void AGS_TrainingRoom::Tick(float DeltaTime)
@@ -101,7 +107,22 @@ void AGS_TrainingRoom::Tick(float DeltaTime)
 		}
 		else if (PlayTime > 15.0f)
 		{
-			
+			if (not IsGameStart)
+			{
+				TArray<AActor*> foundActors;
+				UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor_StartDoor::StaticClass(), foundActors);
+				for (AActor* found : foundActors)
+				{
+					AActor_StartDoor* door = Cast<AActor_StartDoor>(found);
+					if (door)
+					{
+						door->SetGamePlayState(EGamePlayState::Start);
+						Doors.Add(door);
+					}
+				}
+
+				IsGameStart = true;
+			}
 		}
 	}
 	else
@@ -452,6 +473,7 @@ void AGS_TrainingRoom::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(AGS_TrainingRoom, PlayTime);
 	DOREPLIFETIME(AGS_TrainingRoom, Points);
+	DOREPLIFETIME(AGS_TrainingRoom, Doors);
 
 	DOREPLIFETIME(AGS_TrainingRoom, Occupation);
 	DOREPLIFETIME(AGS_TrainingRoom, Result);
@@ -488,6 +510,13 @@ void AGS_TrainingRoom::OnRep_PlayTime()
 	//	PC->UI_Zone->SetPlayTime(PlayTime);
 	//}
 	PC->SetPlayTime(PlayTime);
+}
+void AGS_TrainingRoom::OnRep_Doors()
+{
+	for (AActor_StartDoor* door : Doors)
+	{
+		door->SetGamePlayState(EGamePlayState::Start);
+	}
 }
 void AGS_TrainingRoom::OnRep_Points()
 {

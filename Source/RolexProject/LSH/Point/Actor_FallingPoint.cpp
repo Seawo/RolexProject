@@ -5,6 +5,8 @@
 
 #include "Components/BoxComponent.h"
 #include "BaseCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystemComponent.h"
 
 // Sets default values
 AActor_FallingPoint::AActor_FallingPoint()
@@ -38,6 +40,12 @@ void AActor_FallingPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComponen
 	if (character)
 	{
 		character->ChangeState(EMoveState::Die, character->stateMontages["Die"]);
+		if (Particle)
+		{
+			
+			FVector location = character->GetActorLocation() + Location;
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Particle, location);
+		}
 	}
 }
 

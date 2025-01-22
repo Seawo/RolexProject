@@ -35,6 +35,9 @@ public:
 
 
 
-
+public:
 	bool bIsComeIntoSpawnPoint = false;
+
+	UPROPERTY(EditAnywhere)
+	bool bTeam = false;
 };

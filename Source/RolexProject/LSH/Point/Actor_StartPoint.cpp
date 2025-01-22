@@ -38,7 +38,25 @@ FVector AActor_StartPoint::SpawnPoint()
 void AActor_StartPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	Super::OnOverlapBegin(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
-	UE_LOG(LogTemp, Warning, TEXT("[StartPoint] OnOverlapBegin"));
+	//UE_LOG(LogTemp, Warning, TEXT("[StartPoint] OnOverlapBegin"));
+
+	//ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
+	//if (character and character->Data.Team == bTeam)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("[StartPoint] OnOverlapBegin - Same Team"));
+	//}
+	//else if (character and character->Data.Team != bTeam)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("[StartPoint] OnOverlapBegin - Different Team"));
+	//	FVector location = character->GetActorLocation() - character->GetActorForwardVector() * 10;
+	//	UE_LOG(LogTemp, Warning, TEXT("[StartPoint] OnOverlapBegin - GetActorLoation: %s"), *character->GetActorLocation().ToString());
+
+
+	//	FVector ReverseMovement = -SweepResult.ImpactNormal * SweepResult.PenetrationDepth;
+	//	character->SetActorLocation(location);
+	//	UE_LOG(LogTemp, Warning, TEXT("[StartPoint] OnOverlapBegin - GetActorLoation: %s"), *character->GetActorLocation().ToString());
+
+	//}
 }
 
 void AActor_StartPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)

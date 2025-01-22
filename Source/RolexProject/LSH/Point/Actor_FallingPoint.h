@@ -30,4 +30,10 @@ public:
 public:
 	UPROPERTY(EditAnywhere)
 	class UBoxComponent* Collision;
+
+	UPROPERTY(EditAnywhere)
+	class UParticleSystem* Particle;
+
+	UPROPERTY(EditAnywhere)
+	FVector Location;
 };

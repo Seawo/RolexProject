@@ -1,10 +1,19 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Actor_StartDoor.generated.h"
+
+UENUM(BlueprintType)
+enum class EGamePlayState : uint8
+{
+	None,
+	Start,
+	End,
+};
+
 
 UCLASS()
 class ROLEXPROJECT_API AActor_StartDoor : public AActor
@@ -23,4 +32,23 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+
+
+	void SetGamePlayState(EGamePlayState state);
+
+
+public:
+	UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent* Mesh;
+
+
+	UPROPERTY(EditAnywhere)
+	bool bTeam = false; // true ATeam, false BTeam
+
+	bool bGameStart = false;
+	bool bGameEnd = false;
+
+private:
+	UPROPERTY(VisibleAnywhere)
+	EGamePlayState GamePlayState = EGamePlayState::None;
 };
