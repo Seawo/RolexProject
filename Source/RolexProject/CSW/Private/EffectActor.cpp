@@ -67,6 +67,9 @@ void AEffectActor::BeginPlay()
 	if (bIsShield)
 	{
 		CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AEffectActor::ShieldOverlapBegin);
+
+		CollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		
 	}
 	else
 	{
@@ -282,6 +285,7 @@ void AEffectActor::ShieldOverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 					true // 자동 크기 조정
 				);
 			}
+
 
 		}
 	}

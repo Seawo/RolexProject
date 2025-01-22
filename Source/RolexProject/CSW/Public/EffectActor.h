@@ -38,6 +38,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	bool bIsShield = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	FVector CollCompLocation;
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")

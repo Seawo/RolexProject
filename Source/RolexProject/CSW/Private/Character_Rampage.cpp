@@ -49,8 +49,7 @@ void ACharacter_Rampage::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// 
-	ChangeState(EMoveState::Start, stateMontages[TEXT("Start")]);
+	//ChangeState(EMoveState::Start, stateMontages[TEXT("Start")]);
 }
 
 void ACharacter_Rampage::Tick(float DeltaTime)
@@ -172,7 +171,7 @@ void ACharacter_Rampage::InputAttack(const FInputActionValue& inputValue)
 	inputVector--;
 	
 
-	if (bIsSkillOn[inputVector])
+	if (bIsSkillOn[inputVector]&& MoveState != EMoveState::Die)
 	{
 		CurrAttackState = static_cast<EAttackState>(inputVector);
 		ChangeAttackState(CurrAttackState);

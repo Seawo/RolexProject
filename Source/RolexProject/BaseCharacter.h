@@ -93,6 +93,8 @@ protected:
 
 public:
 	void ChangeState(EMoveState newState, UAnimMontage* montage);
+	UFUNCTION(Server, Reliable)
+	void Server_ChangeState(EMoveState newState, UAnimMontage* montage);
 
 
 public:	

@@ -88,11 +88,16 @@ void AFey::InputAttack(const FInputActionValue& inputValue)
 
 	int32 InputVector = inputValue.Get<float>();	// each input value are represented as a float val
 	InputVector--;
-	CurrentAttackState = static_cast<EAttackState>(InputVector);
-	ChangeAttackState(CurrentAttackState);
-	if (IsLocallyControlled())
+
+	if (bIsSkillOn[InputVector] && MoveState != EMoveState::Die)
 	{
-		Server_ChangeAttackState(CurrentAttackState);
+		CurrentAttackState = static_cast<EAttackState>(InputVector);
+		ChangeAttackState(CurrentAttackState);
+		if (IsLocallyControlled())
+		{
+			Server_ChangeAttackState(CurrentAttackState);
+		}
+		StartSkillCool(InputVector);
 	}
 
 }

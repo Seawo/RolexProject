@@ -102,7 +102,6 @@ void ABaseCharacter::Tick(float DeltaTime)
 	// 캐릴터에 shield 달아주기
 	DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 80), FString::Printf(TEXT("Shield : %d"), Data.Shield), nullptr, FColor::Green, DeltaTime);
 
-
 	// 실드 5초간 활성화, 5초 후 비활성화
 	//if (bIsShield)
 	//{
@@ -299,6 +298,11 @@ void ABaseCharacter::Sever_MoveEnable_Implementation()
 
 void ABaseCharacter::ChangeState(EMoveState newState, UAnimMontage* montage)
 {
+	Server_ChangeState(newState, montage);
+}
+
+void ABaseCharacter::Server_ChangeState_Implementation(EMoveState newState, UAnimMontage* montage)
+{
 	MoveState = newState;
 
 	switch (newState)
@@ -328,7 +332,6 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	{
 		characterInput->BindAction(IA_VectorMove, ETriggerEvent::Triggered, this, &ABaseCharacter::InputMove);
 		characterInput->BindAction(IA_Rotation, ETriggerEvent::Triggered, this, &ABaseCharacter::InputRotation);
-
 	}
 }
 
@@ -385,7 +388,7 @@ void ABaseCharacter::InputRotation(const FInputActionValue& inputValue)
 {
 	FVector2D InputVector = inputValue.Get<FVector2D>();
 
-	if (IsValid(Controller))
+	if (IsValid(Controller)&&MoveState != EMoveState::Die)
 	{
 		AddControllerYawInput(InputVector.X);
 		AddControllerPitchInput(InputVector.Y);
