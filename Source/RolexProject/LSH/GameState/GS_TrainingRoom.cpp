@@ -64,7 +64,7 @@ void AGS_TrainingRoom::Tick(float DeltaTime)
 	{
 		PC->SetPlayTime(PlayTime);
 
-		if (PlayTime > 10.0f)
+		if (PlayTime > 30.0f)
 		{
 			if (not IsActiveBsePoint)
 			{
@@ -98,6 +98,10 @@ void AGS_TrainingRoom::Tick(float DeltaTime)
 				PC->SetIsATeamExtraTime(IsGetATeamExtraTime);
 				PC->SetIsBTeamExtraTime(IsGetBTeamExtraTime);
 			}
+		}
+		else if (PlayTime > 15.0f)
+		{
+			
 		}
 	}
 	else
