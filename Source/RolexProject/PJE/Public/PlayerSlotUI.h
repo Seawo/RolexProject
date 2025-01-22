@@ -24,7 +24,7 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	UImage* PlayerHeroImage;
 
-	bool SelectHero = false;
+	bool bSelectHero = false;
 	
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* PlayerID;

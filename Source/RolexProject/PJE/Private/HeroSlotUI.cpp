@@ -30,7 +30,14 @@ void UHeroSlotUI::OnHeroSelectButtonClicked()
 {
 	// if someone in the same team already selected this hero, return
 	if (AlreadySelected) return;
-		
+
+	// if the player want to change the hero
+	if (RolexPlayerController->OwnPlayerSlot->bSelectHero == true)
+	{
+		// unblock the previous hero and set the previous hero texture
+		RolexPlayerController->ServerRPC_UnBlockHero(RolexPlayerController->PreviousSelectedHeroSlotIndex, OwnerPlayerSlotIndex);
+	}
+
 	if (WaitingRoomGameStateBase== nullptr)
 		WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetWorld()->GetGameState());
 
@@ -48,8 +55,8 @@ void UHeroSlotUI::OnHeroSelectButtonClicked()
 		UE_LOG(LogTemp, Warning, TEXT("UniqueID: %s"), *RolexPlayerState->UniqueID);
 	}
 
-	RolexPlayerController->OwnPlayerSlot->SelectHero = true;
-	
+	RolexPlayerController->OwnPlayerSlot->bSelectHero = true;
+
 	// set the selected hero image to its own player slot
 	RolexPlayerController->ServerRPC_SetPlayerSlotHeroImage(HeroTexture, OwnerPlayerSlotIndex);
 
@@ -59,4 +66,6 @@ void UHeroSlotUI::OnHeroSelectButtonClicked()
 	//  add information of "player - selected hero" pair to the server
 	RolexPlayerController->ServerRPC_SetSelectedHero(RolexPlayerState->UniqueID, BaseCharacter);
 	//  map <player, pawn class> for the main level 
+
+	RolexPlayerController->PreviousSelectedHeroSlotIndex = HeroSlotIndex;
 }
