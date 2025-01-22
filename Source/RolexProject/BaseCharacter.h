@@ -91,8 +91,8 @@ protected:
 	virtual void ChangeAttackState(EAttackState newState) PURE_VIRTUAL(ABaseCharacter::ChangeState,);
 	virtual void InputAttack(const struct FInputActionValue& inputValue) PURE_VIRTUAL(ABaseCharacter::InputAttack,);
 
+public:
 	void ChangeState(EMoveState newState, UAnimMontage* montage);
-	void UpdateCoolTime(float DeltaTime);		// 쿨타임 업데이트 함수(Tick)
 
 
 public:	

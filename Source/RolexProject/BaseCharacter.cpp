@@ -102,20 +102,17 @@ void ABaseCharacter::Tick(float DeltaTime)
 	// 캐릴터에 shield 달아주기
 	DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 80), FString::Printf(TEXT("Shield : %d"), Data.Shield), nullptr, FColor::Green, DeltaTime);
 
-	// 쿨타임 업데이트
-	UpdateCoolTime(DeltaTime);
-
 
 	// 실드 5초간 활성화, 5초 후 비활성화
-	if (bIsShield)
-	{
-		ShieldTime -= DeltaTime;
+	//if (bIsShield)
+	//{
+	//	ShieldTime -= DeltaTime;
 
-		if (ShieldTime <= 0.0f)
-		{
-			bIsShield = false;
-		}
-	}
+	//	if (ShieldTime <= 0.0f)
+	//	{
+	//		bIsShield = false;
+	//	}
+	//}
 }
 
 
@@ -318,35 +315,6 @@ void ABaseCharacter::ChangeState(EMoveState newState, UAnimMontage* montage)
 	default:
 		break;
 	}
-}
-
-void ABaseCharacter::UpdateCoolTime(float DeltaTime)
-{
-	Data.LMBCoolTime -= DeltaTime;
-	if (Data.LMBCoolTime < 0)
-	{
-		Data.LMBCoolTime = 0.0f;
-	}
-
-	Data.RMBCoolTime -= DeltaTime;
-	if (Data.RMBCoolTime < 0)
-	{
-		Data.RMBCoolTime = 0.0f;
-	}
-
-	Data.ESkillCoolTime -= DeltaTime;
-	if (Data.ESkillCoolTime < 0)
-	{
-		Data.ESkillCoolTime = 0.0f;
-	}
-
-	Data.QSkillCoolTime -= DeltaTime;
-	if (Data.QSkillCoolTime < 0)
-	{
-		Data.QSkillCoolTime = 0.0f;
-	}
-
-
 }
 
 // Called to bind functionality to input
