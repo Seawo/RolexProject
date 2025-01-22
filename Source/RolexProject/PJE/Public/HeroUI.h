@@ -27,6 +27,8 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	UProgressBar* ESkillCoolTimeBar;
 
+	// bind cooltime bar with timer 
+
 	// Skill CoolTime
 	int32 CoolTime;
 

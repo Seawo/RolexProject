@@ -103,8 +103,8 @@ void UUI_Zone::SetTakingGuage(float Agauge, float Bgauge)
 	{
 		Img_CircleProgressBarA->SetVisibility(ESlateVisibility::Hidden);
 		Img_CircleProgressBarB->SetVisibility(ESlateVisibility::Visible);
-
-		UMaterialInterface* materialInterface = Cast<UMaterialInterface>(Img_CircleProgressBarB->Brush.GetResourceObject());
+		
+		UMaterialInterface* materialInterface = Cast<UMaterialInterface>(Img_CircleProgressBarB->GetBrush().GetResourceObject());
 		if (materialInterface)
 		{
 			if (not MI_CircleProcessBarB)
@@ -121,7 +121,7 @@ void UUI_Zone::SetTakingGuage(float Agauge, float Bgauge)
 		Img_CircleProgressBarA->SetVisibility(ESlateVisibility::Visible);
 		Img_CircleProgressBarB->SetVisibility(ESlateVisibility::Hidden);
 
-		UMaterialInterface* materialInterface = Cast<UMaterialInterface>(Img_CircleProgressBarA->Brush.GetResourceObject());
+		UMaterialInterface* materialInterface = Cast<UMaterialInterface>(Img_CircleProgressBarA->GetBrush().GetResourceObject());
 		if (materialInterface)
 		{
 			if (not MI_CircleProcessBarA)
