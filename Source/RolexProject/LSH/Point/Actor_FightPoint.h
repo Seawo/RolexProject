@@ -64,9 +64,6 @@ public:
 
 	void DrawDebugS(float DeltaTime);
 
-	UFUNCTION(NetMulticast, Reliable)
-	void Multi_SetPointGauge(float DeltaTime);
-
 
 	void SetActivePoint(EActivePoint activePoint) { ActivePoint = activePoint; }
 	EActivePoint GetActivePoint() const { return ActivePoint; }
@@ -85,23 +82,8 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	int32 ActiveBTeamCount = 0;
 
-	float ATeamPointGauge = 0.0f;				// 최대치 120
-	float ATeamGaugePercent = 0.0f;				// 최대치 100%
-	float BTeamPointGauge = 0.0f;				// 최대치 120	
-	float BTeamGaugePercent = 0.0f;				// 최대치 100%
-
-	float TakePointATeamGauge = 0.0f;			// 최대치 100
-	float TakePointBTeamGauge = 0.0f;			// 최대치 100
-
-	float Timer = 0.0f;							// 대기 타이머
-	float ExtraTimer = 8.0f;					// 추가 타이머
-	float ExtraTimerDecrease = 1.0f;			// 추가 타이머 감소량
-
-	bool IsAddATeamExtraTime = false;			// A팀 추가 시간여부 (B팀 거점일 경우)
-	bool IsAddBTeamExtraTime = false;			// B팀 추가 시간여부 (A팀 거점일 경우)
 
 	EActivePoint ActivePoint = EActivePoint::Deactivate;
 	ETeam Team = ETeam::None;
-
 	EFinish Finish = EFinish::None;
 };

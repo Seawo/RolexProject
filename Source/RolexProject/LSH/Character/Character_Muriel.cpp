@@ -39,8 +39,8 @@ void ACharacter_Muriel::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Blue, FString::Printf(TEXT("[Muriel] FlyGauge : %.1f"), FlyGauge));
-	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Blue, FString::Printf(TEXT("[Muriel] MovementMode : %s"), *GetCharacterMovement()->GetMovementName()));
+	//GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Blue, FString::Printf(TEXT("[Muriel] FlyGauge : %.1f"), FlyGauge));
+	//GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Blue, FString::Printf(TEXT("[Muriel] MovementMode : %s"), *GetCharacterMovement()->GetMovementName()));
 
 	//UpdateFlyCoolTime(DeltaTime);
 	// 캐릭이 땅에 닿아 있을때만 FlyGauge를 채울 수 있도록 설정

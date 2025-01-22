@@ -220,7 +220,7 @@ void AGS_TrainingRoom::UpdatePointGauge(float DeltaTime)
 	// 거점을 A팀이 점령하고 있는 상태
 	else if (Occupation == EOccupation::TeamA)
 	{
-		if (PointBTeamCount > 0)
+		if (PointATeamCount > 0  and PointBTeamCount > 0)
 		{
 			Clash = EClashing::Clash;
 		}
@@ -335,7 +335,7 @@ void AGS_TrainingRoom::UpdatePointGauge(float DeltaTime)
 	// 거점을 B팀이 점령하고 있는 상태
 	else if (Occupation == EOccupation::TeamB)
 	{
-		if (PointATeamCount > 0)
+		if (PointATeamCount > 0 and PointBTeamCount > 0)
 		{
 			Clash = EClashing::Clash;
 		}

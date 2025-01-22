@@ -32,6 +32,25 @@ ARolexGameMode::ARolexGameMode()
 void ARolexGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
+	FTimerHandle timerPlayer;
+	GetWorldTimerManager().SetTimer(timerPlayer, [this]()
+	{
+			TArray<AActor*> foundPlayer;
+			UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), foundPlayer);
+			for (AActor* player : foundPlayer)
+			{
+				ABaseCharacter* p = Cast<ABaseCharacter>(player);
+				if (p)
+				{
+					ARolexPlayerState* rolexPS = Cast<ARolexPlayerState>(p->GetPlayerState());
+					UE_LOG(LogTemp, Log, TEXT("[GameMode BeginPlay] player Team : %s"), rolexPS->Team ? TEXT("ATeam") : TEXT("BTeam"));
+
+					UE_LOG(LogTemp, Warning, TEXT("[GameMode BeginPlay] player Name : %s"), *p->GetName());
+
+				}
+			}
+	}, 3.0f, false);
 }
 
 void ARolexGameMode::Tick(float DeltaTime)
