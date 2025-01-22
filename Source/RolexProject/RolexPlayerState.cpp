@@ -28,6 +28,7 @@ void ARolexPlayerState::CopyProperties(APlayerState* PlayerState)
 	if (RolexPlayerState)
 	{
 		RolexPlayerState->SelectedHero = SelectedHero;
+		RolexPlayerState->Team = Team;
 	}
 }
 

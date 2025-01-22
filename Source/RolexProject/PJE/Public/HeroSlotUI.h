@@ -7,7 +7,6 @@
 #include "HeroSlotUI.generated.h"
 
 
-DECLARE_DELEGATE_TwoParams(FHeroSelectButtonClikcedDelegate, UTexture2D*, int32);
 
 UCLASS()
 class ROLEXPROJECT_API UHeroSlotUI : public UUserWidget
@@ -31,8 +30,6 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FText HeroDescription;
-	
-	FHeroSelectButtonClikcedDelegate HeroSelectButtonClickedDelegate;
 
 	bool AlreadySelected = false;
 	
