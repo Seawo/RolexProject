@@ -65,7 +65,7 @@ void ACharacter_Rampage::Tick(float DeltaTime)
 		float Progress = ElapsedTime / DashDuration;
 
 		// End dash if progress reaches or exceeds 1
-		if (Progress >= 2.0f)
+		if (Progress >= 1.0f)
 		{
 			bIsDashing = false;
 
@@ -74,6 +74,8 @@ void ACharacter_Rampage::Tick(float DeltaTime)
 
 			return;
 		}
+		
+
 
 		// Calculate horizontal movement
 		float horizontalDistance = DashSpeed * Progress * DashDuration;
@@ -292,10 +294,12 @@ void ACharacter_Rampage::EAttack()
 		return; 
 
 	bIsDashing = true;
+	FRotator controlRot = GetControlRotation();
+	float controlPitch = controlRot.Pitch;
 
 	if (IsLocallyControlled())
 	{
-		Server_DashCheck(bIsDashing);
+		Server_DashCheck(bIsDashing, controlPitch);
 	}
 }
 
@@ -307,22 +311,58 @@ void ACharacter_Rampage::OutputNone(const struct FInputActionValue& inputValue)
 	ChangeAttackState(CurrAttackState);
 }
 
-void ACharacter_Rampage::Server_DashCheck_Implementation(bool bIsDash)
+void ACharacter_Rampage::Server_DashCheck_Implementation(bool bIsDash, float pitch)
 {
-	Multi_DashCheck(bIsDash);
+	Multi_DashCheck(bIsDash, pitch);
 }
 
-void ACharacter_Rampage::Multi_DashCheck_Implementation(bool bIsDash)
+void ACharacter_Rampage::Multi_DashCheck_Implementation(bool bIsDash, float pitch)
 {
 	bIsDashing = bIsDash;
 	ElapsedTime = 0.0f;
 
+	// 저장: 키를 눌렀을 때의 컨트롤러 Pitch
+	float controlPitch = pitch;
+	UE_LOG(LogTemp, Warning, TEXT("ControlPitch : %f"), controlPitch);
+
 	// Record the starting position and direction
 	StartPos = GetActorLocation();
-	DashDirection = GetActorForwardVector();
+	DashDirection = GetActorForwardVector().GetSafeNormal();
 
 	// Disable normal movement during the dash
 	GetCharacterMovement()->DisableMovement();
+	
+	// 각도에 따른 이동 속도와 높이 변화
+	if (controlPitch >= 0 && controlPitch < 30)
+	{
+		DashSpeed = 1700.0f;
+		DashHeight = 800.0f;
+	}
+	else if (controlPitch >= 30 && controlPitch < 45)
+	{
+		DashSpeed = 1400.0f;
+		DashHeight = 1000.0f;
+	}
+	else if (controlPitch >= 45 && controlPitch < 60)
+	{
+		DashSpeed = 1000.0f;
+		DashHeight = 1400.0f;
+	}
+	else if (controlPitch >= 60 && controlPitch < 90)
+	{
+		DashSpeed = 800.0f;
+		DashHeight = 1700.0f;
+	}
+	else if (controlPitch >= 270 && controlPitch <= 360)
+	{
+		DashSpeed = 2000.0f;
+		DashHeight = 500.0f;
+	}
+	else
+	{
+		DashSpeed = 500.0f;
+		DashHeight = 2000.0f;
+	}
 
 	// Set a timer to end the dash
 	GetWorld()->GetTimerManager().SetTimer(DashTimerHandle, FTimerDelegate::CreateLambda(
@@ -330,12 +370,11 @@ void ACharacter_Rampage::Multi_DashCheck_Implementation(bool bIsDash)
 		{
 			bIsDashing = false;
 
-
 			SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
-
-			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 		}),
 		DashDuration, false);
+
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
 }
 
 void ACharacter_Rampage::CreateStone()

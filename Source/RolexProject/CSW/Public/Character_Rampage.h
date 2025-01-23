@@ -90,7 +90,7 @@ private:
 	void OutputNone(const struct FInputActionValue& inputValue);
 
 	UFUNCTION(Server, Reliable)
-	void Server_DashCheck(bool bIsDash);
+	void Server_DashCheck(bool bIsDash, float pitch);
 	UFUNCTION(NetMulticast, Reliable)
-	void Multi_DashCheck(bool bIsDash);
+	void Multi_DashCheck(bool bIsDash, float pitch);
 };

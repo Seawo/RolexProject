@@ -392,6 +392,7 @@ void ABaseCharacter::InputRotation(const FInputActionValue& inputValue)
 	{
 		AddControllerYawInput(InputVector.X);
 		AddControllerPitchInput(InputVector.Y);
+		
 	}
 
 }
