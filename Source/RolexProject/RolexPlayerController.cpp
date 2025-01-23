@@ -187,6 +187,11 @@ void ARolexPlayerController::ServerRPC_BlockHero_Implementation(int32 HeroIndex,
 //////////////////////////////////////////////////////////////////////////
 
 
+void ARolexPlayerController::ServerRPC_UnBlockHero_Implementation(int32 HeroIndex, int32 PlayerIndex)
+{
+	WaitingRoomGameStateBase->MulticastRPC_UnBlockHero(HeroIndex, PlayerIndex);
+}
+
 void ARolexPlayerController::InitUI()
 {
 	if (not IsLocalController()) return;

@@ -66,6 +66,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_BlockHero(int32 HeroIndex, int32 PlayerIndex);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPC_UnBlockHero(int32 HeroIndex, int32 PlayerIndex);
+	
 public:
 	void SelcetRandomHero();
 };

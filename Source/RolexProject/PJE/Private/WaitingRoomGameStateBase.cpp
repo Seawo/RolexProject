@@ -5,6 +5,7 @@
 
 #include "HeroSlotUI.h"
 #include "PlayerSlotUI.h"
+#include "RolexGameInstance.h"
 #include "RolexPlayerController.h"
 #include "RolexPlayerState.h"
 #include "WaitingRoomUI.h"
@@ -65,12 +66,16 @@ void AWaitingRoomGameStateBase::MatchPlayers()
 	// does not make random	
 	// FRandomStream Random;
 	// Random.GenerateNewSeed();
+
+	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
 	
 	Algo::RandomShuffle(PlayerArray);
+	
 	int32 HalfPlayers = PlayerArray.Num()/2;
 	for (int32 i = 0; i < PlayerArray.Num(); i++)
 	{
 		ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(PlayerArray[i]);
+		RolexPlayerState->FindUniqueID();
 		if (RolexPlayerState)
 		{
 			if (i < HalfPlayers)
@@ -79,6 +84,7 @@ void AWaitingRoomGameStateBase::MatchPlayers()
 				ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(RolexPlayerState->GetPlayerController());
 				if (RolexPlayerController)
 				{
+					RolexGameInstance->PlayerTeam.Add(RolexPlayerState->UniqueID, true);
 					MulticastRPC_UpdatePlayerTeam(RolexPlayerController->PlayerSlotIndex, FLinearColor::Red);
 				}
 			}
@@ -88,6 +94,7 @@ void AWaitingRoomGameStateBase::MatchPlayers()
 				ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(RolexPlayerState->GetPlayerController());
 				if (RolexPlayerController)
 				{
+					RolexGameInstance->PlayerTeam.Add(RolexPlayerState->UniqueID, false);
 					MulticastRPC_UpdatePlayerTeam(RolexPlayerController->PlayerSlotIndex, FLinearColor::Blue);
 				}
 			}
@@ -120,7 +127,7 @@ void AWaitingRoomGameStateBase::SelcetRandomHero()
 	ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (RolexPlayerController)
 	{
-		if  (RolexPlayerController->OwnPlayerSlot->SelectHero) return;	// already selected a hero
+		if  (RolexPlayerController->OwnPlayerSlot->bSelectHero) return;	// already selected a hero
 	}
 	
 	TArray<UHeroSlotUI*> RemainHeroArray;
@@ -141,7 +148,7 @@ void AWaitingRoomGameStateBase::SelcetRandomHero()
 		RolexPlayerState->FindUniqueID();
 	}
 
-	RolexPlayerController->OwnPlayerSlot->SelectHero = true;
+	RolexPlayerController->OwnPlayerSlot->bSelectHero = true;
 	
 	// set the selected hero image to its own player slot
 	RolexPlayerController->ServerRPC_SetPlayerSlotHeroImage(RemainHeroArray[0]->HeroTexture, RemainHeroArray[0]->OwnerPlayerSlotIndex);
@@ -164,6 +171,21 @@ void AWaitingRoomGameStateBase::MulticastRPC_BlockHero_Implementation(int32 Hero
 		{
 			HeroSlotUI->AlreadySelected = true;
 			HeroSlotUI->HeroImage->SetColorAndOpacity(FLinearColor(0.0, 0.0, 0.0, 0.4));
+		}
+	}
+}
+
+void AWaitingRoomGameStateBase::MulticastRPC_UnBlockHero_Implementation(int32 HeroIndex, int32 PlayerIndex)
+{
+	ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(GetWorld()->GetFirstPlayerController());
+	UHeroSlotUI* HeroSlotUI = WaitingRoomUI->HeroButtonArray[HeroIndex];
+	if (HeroSlotUI)
+	{
+		if (RolexPlayerController->OwnPlayerSlot->TeamColor->GetColorAndOpacity() == WaitingRoomUI->PlayerSlots[PlayerIndex]->TeamColor->GetColorAndOpacity())
+		{
+			HeroSlotUI->AlreadySelected = false;
+			HeroSlotUI->HeroImage->SetColorAndOpacity(FLinearColor(1.0, 1.0, 1.0, 1.0));
+			HeroSlotUI->HeroImage->SetBrushFromTexture(HeroSlotUI->HeroTexture);
 		}
 	}
 }

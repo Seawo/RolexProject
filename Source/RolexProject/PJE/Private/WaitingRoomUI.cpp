@@ -12,6 +12,7 @@
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Components/UniformGridPanel.h"
+#include "GameFramework/GameStateBase.h"
 #include "Net/UnrealNetwork.h"
 
 void UWaitingRoomUI::NativeConstruct()
@@ -100,6 +101,17 @@ void UWaitingRoomUI::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>&
 
 void UWaitingRoomUI::TravelToMain()
 {
+	TArray<APlayerState*> PlayerStateArray = GetWorld()->GetGameState()->PlayerArray;
+	for (int32 i = 0; i < PlayerStateArray.Num(); i++)
+	{
+		ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(PlayerStateArray[i]);
+		if (!*RolexPlayerState->UniqueID) RolexPlayerState->FindUniqueID();
+		if (RolexPlayerState)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ID: %s, Team: %d"), *RolexPlayerState->UniqueID, RolexPlayerState->Team);
+		}
+	}
+	
 	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
 	GetWorld()->ServerTravel(RolexGameInstance->TravelLevel);
 }

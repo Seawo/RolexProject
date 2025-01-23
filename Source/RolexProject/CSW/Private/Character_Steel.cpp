@@ -10,6 +10,7 @@
 
 #include "Components/SkeletalMeshComponent.h"
 #include "EffectActor.h"
+#include "Components\CapsuleComponent.h"
 
 ACharacter_Steel::ACharacter_Steel()
 {
@@ -99,7 +100,7 @@ void ACharacter_Steel::InputAttack(const FInputActionValue& inputValue)
 	int inputVector = inputValue.Get<float>();
 	inputVector--;
 
-	if (bIsSkillOn[inputVector])
+	if (bIsSkillOn[inputVector] && MoveState != EMoveState::Die)
 	{
 		CurrAttackState = static_cast<EAttackState>(inputVector);
 		ChangeAttackState(CurrAttackState);
@@ -213,6 +214,10 @@ void ACharacter_Steel::RMBAttack()
 	if (!skeletalMesh) return;
 
 	SpringArmComp->SetRelativeLocation(FVector(-200, 10, 90));
+	// 충돌처리 거대화
+	capsuleComp->SetCapsuleHalfHeight(120.0f);
+	capsuleComp->SetCapsuleRadius(120.0f);
+
 
 	// 소켓 위치 가져오기
 	FVector SocketLocation = skeletalMesh->GetSocketLocation(TEXT("sheild_main"));
@@ -369,6 +374,8 @@ void ACharacter_Steel::ShieldBreak()
 	bIsShield = false;
 
 	Data.Shield = 0;
+	capsuleComp->SetCapsuleHalfHeight(100.0f);
+	capsuleComp->SetCapsuleRadius(50.0f);
 
 	FName sectionName = FName("End");
 	PlayAnimMontage(AttackMontages[TEXT("RMB")], 1.0f, *sectionName.ToString());

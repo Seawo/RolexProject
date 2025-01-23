@@ -54,6 +54,9 @@ public:
 	
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TMap<FString, bool> PlayerTeam;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TMap<FString, TSubclassOf<ABaseCharacter>> PlayerHeroSelections;
 
 };

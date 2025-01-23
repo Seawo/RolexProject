@@ -172,7 +172,7 @@ void ACharacter_Sparrow::InputAttack(const FInputActionValue& inputValue)
 	int inputVector = inputValue.Get<float>();
 	inputVector--;
 
-	if (bIsSkillOn[inputVector])
+	if (bIsSkillOn[inputVector] && MoveState != EMoveState::Die)
 	{
 		CurrAttackState = static_cast<EAttackState>(inputVector);
 		ChangeAttackState(CurrAttackState);

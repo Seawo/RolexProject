@@ -222,13 +222,15 @@ void ACharacter_Muriel::InputAttack(const FInputActionValue& inputValue)
 			return;
 		}
 	}
-
 	int inputVector = inputValue.Get<float>();
 	inputVector--;
-	AttackState = static_cast<EAttackState>(inputVector);
-	ChangeAttackState(AttackState);
-
-
+	
+	if (bIsSkillOn[inputVector] && MoveState != EMoveState::Die)
+	{
+		AttackState = static_cast<EAttackState>(inputVector);
+		ChangeAttackState(AttackState);
+		StartSkillCool(inputVector);
+	}
 }
 void ACharacter_Muriel::MurielLShift()
 {

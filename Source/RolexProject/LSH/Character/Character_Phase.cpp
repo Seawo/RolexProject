@@ -163,9 +163,13 @@ void ACharacter_Phase::InputAttack(const FInputActionValue& inputValue)
 
 	int inputVector = inputValue.Get<float>();
 	inputVector--;
-	AttackState = static_cast<EAttackState>(inputVector);
-	ChangeAttackState(AttackState);
 
+	if (bIsSkillOn[inputVector] && MoveState != EMoveState::Die)
+	{
+		AttackState = static_cast<EAttackState>(inputVector);
+		ChangeAttackState(AttackState);
+		StartSkillCool(inputVector);
+	}
 }
 void ACharacter_Phase::OutPutAttack(const struct FInputActionValue& inputValue)
 {

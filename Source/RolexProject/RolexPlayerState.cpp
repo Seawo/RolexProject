@@ -20,15 +20,27 @@ ARolexPlayerState::ARolexPlayerState()
 	}
 }
 
-void ARolexPlayerState::CopyProperties(APlayerState* PlayerState)
+void ARolexPlayerState::BeginPlay()
 {
-	Super::CopyProperties(PlayerState);
+	Super::BeginPlay();
+	
+}
 
-	ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(PlayerState);
-	if (RolexPlayerState)
-	{
-		RolexPlayerState->SelectedHero = SelectedHero;
-	}
+// void ARolexPlayerState::CopyProperties(APlayerState* PlayerState)
+// {
+// 	Super::CopyProperties(PlayerState);
+//
+// 	ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(PlayerState);
+// 	if (RolexPlayerState)
+// 	{
+// 		RolexPlayerState->SelectedHero = SelectedHero;
+// 		RolexPlayerState->Team = Team;
+// 	}
+// }
+
+void ARolexPlayerState::ServerSetUniqueID_Implementation(const FString& ID)
+{
+	UniqueID = ID;
 }
 
 void ARolexPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -50,4 +62,5 @@ void ARolexPlayerState::FindUniqueID()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to get unique ID"));
 	}
+	
 }

@@ -20,19 +20,13 @@ ARolexGameMode::ARolexGameMode()
 	PrimaryActorTick.bCanEverTick = true;
 	bUseSeamlessTravel = true;
 	
-	// // set default pawn class to our Blueprinted character
-	// static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/ThirdPerson/Blueprints/BP_ThirdPersonCharacter"));
-	//
-	// if (PlayerPawnBPClass.Class != NULL)
-	// {
-	// 	DefaultPawnClass = PlayerPawnBPClass.Class;
-	// }
 }
 
 void ARolexGameMode::BeginPlay()
 {
+	UE_LOG(LogTemp, Warning, TEXT("------------------------------------------------------------------------ RolexGameMode BeginPlay ------------------------------------------------------------------------"));
 	Super::BeginPlay();
-
+	
 	FTimerHandle timerPlayer;
 	GetWorldTimerManager().SetTimer(timerPlayer, [this]()
 	{
@@ -44,10 +38,8 @@ void ARolexGameMode::BeginPlay()
 				if (p)
 				{
 					ARolexPlayerState* rolexPS = Cast<ARolexPlayerState>(p->GetPlayerState());
-					UE_LOG(LogTemp, Log, TEXT("[GameMode BeginPlay] player Team : %s"), rolexPS->Team ? TEXT("ATeam") : TEXT("BTeam"));
-
 					UE_LOG(LogTemp, Warning, TEXT("[GameMode BeginPlay] player Name : %s"), *p->GetName());
-
+					UE_LOG(LogTemp, Warning, TEXT("[GameMode BeginPlay] player Team : %s"), rolexPS->Team ? TEXT("ATeam") : TEXT("BTeam"));
 				}
 			}
 	}, 3.0f, false);
@@ -60,10 +52,10 @@ void ARolexGameMode::Tick(float DeltaTime)
 
 UClass* ARolexGameMode::GetDefaultPawnClassForController_Implementation(AController* InController)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Main Level ------------------------------------------------------------------------ Choose Player ------------------------------------------------------------------------"));
+	UE_LOG(LogTemp, Warning, TEXT("------------------------------------------------------------------------ RolexGameMode GetDefaultPawnClassForController ------------------------------------------------------------------------"));
 	
-	ARolexPlayerState* RolexPlayerState = InController->GetPlayerState<ARolexPlayerState>();
 	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
+	ARolexPlayerState* RolexPlayerState = InController->GetPlayerState<ARolexPlayerState>();
 
 	if (RolexPlayerState && RolexGameInstance)
 	{
@@ -71,6 +63,7 @@ UClass* ARolexGameMode::GetDefaultPawnClassForController_Implementation(AControl
 		RolexPlayerState->FindUniqueID();
 		if (TSubclassOf<ABaseCharacter>* BaseCharacterFactory = RolexGameInstance->PlayerHeroSelections.Find(RolexPlayerState->UniqueID))
 		{
+			UE_LOG(LogTemp, Warning, TEXT("[GameMode GetDefaultPawnClassForController] Player ID : %s"), *RolexPlayerState->UniqueID);
 			return *BaseCharacterFactory;	
 		}
 	}
@@ -81,13 +74,25 @@ UClass* ARolexGameMode::GetDefaultPawnClassForController_Implementation(AControl
 
 AActor* ARolexGameMode::ChoosePlayerStart_Implementation(AController* Player)
 {
+	UE_LOG(LogTemp, Warning, TEXT("------------------------------------------------------------------------ RolexGameMode ChoosePlayerStart ------------------------------------------------------------------------"));
+	// set team
+	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
+	if (RolexGameInstance)
+		UE_LOG(LogTemp, Warning, TEXT("[GameMode ChoosePlayerStart] RolexGameInstance exists"));
+	
+	ARolexPlayerState* RolexPlayerState = Player->GetPlayerState<ARolexPlayerState>();
+	if (RolexGameInstance->PlayerTeam.Find(RolexPlayerState->UniqueID))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[GameMode ChoosePlayerStart] Player ID : %i"), RolexPlayerState->GetPlayerId());
+		UE_LOG(LogTemp, Warning, TEXT("Assign team "));
+		RolexPlayerState->Team = *RolexGameInstance->PlayerTeam.Find(RolexPlayerState->UniqueID);
+	}
+	
 	// True == A팀, False == B팀
 	TArray<AActor*> foundPlayerStarts;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), foundPlayerStarts);
 	for (AActor* playerStart : foundPlayerStarts)
 	{
-		ABaseCharacter* player = Cast<ABaseCharacter>(Player->GetPawn());
-		ARolexPlayerState* RolexPlayerState = Player->GetPlayerState<ARolexPlayerState>();
 		UE_LOG(LogTemp, Warning, TEXT("[GameMode ChoosePlayerStart] playerStart Name : %s"), *playerStart->GetName());
 		UE_LOG(LogTemp, Warning, TEXT("[GameMode ChoosePlayerStart] Team : %s"), RolexPlayerState->Team ? TEXT("ATeam") : TEXT("BTeam"));
 		if (RolexPlayerState and RolexPlayerState->Team) // A팀
@@ -111,4 +116,12 @@ AActor* ARolexGameMode::ChoosePlayerStart_Implementation(AController* Player)
 	}
 
 	return nullptr;
+}
+
+void ARolexGameMode::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+
+	UE_LOG(LogTemp, Warning, TEXT("------------------------------------------------------------------------ RolexGameMode PostLogin ------------------------------------------------------------------------"));
+	ChoosePlayerStart_Implementation(NewPlayer);
 }
