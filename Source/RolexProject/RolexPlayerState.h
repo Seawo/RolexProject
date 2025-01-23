@@ -17,12 +17,17 @@ class ROLEXPROJECT_API ARolexPlayerState : public APlayerState
 	ARolexPlayerState();
 	
 public:
+	virtual void BeginPlay() override;
+	
 	TSubclassOf<class ABaseCharacter> SelectedHero;
 
-	virtual void CopyProperties(APlayerState* PlayerState) override;
-
+	//virtual void CopyProperties(APlayerState* PlayerState) override;
+	
 	FString UniqueID;
 
+	UFUNCTION(Server, Reliable)
+	void ServerSetUniqueID(const FString& ID);
+	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Replicated)
 	bool Team;
 
@@ -32,3 +37,4 @@ public:
 
 	
 };
+

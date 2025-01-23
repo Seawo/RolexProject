@@ -11,6 +11,7 @@
 #include <GameFramework\SpringArmComponent.h>
 
 #include "HeroUI.h"
+#include "RolexGameInstance.h"
 #include "RolexPlayerController.h"
 #include "Camera\CameraComponent.h"
 
@@ -55,6 +56,18 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
+	ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(GetPlayerState());
+	if (RolexGameInstance && RolexPlayerState)
+	{
+		if (RolexGameInstance->PlayerTeam.Find(RolexPlayerState->UniqueID))
+			Data.Team = *RolexGameInstance->PlayerTeam.Find(RolexPlayerState->UniqueID);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("RolexPlayerState does not exists"));
+	}
+
 	auto pc = Cast<APlayerController>(Controller);
 
 	if (pc)
