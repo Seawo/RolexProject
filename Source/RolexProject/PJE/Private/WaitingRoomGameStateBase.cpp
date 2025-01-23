@@ -5,6 +5,7 @@
 
 #include "HeroSlotUI.h"
 #include "PlayerSlotUI.h"
+#include "RolexGameInstance.h"
 #include "RolexPlayerController.h"
 #include "RolexPlayerState.h"
 #include "WaitingRoomUI.h"
@@ -65,12 +66,16 @@ void AWaitingRoomGameStateBase::MatchPlayers()
 	// does not make random	
 	// FRandomStream Random;
 	// Random.GenerateNewSeed();
+
+	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
 	
 	Algo::RandomShuffle(PlayerArray);
+	
 	int32 HalfPlayers = PlayerArray.Num()/2;
 	for (int32 i = 0; i < PlayerArray.Num(); i++)
 	{
 		ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(PlayerArray[i]);
+		RolexPlayerState->FindUniqueID();
 		if (RolexPlayerState)
 		{
 			if (i < HalfPlayers)
@@ -79,6 +84,7 @@ void AWaitingRoomGameStateBase::MatchPlayers()
 				ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(RolexPlayerState->GetPlayerController());
 				if (RolexPlayerController)
 				{
+					RolexGameInstance->PlayerTeam.Add(RolexPlayerState->UniqueID, true);
 					MulticastRPC_UpdatePlayerTeam(RolexPlayerController->PlayerSlotIndex, FLinearColor::Red);
 				}
 			}
@@ -88,6 +94,7 @@ void AWaitingRoomGameStateBase::MatchPlayers()
 				ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(RolexPlayerState->GetPlayerController());
 				if (RolexPlayerController)
 				{
+					RolexGameInstance->PlayerTeam.Add(RolexPlayerState->UniqueID, false);
 					MulticastRPC_UpdatePlayerTeam(RolexPlayerController->PlayerSlotIndex, FLinearColor::Blue);
 				}
 			}

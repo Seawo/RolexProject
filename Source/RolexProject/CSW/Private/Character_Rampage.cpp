@@ -25,7 +25,7 @@ ACharacter_Rampage::ACharacter_Rampage()
 
 	// character setting 
 	Data.RoleType = ERoleType::Dealer;
-	Data.Name = "Phase";
+	Data.Name = "Rampage";
 	Data.Team = true;
 	Data.MaxHp = 550;
 	Data.Hp = 550;
