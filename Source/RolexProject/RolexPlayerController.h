@@ -63,7 +63,7 @@ public:
 	void ServerRPC_SetSelectedHero(const FString& ID, TSubclassOf<class ABaseCharacter> BaseCharacter);
 
 	int32 PreviousSelectedHeroSlotIndex;
-	
+
 public:
 	bool bIsGoInPlayMap;			// 플레이맵으로 넘어가는지 여부
 /////////////////////////PlayMap에서 사용될 함수 변수들/////////////////////////
