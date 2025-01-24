@@ -54,6 +54,8 @@ void AActor_FightPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 		ARolexPlayerState* rolexPS = Cast<ARolexPlayerState>(character->GetPlayerState());
 		if (rolexPS)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapBegin Character : %s"), *character->GetName());
+			UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapBegin RolexPS Team : %s"), rolexPS->Team ? TEXT("ATeam") : TEXT("BTeam"));
 			OnPointOverlapChanged.Broadcast(rolexPS->Team, 1);
 		}
 		//OnPointOverlapChanged.Broadcast(character->Data.Team, 1);

@@ -39,7 +39,7 @@ void AGS_TrainingRoom::BeginPlay()
 		//UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] PC is nullptr"));
 	}
 
-	GetWorld()->GetWorldSettings()->SetTimeDilation(0.1f);
+	//GetWorld()->GetWorldSettings()->SetTimeDilation(0.1f);
 
 	//if (HasAuthority())
 	//{
