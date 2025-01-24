@@ -134,6 +134,10 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	class UCameraComponent* TpsCamComp;
 
+	// team widget
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")
+	class UWidgetComponent* TeamWidget;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputMappingContext* Imc_base;
 
@@ -221,4 +225,5 @@ public:
 	UHeroUI* HeroUI;
 
 	void InitHeroUI();
+	
 };

@@ -17,6 +17,7 @@
 
 #include "Animation\AnimMontage.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework\CharacterMovementComponent.h"
 
 #include "Net/UnrealNetwork.h"
@@ -43,6 +44,10 @@ ABaseCharacter::ABaseCharacter()
 	TpsCamComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	TpsCamComp->SetupAttachment(SpringArmComp);
 	TpsCamComp->bUsePawnControlRotation = false;
+
+	// team widget
+	TeamWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("TeamWidget"));
+	TeamWidget->SetupAttachment(RootComponent);
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = true;
@@ -78,8 +83,7 @@ void ABaseCharacter::BeginPlay()
 			subsystem->AddMappingContext(Imc_base, 0);
 		}
 	}
-
-
+	
 	// startPos 저장
 	StartPos = GetActorLocation();
 
