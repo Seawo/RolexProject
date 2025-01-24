@@ -108,7 +108,7 @@ void ARolexGameMode::PostLogin(APlayerController* NewPlayer)
 					ABaseCharacter* character = Cast<ABaseCharacter>(NewPlayer->GetPawn());
 					if (character)
 					{
-						character->Data.Team = RolexPlayerState->Team;
+						character->Data.Team = true;
 						character->SetActorLocation(PlayerStart->GetActorLocation());
 					}
 					
@@ -127,7 +127,7 @@ void ARolexGameMode::PostLogin(APlayerController* NewPlayer)
 					ABaseCharacter* character = Cast<ABaseCharacter>(NewPlayer->GetPawn());
 					if (character)
 					{
-						character->Data.Team = RolexPlayerState->Team;
+						character->Data.Team = false;
 						character->SetActorLocation(PlayerStart->GetActorLocation());
 					}
 				}
