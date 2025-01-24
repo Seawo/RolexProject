@@ -45,10 +45,6 @@ ABaseCharacter::ABaseCharacter()
 	TpsCamComp->SetupAttachment(SpringArmComp);
 	TpsCamComp->bUsePawnControlRotation = false;
 
-	// team widget
-	TeamWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("TeamWidget"));
-	TeamWidget->SetupAttachment(RootComponent);
-
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
@@ -94,8 +90,6 @@ void ABaseCharacter::BeginPlay()
 
 void ABaseCharacter::InitHeroUI()
 {
-	if (GetController())
-		UE_LOG(LogTemp, Warning, TEXT("Controller Exists"));
 	// create UI
 	ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(GetController());
 	if (HeroUIFactory && RolexPlayerController && RolexPlayerController->IsLocalPlayerController())
@@ -364,8 +358,9 @@ void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 void ABaseCharacter::StartSkillCool(int32 skillIndex)
 {
+	// skillIndx = Q, E, LMB, RMB
 	// 불가능
-	bIsSkillOn[skillIndex] = false;
+	bIsSkillOn[skillIndex] = false; 
 	GetWorld()->GetTimerManager().SetTimer(SkillCooldownHandles[skillIndex], FTimerDelegate::CreateUObject(
 		this,
 		&ABaseCharacter::ResetSkillCool,
@@ -374,6 +369,9 @@ void ABaseCharacter::StartSkillCool(int32 skillIndex)
 		false
 	);
 
+	if (skillIndex==1)
+		HeroUI->SetCoolTimePercent(HeroUI->ESkillCoolTimeBar, SkillCooldownDurations[skillIndex]);
+	
 }
 
 void ABaseCharacter::ResetSkillCool(int32 skillIndex)

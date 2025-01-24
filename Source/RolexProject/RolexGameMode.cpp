@@ -105,18 +105,6 @@ void ARolexGameMode::PostLogin(APlayerController* NewPlayer)
 					{
 						BaseCharacter->Data.Team = true;
 						BaseCharacter->SetActorLocation(PlayerStart->GetActorLocation());
-
-						// team color
-						UTeamWidget* TeamWidget = Cast<UTeamWidget>(BaseCharacter->TeamWidget->GetWidget());
-						if (TeamWidget)
-						{
-							if ( TeamWidget->TeamColorImage)
-								TeamWidget->TeamColorImage->SetColorAndOpacity(FLinearColor::Blue);
-						}
-						else
-						{
-							UE_LOG(LogTemp, Warning, TEXT("Team Widget is NULL"));
-						}
 					}
 				}
 			}
@@ -129,18 +117,6 @@ void ARolexGameMode::PostLogin(APlayerController* NewPlayer)
 					{
 						BaseCharacter->Data.Team = false;
 						BaseCharacter->SetActorLocation(PlayerStart->GetActorLocation());
-
-						// team color
-						UTeamWidget* TeamWidget = Cast<UTeamWidget>(BaseCharacter->TeamWidget->GetWidget());
-						if (TeamWidget)
-						{
-							if ( TeamWidget->TeamColorImage)
-								TeamWidget->TeamColorImage->SetColorAndOpacity(FLinearColor::Red);
-						}
-						else
-						{
-							UE_LOG(LogTemp, Warning, TEXT("Team Widget is NULL"));
-						}
 					}
 				}
 			}

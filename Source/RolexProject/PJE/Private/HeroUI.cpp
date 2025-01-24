@@ -7,6 +7,7 @@
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "Components/TimelineComponent.h"
 
 void UHeroUI::NativeConstruct()
 {
@@ -41,4 +42,15 @@ void UHeroUI::NativeConstruct()
 		WeaponImage->SetBrushFromTexture(BaseCharacter->WeaponImage);
 
 	CoolTime = BaseCharacter->Data.ESkillCoolTime;
+}
+
+void UHeroUI::SetCoolTimePercent(UProgressBar* ProgressBar, int32 Time)
+{
+	FOnTimelineFloat ProgressUpdate;
+	ProgressUpdate.BindUFunction(this, FName("UpdatePercent"));
+}
+
+void UHeroUI::UpdatePercent()
+{
+	
 }

@@ -133,10 +133,6 @@ public:
 	class USpringArmComponent* SpringArmComp;
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	class UCameraComponent* TpsCamComp;
-
-	// team widget
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")
-	class UWidgetComponent* TeamWidget;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputMappingContext* Imc_base;
@@ -165,7 +161,7 @@ public:
 	
 	// Q, E, LMB, RMB순 스킬별 쿨타임 지속 시간
 	UPROPERTY(EditAnywhere, Category = "Cooltime")
-	float SkillCooldownDurations[4] = { 0, 0, 0, 0 };  
+	float SkillCooldownDurations[4] = { 0, 0, 0, 0 };
 	
 	void StartSkillCool(int32 skillIndex);
 	void ResetSkillCool(int32 skillIndex);

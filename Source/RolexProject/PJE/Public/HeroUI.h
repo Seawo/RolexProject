@@ -21,6 +21,9 @@ public:
 	class ABaseCharacter* BaseCharacter;
 
 	// Skill CoolTime Bar
+	// UPROPERTY(meta = (BindWidget))
+	// class URadialSlider* QSkillCoolTimeRadialBar;
+	
 	UPROPERTY(meta = (BindWidget))
 	class UProgressBar* RMBSkillCoolTimeBar;
 	
@@ -44,5 +47,7 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UImage* WeaponImage;
 	
-	
+	void SetCoolTimePercent(UProgressBar* ProgressBar, int32 Time);
+
+	void UpdatePercent();
 };
