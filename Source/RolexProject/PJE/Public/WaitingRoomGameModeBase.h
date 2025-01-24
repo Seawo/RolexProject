@@ -36,5 +36,7 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<class ABaseCharacter*> HeroArray;
+
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 };
 

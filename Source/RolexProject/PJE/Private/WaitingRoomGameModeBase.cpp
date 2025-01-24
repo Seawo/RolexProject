@@ -96,3 +96,9 @@ FString AWaitingRoomGameModeBase::GetSteamID(APlayerController* NewPlayer)
 	UE_LOG(LogTemp, Warning, TEXT("Steam Nick Name: %s"), *SteamNickName);
 	return SteamNickName;
 }
+
+AActor* AWaitingRoomGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
+{
+	return Super::ChoosePlayerStart_Implementation(Player);
+}
+

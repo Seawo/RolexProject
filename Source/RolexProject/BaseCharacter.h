@@ -49,7 +49,7 @@ public:
 	ERoleType RoleType;		// 역할
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FString Name;			// 캐릭터 이름
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	bool Team;				// 팀 여부 (true = Red , false = Blue)
 
 	// Stat
