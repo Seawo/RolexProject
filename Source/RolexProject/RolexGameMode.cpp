@@ -24,8 +24,10 @@ ARolexGameMode::ARolexGameMode()
 
 void ARolexGameMode::BeginPlay()
 {
-	UE_LOG(LogTemp, Warning, TEXT("------------------------------------------------------------------------ RolexGameMode BeginPlay ------------------------------------------------------------------------"));
+	UE_LOG(LogTemp, Warning, TEXT("------------ RolexGameMode BeginPlay ------------"));
 	Super::BeginPlay();
+
+
 
 	// print player name and team
 	FTimerHandle timerPlayer;
@@ -39,7 +41,7 @@ void ARolexGameMode::BeginPlay()
 				if (BaseCharacter)
 				{
 					ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(BaseCharacter->GetPlayerState());
-					BaseCharacter->Data.Team = RolexPlayerState->Team;
+					//BaseCharacter->Data.Team = RolexPlayerState->Team;
 					UE_LOG(LogTemp, Warning, TEXT("[GameMode BeginPlay] Name : %s, Team : %s"), *BaseCharacter->GetName(), BaseCharacter->Data.Team ? TEXT("ATeam") : TEXT("BTeam"));
 				}
 			}
@@ -96,18 +98,38 @@ void ARolexGameMode::PostLogin(APlayerController* NewPlayer)
 			{
 				if (PlayerStart->GetName().Contains(TEXT("PlayerStart_4")))
 				{
-					APawn* Pawn = NewPlayer->GetPawn();
+					/*APawn* Pawn = NewPlayer->GetPawn();
 					if (Pawn)
+					{
 						Pawn->SetActorLocation(PlayerStart->GetActorLocation());
+					}*/
+
+
+					ABaseCharacter* character = Cast<ABaseCharacter>(NewPlayer->GetPawn());
+					if (character)
+					{
+						character->Data.Team = RolexPlayerState->Team;
+						character->SetActorLocation(PlayerStart->GetActorLocation());
+					}
+					
 				}
 			}
 			else if (RolexPlayerState and !RolexPlayerState->Team) // B team starts in PlayerStart_3
 			{
 				if (PlayerStart->GetName().Contains(TEXT("PlayerStart_3")))
 				{
-					APawn* Pawn = NewPlayer->GetPawn();
+					/*APawn* Pawn = NewPlayer->GetPawn();
 					if (Pawn)
+					{
 						Pawn->SetActorLocation(PlayerStart->GetActorLocation());
+					}*/
+
+					ABaseCharacter* character = Cast<ABaseCharacter>(NewPlayer->GetPawn());
+					if (character)
+					{
+						character->Data.Team = RolexPlayerState->Team;
+						character->SetActorLocation(PlayerStart->GetActorLocation());
+					}
 				}
 			}
 		}
