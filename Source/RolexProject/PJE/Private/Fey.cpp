@@ -21,6 +21,7 @@ AFey::AFey()
 	Data.Team = true;
 	Data.MaxHp = 250;
 	Data.Hp = Data.MaxHp;
+	Data.MaxShield = 500;
 	Data.Shield = 0;
 	Data.Speed = 400.0f;
 	Data.Power = 10;
@@ -49,6 +50,8 @@ void AFey::BeginPlay()
 
 	SpringArmComp->SetRelativeRotation(FRotator(0, 60, 50));
 	ChangeState(EMoveState::Start, stateMontages[TEXT("Start")]);
+
+	InitHealBarColor();
 }
 
 // Called every frame
