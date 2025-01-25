@@ -53,9 +53,6 @@ ABaseCharacter::ABaseCharacter()
 	HealthBarComponent->SetWidgetSpace(EWidgetSpace::Screen); 
 	HealthBarComponent->SetDrawSize(FVector2D(160.0f, 30.0f));
 	HealthBarComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 120.0f));
-	// team widget
-	TeamWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("TeamWidget"));
-	TeamWidget->SetupAttachment(RootComponent);
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = true;
@@ -426,7 +423,7 @@ void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 void ABaseCharacter::StartSkillCool(int32 skillIndex)
 {
 	// 불가능
-	bIsSkillOn[skillIndex] = false;
+	bIsSkillOn[skillIndex] = false;		// index order: Q, E, LMB, RMB
 	GetWorld()->GetTimerManager().SetTimer(SkillCooldownHandles[skillIndex], FTimerDelegate::CreateUObject(
 		this,
 		&ABaseCharacter::ResetSkillCool,
@@ -435,6 +432,12 @@ void ABaseCharacter::StartSkillCool(int32 skillIndex)
 		false
 	);
 
+	// synchronize UI cool time
+	if (HeroUI)
+	{
+		if (skillIndex == 1 || skillIndex == 3)
+			HeroUI->StartCoolTime(skillIndex, SkillCooldownDurations[skillIndex]);
+	}
 }
 
 void ABaseCharacter::ResetSkillCool(int32 skillIndex)

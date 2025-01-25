@@ -20,7 +20,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class ABaseCharacter* BaseCharacter;
 
-	// Skill CoolTime Bar
+	// //Skill CoolTime Bar
 	// UPROPERTY(meta = (BindWidget))
 	// class URadialSlider* QSkillCoolTimeRadialBar;
 	
@@ -30,8 +30,23 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	UProgressBar* ESkillCoolTimeBar;
 
-	// bind cooltime bar with timer 
+	// index order: Q, E, LMB, RMB
+	TMap<int32, UProgressBar*> ProgressBarMap;
 
+	UPROPERTY()
+	FTimerHandle ETimerHandle;
+
+	UPROPERTY()
+	FTimerHandle RMBTimerHandle;
+	
+	TMap<int32, FTimerHandle> TimerMap;
+	
+	float EAccumulateTime = 0.0f;
+
+	float RMBAccumulateTime = 0.0f;
+	
+	TMap<int32, float> AccumulateTimeMap;
+	
 	// Skill CoolTime
 	int32 CoolTime;
 
@@ -47,7 +62,8 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UImage* WeaponImage;
 	
-	void SetCoolTimePercent(UProgressBar* ProgressBar, int32 Time);
+	void StartCoolTime(int32 SkillIndex, int32 Time);
 
-	void UpdatePercent();
+	void UpdatePercent(int32 SkillIndex, int32 Time);
 };
+
