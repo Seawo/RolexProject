@@ -233,7 +233,7 @@ public:
 	TSubclassOf<class UHeroUI> HeroUIFactory;
 
 	UPROPERTY(BlueprintReadOnly, Category="UI")
-	UHeroUI* HeroUI;
+	UHeroUI* HeroUI; 
 
 	void InitHeroUI();
 	
