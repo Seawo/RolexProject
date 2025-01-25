@@ -7,6 +7,9 @@
 #include "RolexProjectCharacter.h"
 #include "RolexPlayerController.h"
 #include "RolexPlayerState.h"
+#include "TeamWidget.h"
+#include "Components/Image.h"
+#include "Components/WidgetComponent.h"
 #include "GameState/GS_TrainingRoom.h"
 #include "Kismet/GameplayStatics.h"
 #include "Point/Actor_FightPoint.h"
@@ -24,9 +27,9 @@ ARolexGameMode::ARolexGameMode()
 
 void ARolexGameMode::BeginPlay()
 {
-	UE_LOG(LogTemp, Warning, TEXT("------------------------------------------------------------------------ RolexGameMode BeginPlay ------------------------------------------------------------------------"));
+	UE_LOG(LogTemp, Warning, TEXT("------------ RolexGameMode BeginPlay ------------"));
 	Super::BeginPlay();
-
+	
 	// print player name and team
 	FTimerHandle timerPlayer;
 	GetWorldTimerManager().SetTimer(timerPlayer, [this]()
@@ -38,8 +41,8 @@ void ARolexGameMode::BeginPlay()
 				ABaseCharacter* BaseCharacter = Cast<ABaseCharacter>(Player);
 				if (BaseCharacter)
 				{
-					ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(BaseCharacter->GetPlayerState());
-					BaseCharacter->Data.Team = RolexPlayerState->Team;
+					// ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(BaseCharacter->GetPlayerState());
+					//BaseCharacter->Data.Team = RolexPlayerState->Team;
 					UE_LOG(LogTemp, Warning, TEXT("[GameMode BeginPlay] Name : %s, Team : %s"), *BaseCharacter->GetName(), BaseCharacter->Data.Team ? TEXT("ATeam") : TEXT("BTeam"));
 				}
 			}
@@ -53,7 +56,7 @@ void ARolexGameMode::Tick(float DeltaTime)
 
 UClass* ARolexGameMode::GetDefaultPawnClassForController_Implementation(AController* InController)
 {
-	UE_LOG(LogTemp, Warning, TEXT("------------------------------------------------------------------------ RolexGameMode GetDefaultPawnClassForController ------------------------------------------------------------------------"));
+	UE_LOG(LogTemp, Warning, TEXT("------------ RolexGameMode GetDefaultPawnClassForController ------------"));
 	
 	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
 	ARolexPlayerState* RolexPlayerState = InController->GetPlayerState<ARolexPlayerState>();
@@ -85,7 +88,8 @@ void ARolexGameMode::PostLogin(APlayerController* NewPlayer)
 	{
 		RolexPlayerState->Team = *RolexGameInstance->PlayerTeam.Find(RolexPlayerState->UniqueID);
 		UE_LOG(LogTemp, Warning, TEXT("[GameMode PostLogin] Player : %s, Team : %s"), *NewPlayer->GetPawn()->GetName(), RolexPlayerState->Team ? TEXT("ATeam") : TEXT("BTeam"));
-		// True == A팀, False == B팀
+
+		// True == A Team, False == B Team
 		TArray<AActor*> PlayerStartArray;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), PlayerStartArray);
 
@@ -96,20 +100,51 @@ void ARolexGameMode::PostLogin(APlayerController* NewPlayer)
 			{
 				if (PlayerStart->GetName().Contains(TEXT("PlayerStart_4")))
 				{
-					APawn* Pawn = NewPlayer->GetPawn();
-					if (Pawn)
-						Pawn->SetActorLocation(PlayerStart->GetActorLocation());
+					ABaseCharacter* BaseCharacter = Cast<ABaseCharacter>(NewPlayer->GetPawn());
+					if (BaseCharacter)
+					{
+						BaseCharacter->Data.Team = true;
+						BaseCharacter->SetActorLocation(PlayerStart->GetActorLocation());
+
+						// team color
+						UTeamWidget* TeamWidget = Cast<UTeamWidget>(BaseCharacter->TeamWidget->GetWidget());
+						if (TeamWidget)
+						{
+							if ( TeamWidget->TeamColorImage)
+								TeamWidget->TeamColorImage->SetColorAndOpacity(FLinearColor::Blue);
+						}
+						else
+						{
+							UE_LOG(LogTemp, Warning, TEXT("Team Widget is NULL"));
+						}
+					}
 				}
 			}
 			else if (RolexPlayerState and !RolexPlayerState->Team) // B team starts in PlayerStart_3
 			{
 				if (PlayerStart->GetName().Contains(TEXT("PlayerStart_3")))
 				{
-					APawn* Pawn = NewPlayer->GetPawn();
-					if (Pawn)
-						Pawn->SetActorLocation(PlayerStart->GetActorLocation());
+					ABaseCharacter* BaseCharacter = Cast<ABaseCharacter>(NewPlayer->GetPawn());
+					if (BaseCharacter)
+					{
+						BaseCharacter->Data.Team = false;
+						BaseCharacter->SetActorLocation(PlayerStart->GetActorLocation());
+
+						// team color
+						UTeamWidget* TeamWidget = Cast<UTeamWidget>(BaseCharacter->TeamWidget->GetWidget());
+						if (TeamWidget)
+						{
+							if ( TeamWidget->TeamColorImage)
+								TeamWidget->TeamColorImage->SetColorAndOpacity(FLinearColor::Red);
+						}
+						else
+						{
+							UE_LOG(LogTemp, Warning, TEXT("Team Widget is NULL"));
+						}
+					}
 				}
 			}
 		}
+		
 	}
 }

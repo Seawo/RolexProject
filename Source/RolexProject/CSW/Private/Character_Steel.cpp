@@ -21,6 +21,7 @@ ACharacter_Steel::ACharacter_Steel()
 	Data.MaxHp = 450;
 	Data.Hp = 450;
 	Data.Shield = 0;
+	Data.MaxShield = 500;
 	Data.Speed = 600.0f;
 	Data.Power = 20;
 
@@ -31,6 +32,8 @@ ACharacter_Steel::ACharacter_Steel()
 void ACharacter_Steel::BeginPlay()
 {
 	Super::BeginPlay();
+
+	InitHealBarColor();
 }
 
 void ACharacter_Steel::Tick(float DeltaTime)
@@ -203,7 +206,7 @@ void ACharacter_Steel::RMBAttack()
 
 	bIsShield = true;
 
-	Data.Shield = 300.0f;
+	Data.Shield += 300.0f;
 
 	FName sectionName = FName("Start");
 	PlayAnimMontage(AttackMontages[TEXT("RMB")], 1.0f, *sectionName.ToString());

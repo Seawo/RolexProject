@@ -30,6 +30,7 @@ ACharacter_Sparrow::ACharacter_Sparrow()
 	Data.MaxHp = 250;
 	Data.Hp = 250;
 	Data.Shield = 0;
+	Data.MaxShield = 500;
 	Data.Speed = 750.0f;
 	Data.Power = 20;
 
@@ -52,7 +53,7 @@ void ACharacter_Sparrow::BeginPlay()
 	AimIndicator = FindComponentByClass<UDecalComponent>();
 	AimIndicator->SetVisibility(false);
 
-	
+	InitHealBarColor();
 }
 
 void ACharacter_Sparrow::Tick(float DeltaTime)

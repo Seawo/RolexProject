@@ -51,14 +51,17 @@ void AActor_FightPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
 	if (character)
 	{
-		ARolexPlayerState* rolexPS = Cast<ARolexPlayerState>(character->GetPlayerState());
+		/*ARolexPlayerState* rolexPS = Cast<ARolexPlayerState>(character->GetPlayerState());
 		if (rolexPS)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapBegin Character : %s"), *character->GetName());
 			UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapBegin RolexPS Team : %s"), rolexPS->Team ? TEXT("ATeam") : TEXT("BTeam"));
 			OnPointOverlapChanged.Broadcast(rolexPS->Team, 1);
-		}
-		//OnPointOverlapChanged.Broadcast(character->Data.Team, 1);
+		}*/
+
+		UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapBegin Character : %s"), *OtherActor->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapBegin RolexPS Team : %s"), character->Data.Team ? TEXT("ATeam") : TEXT("BTeam"));
+		OnPointOverlapChanged.Broadcast(character->Data.Team, 1);
 	}
 }
 
@@ -74,12 +77,12 @@ void AActor_FightPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, A
 	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
 	if (character)
 	{
-		ARolexPlayerState* rolexPS = Cast<ARolexPlayerState>(character->GetPlayerState());
+		/*ARolexPlayerState* rolexPS = Cast<ARolexPlayerState>(character->GetPlayerState());
 		if (rolexPS)
 		{
 			OnPointOverlapChanged.Broadcast(rolexPS->Team, -1);
-		}
-		//OnPointOverlapChanged.Broadcast(character->Data.Team, -1);
+		}*/
+		OnPointOverlapChanged.Broadcast(character->Data.Team, -1);
 	}
 }
 

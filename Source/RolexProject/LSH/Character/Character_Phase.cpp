@@ -36,6 +36,7 @@ ACharacter_Phase::ACharacter_Phase()
 	Data.Team = false;
 	Data.MaxHp = 200;
 	Data.Hp = 200;
+	Data.MaxShield = 500;
 	Data.Shield = 0;
 	Data.Speed = 400.0f;
 	Data.Power = 20;
@@ -66,6 +67,19 @@ void ACharacter_Phase::BeginPlay()
 	}
 	//PlayMontage("Select", 1.0f);
 	//ChangeState(EMoveState::Stun);
+	// test
+	FTimerHandle MyTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(
+		MyTimerHandle, // 타이머 핸들
+		[this]()       // 람다 함수
+		{
+			LBMAttack();
+		},
+		2.0f,   // 딜레이 (2초)
+		true   // 반복 여부 (false: 한 번만 실행)
+	);
+
+	InitHealBarColor();
 }
 
 void ACharacter_Phase::Tick(float DeltaTime)
