@@ -22,6 +22,8 @@
 
 #include "Net/UnrealNetwork.h"
 
+#include "HealthbarUserWidget.h"
+#include "Components/ProgressBar.h"
 // Sets default values
 ABaseCharacter::ABaseCharacter()
 {
@@ -45,6 +47,12 @@ ABaseCharacter::ABaseCharacter()
 	TpsCamComp->SetupAttachment(SpringArmComp);
 	TpsCamComp->bUsePawnControlRotation = false;
 
+	// health bar widget
+	HealthBarComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBarComponent"));
+	HealthBarComponent->SetupAttachment(RootComponent); 
+	HealthBarComponent->SetWidgetSpace(EWidgetSpace::Screen); 
+	HealthBarComponent->SetDrawSize(FVector2D(160.0f, 30.0f));
+	HealthBarComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 120.0f));
 	// team widget
 	TeamWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("TeamWidget"));
 	TeamWidget->SetupAttachment(RootComponent);
@@ -90,6 +98,9 @@ void ABaseCharacter::BeginPlay()
 	// create widget
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABaseCharacter::InitHeroUI, 3.0f, false);
+
+	HidenHealthBar();
+
 }
 
 void ABaseCharacter::InitHeroUI()
@@ -134,6 +145,8 @@ void ABaseCharacter::Tick(float DeltaTime)
 
 void ABaseCharacter::ModifyHP(int Value)
 {
+	UpdateHealth(Value);
+
 	if (!HasAuthority()) return;
 
 	if (Data.Hp <= 0) return;
@@ -151,6 +164,7 @@ void ABaseCharacter::ModifyHP(int Value)
 	// 데미지가 들어올 경우
 	else if (Value < 0)
 	{
+
 		// 실드가 있는 경우
 		if (Data.Shield > 0)
 		{
@@ -186,6 +200,7 @@ void ABaseCharacter::ModifyHP(int Value)
 				}
 			}
 		}
+
 	}
 }
 
@@ -199,6 +214,52 @@ void ABaseCharacter::ModifyShield(int shield)
 	bIsShield = true;
 	ShieldTime = 5.0f;
 	Data.Shield += shield;
+}
+
+void ABaseCharacter::UpdateHealth(float value)
+{
+	HealthBarComponent->SetVisibility(true);
+	GetWorld()->GetTimerManager().ClearTimer(HealthBarTimerHandle);
+	GetWorld()->GetTimerManager().SetTimer(HealthBarTimerHandle, this, &ABaseCharacter::HidenHealthBar, 3.0f, false);
+
+	// 위젯 갱신
+	if (UUserWidget* Widget = HealthBarComponent->GetWidget())
+	{
+		UHealthbarUserWidget* HealthBar = Cast<UHealthbarUserWidget>(Widget);
+		if (HealthBar)
+		{
+			float hp = static_cast<float>(Data.Hp) / Data.MaxHp;
+			float shield = static_cast<float>(Data.Shield) / Data.MaxShield;
+
+			HealthBar->SetHealthPercentage(hp);
+			HealthBar->SetShieldPercentage(shield);
+		}
+	}
+}
+
+void ABaseCharacter::HidenHealthBar()
+{
+	HealthBarComponent->SetVisibility(false);
+}
+
+void ABaseCharacter::InitHealBarColor()
+{
+	if (UUserWidget* Widget = HealthBarComponent->GetWidget())
+	{
+		UHealthbarUserWidget* HealthBar = Cast<UHealthbarUserWidget>(Widget);
+		if (HealthBar)
+		{
+			if (Data.Team == false)
+			{
+				HealthBar->HealthProgressBar->SetFillColorAndOpacity(FLinearColor::Red);
+			}
+			else
+			{
+
+				HealthBar->HealthProgressBar->SetFillColorAndOpacity(FLinearColor::Blue);
+			}
+		}
+	}
 }
 
 FRotator ABaseCharacter::SetAimDirection(ABaseCharacter* character, FVector& targetLocation, FVector startLocation)

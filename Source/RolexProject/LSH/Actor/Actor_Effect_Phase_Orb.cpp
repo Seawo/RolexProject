@@ -87,7 +87,7 @@ void AActor_Effect_Phase_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComp
 	// 캐릭터 이면서 다른 팀이라면
 	else if (character && character->Data.Team != onwer ->Data.Team)
 	{
-		character->ModifyHP(-1);
+		character->ModifyHP(-10);
 	}
 
 	// NiagaraSystem 실행

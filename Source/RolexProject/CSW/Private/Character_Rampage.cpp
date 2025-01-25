@@ -30,6 +30,7 @@ ACharacter_Rampage::ACharacter_Rampage()
 	Data.MaxHp = 550;
 	Data.Hp = 550;
 	Data.Shield = 0;
+	Data.MaxShield = 500;
 	Data.Speed = 850.0f;
 	Data.Power = 20;
 
@@ -50,6 +51,7 @@ void ACharacter_Rampage::BeginPlay()
 	Super::BeginPlay();
 
 	//ChangeState(EMoveState::Start, stateMontages[TEXT("Start")]);
+	InitHealBarColor();
 }
 
 void ACharacter_Rampage::Tick(float DeltaTime)

@@ -58,7 +58,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int Hp;					// 현재 체력
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int Shield = -1;		// 쉴드
+	int MaxShield;		// 쉴드
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int Shield;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float Speed;			// 이동속도
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -134,6 +136,10 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	class UCameraComponent* TpsCamComp;
 
+	// healthbar widget Component
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	class UWidgetComponent* HealthBarComponent;
+
 	// team widget
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")
 	class UWidgetComponent* TeamWidget;
@@ -180,6 +186,15 @@ public:
 
 	void ModifyHP(int Value);
 	void ModifyShield(int shield);
+
+	// hiden timer
+	FTimerHandle HealthBarTimerHandle; 
+
+
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	void UpdateHealth(float value);
+	void HidenHealthBar();
+	void InitHealBarColor();
 
 	FRotator SetAimDirection(ABaseCharacter* character, FVector& targetLocation, FVector startLocation = FVector::ZeroVector);
 

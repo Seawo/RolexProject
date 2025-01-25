@@ -23,6 +23,7 @@ ACharacter_Muriel::ACharacter_Muriel()
 	Data.Team = false;
 	Data.MaxHp = 200;
 	Data.Hp = 200;
+	Data.MaxShield = 500;
 	Data.Shield = 0;
 	Data.Speed = 400.0f;
 	Data.Power = 15;
@@ -33,6 +34,8 @@ void ACharacter_Muriel::BeginPlay()
 	Super::BeginPlay();
 
 	AnimInstance = Cast<UAnimInstance_Muriel>(GetMesh()->GetAnimInstance());
+
+	InitHealBarColor();
 }
 
 void ACharacter_Muriel::Tick(float DeltaTime)
