@@ -127,7 +127,7 @@ void AActor_Effect_Phase_Q::TakeDamageToCharacter()
 		{
 			if (character and character->Data.Team != Phase->Data.Team)
 			{
-				character->ModifyHP(-1);
+				character->ModifyHP(-30);
 			}
 		}
 	}
