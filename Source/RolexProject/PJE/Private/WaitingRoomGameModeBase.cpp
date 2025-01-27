@@ -46,23 +46,27 @@ void AWaitingRoomGameModeBase::HandleStartingNewPlayer_Implementation(APlayerCon
 		// get ID
 		FString SteamId= GetSteamID(NewPlayer);
 		PlayerIDArray.Add(SteamId);
+
+		AWaitingRoomGameStateBase* WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetWorld()->GetGameState());
+
 		
 		// create widget and initialize for the new player
+		// hero selection part: make invisible at the first time 
 		ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(NewPlayer);
 		if (RolexPlayerController)
 		{
-			RolexPlayerController->ClientRPC_CreateWaitingRoomUI();
-			RolexPlayerController->ClientRPC_InitWaitingRoomUI(PlayerIDArray);
+			RolexPlayerController->ClientRPC_CreateWaitingRoomUI();		// create UI for client
+			RolexPlayerController->ClientRPC_InitWaitingRoomUI(PlayerIDArray);	// init UI content
 			// let server and the owner client know information both
-			RolexPlayerController->ClientRPC_SetPlayerSlotUI(CurrentPlayersNum);
+			RolexPlayerController->ClientRPC_SetPlayerSlotUI(CurrentPlayersNum);	// set client's player slot UI
 		}
 
-		// update new player for the existing players
-		AWaitingRoomGameStateBase* WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetGameState<AGameStateBase>());
+		// update new player for the every player
 		if (WaitingRoomGameStateBase)
 		{
 			if (WaitingRoomGameStateBase)
 			{
+				WaitingRoomGameStateBase->MulticastRPC_UpdateWaitingPlayerSlotID(SteamId);
 				WaitingRoomGameStateBase->MulticastRPC_UpdatePlayerSlotID(CurrentPlayersNum, SteamId);
 				
 				// WaitingRoomGameStateBase->WaitingRoomUI is different by player

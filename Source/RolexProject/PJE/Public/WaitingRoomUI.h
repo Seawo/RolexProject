@@ -21,6 +21,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UHorizontalBox* PlayerBox;
 
+	UPROPERTY(meta = (BindWidget))
+	class UVerticalBox* WaitingPlayersBox;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<class UPlayerSlotUI*> PlayerSlots;
 
@@ -35,7 +38,7 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UUniformGridPanel* HeroSelectionPanel;
 	
-	TArray<class UHeroSlotUI*> HeroButtonArray;
+	TArray<UHeroSlotUI*> HeroButtonArray;
 
 	bool HeroSelectionVisible = false;
 	

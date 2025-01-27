@@ -13,6 +13,8 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "UI_Zone.h"
+#include "WaitingPlayerSlotUI.h"
+#include "Components/VerticalBox.h"
 
 
 ARolexPlayerController::ARolexPlayerController()
@@ -93,6 +95,7 @@ void ARolexPlayerController::ServerRPC_SetPlayerSlotHeroImage_Implementation(UTe
 	// client GameStateBase cannot call RPC functions since clients doesn't have an ownership for GameStateBase
 	WaitingRoomGameStateBase->MulticastRPC_SetPlayerHeroImage(PlayerHeroTexture, Index); 
 }
+
 void ARolexPlayerController::ServerRPC_InformClientPlayerSlotIndex_Implementation(int32 PlayerNumber, UPlayerSlotUI* PlayerSlotUI)
 {
 	PlayerSlotIndex = PlayerNumber;
@@ -125,11 +128,19 @@ void ARolexPlayerController::ServerRPC_UpdateWholePlayerNumber_Implementation()
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle, WaitingRoomGameStateBase, &AWaitingRoomGameStateBase::MatchPlayers, 3.0f, false);
 		}
 }
+
+// init existing players information for the new player
 void ARolexPlayerController::ClientRPC_InitWaitingRoomUI_Implementation(const TArray<FString>& IDArray)
 {
-	TArray<class UPlayerSlotUI*> PlayerSlots = WaitingRoomUI->PlayerSlots;
+	TArray<UPlayerSlotUI*> PlayerSlots = WaitingRoomUI->PlayerSlots;
 	for (int32 i = 0; i < IDArray.Num(); i++)
 	{
+		UWaitingPlayerSlotUI* WaitingPlayerSlotUI = Cast<UWaitingPlayerSlotUI>(CreateWidget(GetWorld(), WaitingPlayerSlotUIFactory));
+		if (WaitingPlayerSlotUI)
+		{
+			WaitingPlayerSlotUI->PlayerID->SetText(FText::FromString(IDArray[i]));
+			WaitingRoomUI->WaitingPlayersBox->AddChild(WaitingPlayerSlotUI);
+		}
 		PlayerSlots[i]->PlayerID->SetText(FText::FromString(IDArray[i]));
 	}
 }
@@ -142,8 +153,6 @@ void ARolexPlayerController::ClientRPC_CreateWaitingRoomUI_Implementation()
 			WaitingRoomUI = Cast<UWaitingRoomUI>(CreateWidget(GetWorld(), WaitingRoomUIFactory));
 			if (WaitingRoomUI)
 				WaitingRoomUI->AddToViewport();
-			
-			//UE_LOG(LogTemp, Warning, TEXT("Waiting Room Created"));
 		}
 	}
 }
@@ -151,7 +160,7 @@ void ARolexPlayerController::ClientRPC_SetPlayerSlotUI_Implementation(int32 Play
 {
 	// set Steam ID on player slot textbox
 	PlayerSlotIndex = PlayerNumber;
-	//UE_LOG(LogTemp, Warning, TEXT("Player Controller %s, PlayerSlotIndex %d"), *GetName(), PlayerSlotIndex);
+	
 	UPlayerSlotUI* PlayerSlot = WaitingRoomUI->PlayerSlots[PlayerNumber];
 	if (PlayerSlot)
 	{
@@ -163,7 +172,7 @@ void ARolexPlayerController::ClientRPC_SetPlayerSlotUI_Implementation(int32 Play
 			for (UHeroSlotUI* HeroSlotButton: WaitingRoomUI->HeroButtonArray)
 			{
 					HeroSlotButton->OwnerPlayerSlotIndex = PlayerNumber;
-					// UE_LOG(LogTemp, Warning, TEXT("Bind Delegate"));
+					
 					// HeroSlotButton->HeroSelectButtonClickedDelegate.BindUObject(
 					// 	WaitingRoomGameStateBase, &AWaitingRoomGameStateBase::ServerRPC_SetPlayerHeroImage);
 			}
