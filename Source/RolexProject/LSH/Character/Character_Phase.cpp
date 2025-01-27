@@ -68,6 +68,7 @@ void ACharacter_Phase::BeginPlay()
 	//PlayMontage("Select", 1.0f);
 	//ChangeState(EMoveState::Stun);
 	// test
+	/*
 	FTimerHandle MyTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(
 		MyTimerHandle, // 타이머 핸들
@@ -78,6 +79,7 @@ void ACharacter_Phase::BeginPlay()
 		2.0f,   // 딜레이 (2초)
 		true   // 반복 여부 (false: 한 번만 실행)
 	);
+	*/
 
 	InitHealBarColor();
 }
