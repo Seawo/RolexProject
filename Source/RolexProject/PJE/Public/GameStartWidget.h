@@ -13,13 +13,4 @@ UCLASS()
 class ROLEXPROJECT_API UGameStartWidget : public UUserWidget
 {
 	GENERATED_BODY()
-
-	UPROPERTY(meta = (BindWidget))
-	class UButton* GameStartButton;
-
-	UPROPERTY(meta = (BindWidget))
-	UButton* OptionButton;
-
-	UPROPERTY(meta = (BindWidget))
-	UButton* QuitButton;
 };

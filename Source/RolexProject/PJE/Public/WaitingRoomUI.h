@@ -53,9 +53,8 @@ public:
 	UTextBlock* CountDown;
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	
 public:
-	UPROPERTY(meta = (BindWidget))
-	class UButton* StartButton;
 
 	UFUNCTION()
 	void TravelToMain();
