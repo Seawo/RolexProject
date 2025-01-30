@@ -566,7 +566,7 @@ void ACharacter_Sparrow::Server_SpawnArrow_Implementation(FName arrowName)
 			{
 				// 쏘기
 				throwdir = TpsCamComp->GetForwardVector();
-				speed = 3000.0f;
+				speed = 4000.0f;
 			}
 
 			EffectActor->InititalizeThrowStone(throwdir, speed);

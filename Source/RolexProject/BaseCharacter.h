@@ -139,10 +139,6 @@ public:
 	// healthbar widget Component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
 	class UWidgetComponent* HealthBarComponent;
-
-	// team widget
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")
-	class UWidgetComponent* TeamWidget;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputMappingContext* Imc_base;
@@ -258,7 +254,7 @@ public:
 	TSubclassOf<class UHeroUI> HeroUIFactory;
 
 	UPROPERTY(BlueprintReadOnly, Category="UI")
-	UHeroUI* HeroUI;
+	UHeroUI* HeroUI; 
 
 	void InitHeroUI();
 	

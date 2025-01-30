@@ -30,9 +30,6 @@ void UWaitingRoomUI::NativeConstruct()
 	Notice->SetVisibility(ESlateVisibility::Hidden);
 	CountDown->SetVisibility(ESlateVisibility::Hidden);
 	HeroSelectionPanel->SetVisibility(ESlateVisibility::Hidden);
-	StartButton->SetVisibility(ESlateVisibility::Hidden);
-	
-	StartButton->OnClicked.AddDynamic(this, &UWaitingRoomUI::TravelToMain);
 	
 	// get player slots from player horizontal box
 	if (PlayerBox)

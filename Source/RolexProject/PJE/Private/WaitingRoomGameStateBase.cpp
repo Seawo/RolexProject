@@ -8,13 +8,16 @@
 #include "RolexGameInstance.h"
 #include "RolexPlayerController.h"
 #include "RolexPlayerState.h"
+#include "WaitingPlayerSlotUI.h"
 #include "WaitingRoomUI.h"
 #include "Algo/RandomShuffle.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Components/UniformGridPanel.h"
+#include "Components/VerticalBox.h"
 #include "Net/UnrealNetwork.h"
+
 
 
 void AWaitingRoomGameStateBase::BeginPlay()
@@ -35,6 +38,18 @@ void AWaitingRoomGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimePrope
 	
 	DOREPLIFETIME(AWaitingRoomGameStateBase, WholePlayerNumber);
 	DOREPLIFETIME(AWaitingRoomGameStateBase, HeroSelectionCountdownTime);
+}
+
+void AWaitingRoomGameStateBase::MulticastRPC_UpdateWaitingPlayerSlotID_Implementation(
+	const FString& NewText)
+{
+	UWaitingPlayerSlotUI* WaitingPlayerSlotUI = Cast<UWaitingPlayerSlotUI>(CreateWidget(GetWorld(), WaitingPlayerSlotUIFactory));
+	if (WaitingPlayerSlotUI)
+	{
+		WaitingPlayerSlotUI->PlayerID->SetText(FText::FromString(NewText));
+		if (WaitingRoomUI && WaitingRoomUI->WaitingPlayersBox)
+			WaitingRoomUI->WaitingPlayersBox->AddChild(WaitingPlayerSlotUI);
+	}
 }
 
 // update new player ID on slot 
@@ -108,11 +123,6 @@ void AWaitingRoomGameStateBase::MatchPlayers()
 	WaitingRoomUI->Notice->SetVisibility(ESlateVisibility::Hidden);
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AWaitingRoomGameStateBase::StartHeroSelectionCountdown, 3.0f, false);
-}
-
-void AWaitingRoomGameStateBase::ServerRPC_StartButtonVisible_Implementation()
-{
-	WaitingRoomUI->StartButton->SetVisibility(ESlateVisibility::Visible);
 }
 
 void AWaitingRoomGameStateBase::StartHeroSelectionCountdown()

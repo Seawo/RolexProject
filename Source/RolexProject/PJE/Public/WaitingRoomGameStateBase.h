@@ -18,6 +18,8 @@ public:
 	virtual void BeginPlay() override;
 
 public:
+	
+public:
 	UPROPERTY(Replicated)
 	int32 WholePlayerNumber = 0;
 
@@ -25,6 +27,9 @@ public:
 	
 public:
 	class UWaitingRoomUI* WaitingRoomUI;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPC_UpdateWaitingPlayerSlotID(const FString& NewText);
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_UpdatePlayerSlotID(int32 PlayerNum, const FString& NewText);
@@ -46,9 +51,6 @@ public:
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_StartHeroSelection();
-
-	UFUNCTION(Server, Reliable)
-	void ServerRPC_StartButtonVisible();
 	
 	FTimerHandle CountdownTimerHandle;
 	
@@ -71,4 +73,7 @@ public:
 	
 public:
 	void SelcetRandomHero();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class UWaitingPlayerSlotUI> WaitingPlayerSlotUIFactory;
 };

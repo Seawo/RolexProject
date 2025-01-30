@@ -17,8 +17,25 @@ class ROLEXPROJECT_API ULobbyUI : public UUserWidget
 	virtual void NativeConstruct() override;
 
 public:
-	class URolexGameInstance* RolexGameInstace;
+	// game start 
+	UPROPERTY(meta = (BindWidget))
+	class UButton* GameStartButton;
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* OptionButton;
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* QuitButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UWidgetSwitcher* LobbyWidgetSwitcher;
+
+	UFUNCTION()
+	void SwitchWidget();
 	
+	class URolexGameInstance* RolexGameInstace;
+
+	// create session
 	UPROPERTY(meta = (BindWidget))
 	class UButton* CreateSessionBtn;
 
@@ -36,7 +53,14 @@ public:
 
 	UFUNCTION()
 	void FindSession();
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* UndoButton;
+
+	UFUNCTION()
+	void UndoSwitchWidget();
 	
+	// found sessions scroll box 
 	UPROPERTY(meta = (BindWidget))
 	class UBorder* SessionScrollBoxBorder;
 	

@@ -38,6 +38,9 @@ public:
 	void ClientRPC_SetPlayerSlotUI(int32 PlayerNumber);
 
 	int32 PlayerSlotIndex;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class UWaitingPlayerSlotUI> WaitingPlayerSlotUIFactory;
 	
 public:
 	class UPlayerSlotUI* OwnPlayerSlot;

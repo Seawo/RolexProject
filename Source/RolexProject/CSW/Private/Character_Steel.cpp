@@ -328,7 +328,7 @@ void ACharacter_Steel::OnDashCollision(UPrimitiveComponent* HitComponent, AActor
 			else
 			{
 				// 추가 딜 주고
-				character->ModifyHP(-40);
+				character->ModifyHP(-60);
 				
 				FVector myLoc = GetActorLocation();
 				FVector targetLoc = character->GetActorLocation();

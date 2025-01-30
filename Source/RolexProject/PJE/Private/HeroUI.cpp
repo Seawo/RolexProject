@@ -7,6 +7,7 @@
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "Components/TimelineComponent.h"
 
 void UHeroUI::NativeConstruct()
 {
@@ -22,7 +23,9 @@ void UHeroUI::NativeConstruct()
 	
 		FProgressBarStyle ProgressBarStyle = RMBSkillCoolTimeBar->GetWidgetStyle();
 		ProgressBarStyle.SetBackgroundImage(BackGroundBrush);
+		ProgressBarStyle.BackgroundImage.TintColor = FLinearColor(1.0f, 1.0f, 1.0f, 0.2f);
 		ProgressBarStyle.SetFillImage(BackGroundBrush);
+		ProgressBarStyle.FillImage.TintColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		RMBSkillCoolTimeBar->SetWidgetStyle(ProgressBarStyle);
 	}
 	
@@ -33,7 +36,9 @@ void UHeroUI::NativeConstruct()
 
 		FProgressBarStyle ProgressBarStyle = ESkillCoolTimeBar->GetWidgetStyle();
 		ProgressBarStyle.SetBackgroundImage(BackGroundBrush);
+		ProgressBarStyle.BackgroundImage.TintColor = FLinearColor(1.0f, 1.0f, 1.0f, 0.2f);
 		ProgressBarStyle.SetFillImage(BackGroundBrush);
+		ProgressBarStyle.FillImage.TintColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		ESkillCoolTimeBar->SetWidgetStyle(ProgressBarStyle);
 	}
 	
@@ -41,4 +46,53 @@ void UHeroUI::NativeConstruct()
 		WeaponImage->SetBrushFromTexture(BaseCharacter->WeaponImage);
 
 	CoolTime = BaseCharacter->Data.ESkillCoolTime;
+
+	ProgressBarMap=
+	   {
+		{1, ESkillCoolTimeBar},
+		{3, RMBSkillCoolTimeBar}
+	   };
+
+	TimerMap =
+		{
+		{1, ETimerHandle},
+		{3, RMBTimerHandle}
+		};
+
+	AccumulateTimeMap =
+		{
+		{1, EAccumulateTime},
+		{3, RMBAccumulateTime}
+		};
+}
+
+void UHeroUI::StartCoolTime(int32 SkillIndex, int32 Time)
+{
+	// index order: Q, E, LMB, RMB
+	AccumulateTimeMap[SkillIndex] = 0.0f;
+	ProgressBarMap[SkillIndex]->SetPercent(AccumulateTimeMap[SkillIndex]);
+	
+	GetWorld()->GetTimerManager().SetTimer(
+		TimerMap[SkillIndex],
+		FTimerDelegate::CreateLambda(
+			[this, SkillIndex, Time]()
+			{
+				UpdatePercent(SkillIndex, Time);
+			}),
+		0.1,
+		true);
+	
+}
+
+void UHeroUI::UpdatePercent(int32 SkillIndex, int32 Time)
+{
+	if (AccumulateTimeMap[SkillIndex] >= Time)
+	{
+		AccumulateTimeMap[SkillIndex] = 0.0f;
+		GetWorld()->GetTimerManager().ClearTimer(TimerMap[SkillIndex]);
+		return;
+	}
+	
+	AccumulateTimeMap[SkillIndex] += 0.1f;
+	ProgressBarMap[SkillIndex]->SetPercent(AccumulateTimeMap[SkillIndex]/Time);
 }

@@ -14,6 +14,7 @@
 #include "CreateSessionUI.h"
 #include "MapSelectUI.h"
 #include "Components/Border.h"
+#include "Components/WidgetSwitcher.h"
 
 void ULobbyUI::NativeConstruct()
 {
@@ -36,11 +37,19 @@ void ULobbyUI::NativeConstruct()
 	RolexGameInstace = Cast<URolexGameInstance>(GetWorld()->GetGameInstance());
 
 	// bind function to OnClicked delegate
+	GameStartButton->OnClicked.AddDynamic(this, &ULobbyUI::SwitchWidget);
+	UndoButton->OnClicked.AddDynamic(this, &ULobbyUI::UndoSwitchWidget);
 	CreateSessionBtn->OnClicked.AddDynamic(this, &ULobbyUI::CreateSession);
 	FindSessionBtn->OnClicked.AddDynamic(this, &ULobbyUI::FindSession);
 
 	if (RolexGameInstace)
 		RolexGameInstace->AddSession.BindUObject(this, &ULobbyUI::AddSession);
+}
+
+void ULobbyUI::SwitchWidget()
+{
+	if (LobbyWidgetSwitcher)
+		LobbyWidgetSwitcher->SetActiveWidgetIndex(1);
 }
 
 void ULobbyUI::CreateSession()
@@ -53,6 +62,12 @@ void ULobbyUI::FindSession()
 {
 	SessionScrollBoxBorder->SetVisibility(ESlateVisibility::Visible);
 	RolexGameInstace->FindSession();
+}
+
+void ULobbyUI::UndoSwitchWidget()
+{
+	if (LobbyWidgetSwitcher)
+		LobbyWidgetSwitcher->SetActiveWidgetIndex(0);
 }
 
 void ULobbyUI::AddSession(int32 SessionIndex, const FString& Owner, const FString& Name)
