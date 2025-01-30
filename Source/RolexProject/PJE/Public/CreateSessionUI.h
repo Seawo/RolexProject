@@ -14,7 +14,7 @@ class ROLEXPROJECT_API UCreateSessionUI : public UUserWidget
 {
 	GENERATED_BODY()
 
-	void NativeConstruct() override;
+	virtual void NativeConstruct() override;
 	
 public:
 	UPROPERTY(meta = (BindWidget))
@@ -24,10 +24,10 @@ public:
 	class UButton* ConfirmBtn;
 
 	UFUNCTION()
-	void Confrim();
+	void Confirm();
 
 	UPROPERTY(meta = (BindWidget))
-	class UComboBoxString* NumberofPlayers;
+	class UComboBoxString* NumberOfPlayers;
 
 	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, EditAnywhere)
 	class UTextBlock* MapString;

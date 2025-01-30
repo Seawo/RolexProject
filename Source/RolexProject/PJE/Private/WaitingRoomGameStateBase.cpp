@@ -16,6 +16,7 @@
 #include "Components/TextBlock.h"
 #include "Components/UniformGridPanel.h"
 #include "Components/VerticalBox.h"
+#include "Components/WidgetSwitcher.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -242,5 +243,11 @@ void AWaitingRoomGameStateBase::MulticastRPC_Countdown_Implementation()
 
 void AWaitingRoomGameStateBase::MulticastRPC_StartHeroSelection_Implementation()
 {
+	WaitingRoomUI->WaitingRoomWidgetSwitcher->SetActiveWidgetIndex(1);
+
+	MulticastRPC_UpdateNotice("START MATCHING");
+	
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AWaitingRoomGameStateBase::MatchPlayers, 3.0f, false);
 }
 

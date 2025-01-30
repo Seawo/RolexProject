@@ -124,17 +124,22 @@ void ARolexPlayerController::ServerRPC_UpdateWholePlayerNumber_Implementation()
 	{
 		WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetWorld()->GetGameState());
 	}
-		//UE_LOG(LogTemp, Warning, TEXT("Exist"));
-		WaitingRoomGameStateBase->WholePlayerNumber += 1;
-		AWaitingRoomGameModeBase* WaitingRoomGameModeBase = Cast<AWaitingRoomGameModeBase>(GetWorld()->GetAuthGameMode());
-		if (WaitingRoomGameStateBase->WholePlayerNumber == WaitingRoomGameModeBase->MaxPlayersNum)
-		{
-			
-			WaitingRoomGameStateBase->MulticastRPC_UpdateNotice("START MATCHING");
+		
+	WaitingRoomGameStateBase->WholePlayerNumber += 1;
+	AWaitingRoomGameModeBase* WaitingRoomGameModeBase = Cast<AWaitingRoomGameModeBase>(GetWorld()->GetAuthGameMode());
+	if (WaitingRoomGameStateBase->WholePlayerNumber >= WaitingRoomGameModeBase->MaxPlayersNum)
+	{
+		WaitingRoomGameStateBase->MulticastRPC_UpdateNotice("STARTING SOON ...");
+		
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, WaitingRoomGameStateBase, &AWaitingRoomGameStateBase::MulticastRPC_StartHeroSelection, 3.0f, false);
+	}
 
-			FTimerHandle TimerHandle;
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle, WaitingRoomGameStateBase, &AWaitingRoomGameStateBase::MatchPlayers, 3.0f, false);
-		}
+	// in MulticastRPC_StartHeroSelection_Implementation - WaitingRoomGameStateBase 
+	// WaitingRoomGameStateBase->MulticastRPC_UpdateNotice("START MATCHING");
+	//
+	// FTimerHandle TimerHandle;
+	// GetWorld()->GetTimerManager().SetTimer(TimerHandle, WaitingRoomGameStateBase, &AWaitingRoomGameStateBase::MatchPlayers, 3.0f, false);
 }
 
 // init existing players information for the new player
@@ -164,6 +169,7 @@ void ARolexPlayerController::ClientRPC_CreateWaitingRoomUI_Implementation()
 		}
 	}
 }
+
 void ARolexPlayerController::ClientRPC_SetPlayerSlotUI_Implementation(int32 PlayerNumber)
 {
 	// set Steam ID on player slot textbox
@@ -192,13 +198,16 @@ void ARolexPlayerController::ClientRPC_SetPlayerSlotUI_Implementation(int32 Play
 		
 		ServerRPC_InformClientPlayerSlotIndex(PlayerNumber, PlayerSlot);
 	}
-	
-		ServerRPC_UpdateWholePlayerNumber();
+
+	// notify current number of players to the server
+	ServerRPC_UpdateWholePlayerNumber();
 }
+
 void ARolexPlayerController::ServerRPC_BlockHero_Implementation(int32 HeroIndex, int32 PlayerIndex)
 {
 	WaitingRoomGameStateBase->MulticastRPC_BlockHero(HeroIndex, PlayerIndex);
 }
+
 void ARolexPlayerController::ServerRPC_UnBlockHero_Implementation(int32 HeroIndex, int32 PlayerIndex)
 {
 	WaitingRoomGameStateBase->MulticastRPC_UnBlockHero(HeroIndex, PlayerIndex);

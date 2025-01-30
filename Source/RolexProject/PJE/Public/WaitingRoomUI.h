@@ -21,6 +21,7 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UHorizontalBox* PlayerBox;
 
+	// waiting other players to come in
 	UPROPERTY(meta = (BindWidget))
 	class UVerticalBox* WaitingPlayersBox;
 	
@@ -33,6 +34,12 @@ public:
 	
 	void AddPlayer();
 
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* RoomName;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UWidgetSwitcher* WaitingRoomWidgetSwitcher;
+	
 public:
 	// hero selection
 	UPROPERTY(meta = (BindWidget))
