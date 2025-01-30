@@ -73,6 +73,7 @@ public:
 
 public:
 	void InitUI();
+	void SetCharacterOverlay();
 
 public:
 	void SetPlayTime(float Time);
@@ -102,6 +103,8 @@ public:
 
 public:
 	class ARolexPlayerState* RolexPS;
+
+	class UMaterialInstanceDynamic* MI_Overlay;
 
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UUI_Zone> UI_ZoneClass;

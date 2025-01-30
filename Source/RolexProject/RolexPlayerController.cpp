@@ -19,6 +19,8 @@
 #include "UI_InGameEsc.h"
 #include "UI_InGameTab.h"
 
+#include "Kismet/GameplayStatics.h"
+
 
 ARolexPlayerController::ARolexPlayerController()
 {
@@ -269,6 +271,37 @@ void ARolexPlayerController::InitUI()
 	//{
 	//	UE_LOG(LogTemp, Warning, TEXT("[RolexPlayerController InitUI] UI_ZoneClass is nullptr"));
 	//}
+}
+
+void ARolexPlayerController::SetCharacterOverlay()
+{
+	if (IsLocalController())
+	{
+		TArray<AActor*> foundActors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), foundActors);
+		UE_LOG(LogTemp, Warning, TEXT("foundActors Num : %d"), foundActors.Num());
+		for (AActor* actor : foundActors)
+		{
+			ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(actor);
+			ABaseCharacter* owner = Cast<ABaseCharacter>(GetPawn());
+			
+			if (baseCharacter->Data.Team != owner->Data.Team)
+			{
+				UMaterialInterface* material = Cast<UMaterialInterface>(baseCharacter->GetMesh()->GetOverlayMaterial());
+
+				if (material)
+				{
+					//if (not MI_Overlay)
+					//{
+					//	
+					//}
+					MI_Overlay = UMaterialInstanceDynamic::Create(material, this);
+					baseCharacter->GetMesh()->SetOverlayMaterial(MI_Overlay);
+					MI_Overlay->SetVectorParameterValue("Color", FLinearColor(1.0f, 0.0f, 0.0f, 1.0f));
+				}
+			}
+		}
+	}
 }
 
 void ARolexPlayerController::SetPlayTime(float Time)

@@ -52,4 +52,6 @@ protected:
 	class ACharacter_Phase* Phase;
 
 	bool bIsLMB = false;		// true : LMB, false : RMB
+
+	class ARolexPlayerState* RolexPS;
 };

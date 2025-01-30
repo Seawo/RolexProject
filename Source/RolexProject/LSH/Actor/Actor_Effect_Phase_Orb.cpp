@@ -90,11 +90,19 @@ void AActor_Effect_Phase_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComp
 	// 캐릭터 이면서 다른 팀이라면
 	else if (character && character->Data.Team != onwer ->Data.Team)
 	{
-		character->ModifyHP(-10);
-		RolexPS->PlayerData.Damage += 10;
 		if (character->Data.Hp <= 0)
 		{
 			RolexPS->PlayerData.KillCount++;
+		}
+		else if (character->Data.Hp < 10)
+		{
+			RolexPS->PlayerData.Damage += character->Data.Hp;
+			character->ModifyHP(-character->Data.Hp);
+		}
+		else
+		{
+			character->ModifyHP(-10);
+			RolexPS->PlayerData.Damage += 10;
 		}
 	}
 

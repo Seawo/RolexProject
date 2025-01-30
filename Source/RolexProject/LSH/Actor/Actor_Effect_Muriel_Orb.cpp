@@ -10,6 +10,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Character_Muriel.h"
 #include "Camera/CameraComponent.h"
+#include "RolexPlayerState.h"
 
 AActor_Effect_Muriel_Orb::AActor_Effect_Muriel_Orb()
 {
@@ -24,6 +25,9 @@ AActor_Effect_Muriel_Orb::AActor_Effect_Muriel_Orb()
 void AActor_Effect_Muriel_Orb::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ABaseCharacter* onwer = Cast<ABaseCharacter>(GetOwner());
+	RolexPS = Cast<ARolexPlayerState>(onwer->GetPlayerState());
 
 	Muriel = Cast<ACharacter_Muriel>(GetOwner());
 
@@ -152,11 +156,37 @@ void AActor_Effect_Muriel_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedCom
 		// 캐릭터 이면서 다른 팀이라면
 		if (character && character->Data.Team != onwer->Data.Team)
 		{
-			character->ModifyHP(-2);
+			if (character->Data.Hp <= 0)
+			{
+				RolexPS->PlayerData.KillCount++;
+			}
+			else if (character->Data.Hp < 10)
+			{
+				RolexPS->PlayerData.Damage += character->Data.Hp;
+				character->ModifyHP(-character->Data.Hp);
+			}
+			else
+			{
+				character->ModifyHP(-10);
+				RolexPS->PlayerData.Damage += 10;
+			}
 		}
 		else if (character && character->Data.Team == onwer->Data.Team)
 		{
-			character->ModifyHP(1);
+			if (character->Data.Hp == character->Data.MaxHp)
+			{
+				return;
+			}
+			else if (character->Data.Hp + 10 >= character->Data.MaxHp)
+			{
+				RolexPS->PlayerData.Healing += character->Data.MaxHp - character->Data.Hp;
+				character->ModifyHP(character->Data.MaxHp - character->Data.Hp);
+			}
+			else
+			{
+				character->ModifyHP(10);
+				RolexPS->PlayerData.Healing += 10;
+			}
 		}
 	}
 	else
@@ -164,11 +194,37 @@ void AActor_Effect_Muriel_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedCom
 		// 캐릭터 이면서 다른 팀이라면
 		if (character && character->Data.Team != onwer->Data.Team)
 		{
-			character->ModifyHP(-1 * 10 * GetActorScale3D().X);
+			if (character->Data.Hp <= 0)
+			{
+				RolexPS->PlayerData.KillCount++;
+			}
+			else if (character->Data.Hp < (1 * 25 * GetActorScale3D().X))
+			{
+				RolexPS->PlayerData.Damage += character->Data.Hp;
+				character->ModifyHP(-character->Data.Hp);
+			}
+			else
+			{
+				character->ModifyHP(-(1 * 25 * GetActorScale3D().X));
+				RolexPS->PlayerData.Damage += (1 * 25 * GetActorScale3D().X);
+			}
 		}
 		else if (character && character->Data.Team == onwer->Data.Team)
 		{
-			character->ModifyHP(1 * 10 * GetActorScale3D().X);
+			if (character->Data.Hp == character->Data.MaxHp)
+			{
+				return;
+			}
+			else if (character->Data.Hp + (1 * 25 * GetActorScale3D().X) >= character->Data.MaxHp)
+			{
+				RolexPS->PlayerData.Healing += character->Data.MaxHp - character->Data.Hp;
+				character->ModifyHP(character->Data.MaxHp - character->Data.Hp);
+			}
+			else
+			{
+				character->ModifyHP(1 * 25 * GetActorScale3D().X);
+				RolexPS->PlayerData.Healing += 1 * 25 * GetActorScale3D().X;
+			}
 		}
 	}
 

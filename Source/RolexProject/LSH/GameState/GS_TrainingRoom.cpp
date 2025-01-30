@@ -34,6 +34,7 @@ void AGS_TrainingRoom::BeginPlay()
 	{
 		//UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] PC : %s"), *PC->GetName());
 		PC->InitUI();
+		PC->SetCharacterOverlay();
 	}
 	else
 	{
@@ -41,10 +42,28 @@ void AGS_TrainingRoom::BeginPlay()
 	}
 
 
-	if (HasAuthority())
-	{
-
-	}
+	//if (HasAuthority())
+	//{
+	//	TArray<AActor*> foundActors;
+	//	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), foundActors);
+	//
+	//	for (AActor* actor : foundActors)
+	//	{
+	//		ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(actor);
+	//		if (baseCharacter)
+	//		{
+	//			if (baseCharacter->Data.Team)
+	//			{
+	//				ATeamChracters.Add(baseCharacter);
+	//				
+	//			}
+	//			else
+	//			{
+	//				BTeamChracters.Add(baseCharacter);
+	//			}
+	//		}
+	//	}
+	//}
 
 
 	//GetWorld()->GetWorldSettings()->SetTimeDilation(0.1f);

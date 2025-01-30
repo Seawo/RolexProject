@@ -7,6 +7,7 @@
 #include "Character_Phase.h"
 #include "NiagaraComponent.h"
 #include "Camera/CameraComponent.h"
+#include "RolexPlayerState.h"
 
 AActor_Effect_Phase_Q::AActor_Effect_Phase_Q()
 {
@@ -24,6 +25,9 @@ void AActor_Effect_Phase_Q::BeginPlay()
 {
 	Super::BeginPlay();
 
+	ABaseCharacter* onwer = Cast<ABaseCharacter>(GetOwner());
+	RolexPS = Cast<ARolexPlayerState>(onwer->GetPlayerState());
+
 	// 충돌체 BeginOverlap
 	BeamCollision->OnComponentBeginOverlap.AddDynamic(this, &AActor_Effect_Phase_Q::OnOverlapBegin);
 
@@ -35,9 +39,9 @@ void AActor_Effect_Phase_Q::BeginPlay()
 	FTimerHandle deathTimer;
 	GetWorld()->GetTimerManager().SetTimer(deathTimer,
 			FTimerDelegate::CreateLambda([this]() {
-			Destroy(); 
 			NiagaraComponent->Deactivate();
 			OverlappedActors.Empty();
+			Destroy(); 
 			}), Phase->QSkillDuration, false);
 
 
@@ -127,7 +131,21 @@ void AActor_Effect_Phase_Q::TakeDamageToCharacter()
 		{
 			if (character and character->Data.Team != Phase->Data.Team)
 			{
-				character->ModifyHP(-30);
+				if (character->Data.Hp <= 0)
+				{
+					RolexPS->PlayerData.KillCount++;
+				}
+				else if (character->Data.Hp < 30)
+				{
+					RolexPS->PlayerData.Damage += character->Data.Hp;
+					character->ModifyHP(-character->Data.Hp);
+				}
+				else
+				{
+					character->ModifyHP(-30);
+					RolexPS->PlayerData.Damage += 30;
+				}
+				
 			}
 		}
 	}

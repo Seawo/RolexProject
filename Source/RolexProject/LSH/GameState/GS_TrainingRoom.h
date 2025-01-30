@@ -99,7 +99,6 @@ public:
 	class ARolexPlayerController* PC;
 
 
-
 	UPROPERTY(ReplicatedUsing = OnRep_PlayTime)
 	float PlayTime = 0.0f;
 	UPROPERTY(VisibleAnywhere, Category = "Info")
