@@ -6,6 +6,7 @@
 #include "HeroSlotUI.h"
 #include "PlayerSlotUI.h"
 #include "RolexGameInstance.h"
+#include "WaitingRoomGameStateBase.h"
 #include "Components/Button.h"
 #include "Components/UniformGridPanel.h"
 #include "Components/HorizontalBox.h"
@@ -26,8 +27,12 @@ void UWaitingRoomUI::NativeConstruct()
 		PlayerController->SetInputMode(FInputModeUIOnly());
 		PlayerController ->bShowMouseCursor = true;
 	}
+
+	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetWorld()->GetGameInstance());
+	if (RolexGameInstance)
+		RoomName->SetText(RolexGameInstance->RoomName);
 	
-	Notice->SetVisibility(ESlateVisibility::Hidden);
+	//Notice->SetVisibility(ESlateVisibility::Hidden);
 	CountDown->SetVisibility(ESlateVisibility::Hidden);
 	HeroSelectionPanel->SetVisibility(ESlateVisibility::Hidden);
 	

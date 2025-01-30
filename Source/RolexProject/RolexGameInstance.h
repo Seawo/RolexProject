@@ -30,6 +30,8 @@ public:
 	TSharedPtr<FOnlineSessionSettings> SessionSettings;
 	
 	TSharedPtr<FOnlineSessionSearch> SessionSearched;
+
+	FText RoomName;
 	
 public:
 	void CreateSession(FName Name);

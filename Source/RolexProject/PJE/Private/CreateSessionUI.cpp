@@ -11,15 +11,15 @@ void UCreateSessionUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	ConfirmBtn->OnClicked.AddDynamic(this, &UCreateSessionUI::Confrim);
+	ConfirmBtn->OnClicked.AddDynamic(this, &UCreateSessionUI::Confirm);
 }
 
-void UCreateSessionUI::Confrim()
+void UCreateSessionUI::Confirm()
 {
 	if (SessionNameBox->GetText().IsEmpty()) return;
 
 	// session settings
-	int32 Num = FCString::Atoi(*NumberofPlayers->GetSelectedOption());
+	int32 Num = FCString::Atoi(*NumberOfPlayers->GetSelectedOption());
 	if (!Num)
 		return;
 	
@@ -28,8 +28,8 @@ void UCreateSessionUI::Confrim()
 	{
 		RolexGameInstance->MaxPlayersNum = Num;
 	}
-	
-	// create a new session
-	URolexGameInstance* RolexGameInstace = Cast<URolexGameInstance>(GetWorld()->GetGameInstance());
-	RolexGameInstace->CreateSession(*SessionNameBox->GetText().ToString());
+
+	RolexGameInstance->RoomName = SessionNameBox->GetText();
+	// create a new sessions
+	RolexGameInstance->CreateSession(*SessionNameBox->GetText().ToString());
 }

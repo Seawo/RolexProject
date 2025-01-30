@@ -47,7 +47,7 @@ public:
 	int32 HeroSelectionCountdownTime = 15;
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastRPC_Countdown();	
+	void MulticastRPC_Countdown();
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_StartHeroSelection();
