@@ -47,11 +47,5 @@ void AActor_Point::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 
 void AActor_Point::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
-
-	if (character and character->Data.Team == bIsATeam)
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("[Point] OnOverlapEnd"));
-	}
 }
 

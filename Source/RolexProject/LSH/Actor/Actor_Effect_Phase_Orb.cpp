@@ -7,6 +7,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "RolexPlayerState.h"
 
 AActor_Effect_Phase_Orb::AActor_Effect_Phase_Orb()
 {
@@ -22,11 +23,13 @@ AActor_Effect_Phase_Orb::AActor_Effect_Phase_Orb()
 void AActor_Effect_Phase_Orb::BeginPlay()
 {
 	Super::BeginPlay();
+	ABaseCharacter* onwer = Cast<ABaseCharacter>(GetOwner());
+	RolexPS = Cast<ARolexPlayerState>(onwer->GetPlayerState());
 
 	OrbCollision->OnComponentBeginOverlap.AddDynamic(this, &AActor_Effect_Phase_Orb::OnOverlapBegin);
 
 	// 각각의 생성시간에 따른 Timer 설정
-	SetLifeSpan(Phase->LRSkillDuration);
+	//SetLifeSpan(Phase->LRSkillDuration);
 
 	//FTimerHandle deathTimer;
 	//GetWorld()->GetTimerManager().SetTimer(deathTimer,
@@ -88,6 +91,11 @@ void AActor_Effect_Phase_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComp
 	else if (character && character->Data.Team != onwer ->Data.Team)
 	{
 		character->ModifyHP(-10);
+		RolexPS->PlayerData.Damage += 10;
+		if (character->Data.Hp <= 0)
+		{
+			RolexPS->PlayerData.KillCount++;
+		}
 	}
 
 	// NiagaraSystem 실행

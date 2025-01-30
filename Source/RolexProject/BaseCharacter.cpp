@@ -100,7 +100,6 @@ void ABaseCharacter::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABaseCharacter::InitHeroUI, 3.0f, false);
 
 	HidenHealthBar();
-
 }
 
 void ABaseCharacter::InitHeroUI()
@@ -410,6 +409,9 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	{
 		characterInput->BindAction(IA_VectorMove, ETriggerEvent::Triggered, this, &ABaseCharacter::InputMove);
 		characterInput->BindAction(IA_Rotation, ETriggerEvent::Triggered, this, &ABaseCharacter::InputRotation);
+		characterInput->BindAction(IA_Tab, ETriggerEvent::Started, this, &ABaseCharacter::InputTab);
+		characterInput->BindAction(IA_Tab, ETriggerEvent::Completed, this, &ABaseCharacter::InputTab);
+		characterInput->BindAction(IA_Esc, ETriggerEvent::Started, this, &ABaseCharacter::ServerInputEsc);
 	}
 }
 
@@ -504,6 +506,11 @@ void ABaseCharacter::Die(UAnimMontage* montage)
 	
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("NoCollision"));
 
+	ARolexPlayerState* rolexPS = Cast<ARolexPlayerState>(GetPlayerState());
+	if (rolexPS)
+	{
+		rolexPS->PlayerData.DeathCount++;
+	}
 
 	FTimerHandle montageTimer;
 	GetWorld()->GetTimerManager().SetTimer(montageTimer, FTimerDelegate::CreateLambda(
@@ -538,4 +545,63 @@ void ABaseCharacter::Start(UAnimMontage* montage)
 		}),
 		montageDelay, false);
 	
+}
+
+void ABaseCharacter::InputTab(const FInputActionValue& inputValue)
+{
+	bool bIsClick = inputValue.Get<bool>();
+
+	ServerInputTab(bIsClick);
+}
+
+void ABaseCharacter::ServerInputTab_Implementation(bool bIsClick)
+{
+	//bIsClickTab = !bIsClickTab;
+	ClientInputTab(bIsClick);
+}
+
+void ABaseCharacter::ClientInputTab_Implementation(bool bIsClick)
+{
+	ARolexPlayerController* rolexPC = Cast<ARolexPlayerController>(GetController());
+	if (rolexPC)
+	{
+		if (bIsClick)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Tab Open"));
+			rolexPC->OpenInGameTab();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Tab Close"));
+			rolexPC->CloseInGameTab();
+		}
+	}
+}
+
+void ABaseCharacter::ServerInputEsc_Implementation()
+{
+	bIsClickEsc = !bIsClickEsc;
+	ClientInputEsc(bIsClickEsc);
+}
+
+void ABaseCharacter::ClientInputEsc_Implementation(bool bIsClick)
+{
+	ARolexPlayerController* rolexPC = Cast<ARolexPlayerController>(GetController());
+	if (rolexPC)
+	{
+		if (bIsClick)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ESC Open"));
+			rolexPC->OpenInGameEsc();
+			rolexPC->SetInputMode(FInputModeGameAndUI());
+			rolexPC->bShowMouseCursor = true;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ESC Close"));
+			rolexPC->CloseInGameEsc();
+			rolexPC->SetInputMode(FInputModeGameOnly());
+			rolexPC->bShowMouseCursor = false;
+		}
+	}
 }

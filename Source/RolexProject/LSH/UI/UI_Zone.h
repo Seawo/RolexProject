@@ -32,9 +32,12 @@ public:
 
 	void SetClashing(EClashing clash);			// 점령 상태 설정	 (누가 점령중인지)
 	void SetExtraTime(float Time);				// 추가 시간 설정
+	void SetOffofTxtraTime();		// 추가 시간 오프 설정
 
 	void SetIsATeamExtraTime(bool bExtra) { bIsATeamExtraTime = bExtra; }
 	void SetIsBTeamExtraTime(bool bExtra) { bIsBTeamExtraTime = bExtra; }
+
+
 
 public:
 	// SetPlayTime

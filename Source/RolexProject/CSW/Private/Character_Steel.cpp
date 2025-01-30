@@ -15,8 +15,8 @@
 ACharacter_Steel::ACharacter_Steel()
 {
 	// character setting 
-	Data.RoleType = ERoleType::Dealer;
-	Data.Name = "Sparrow";
+	Data.RoleType = ERoleType::Tanker;
+	Data.Name = "Steel";
 	Data.Team = true;
 	Data.MaxHp = 450;
 	Data.Hp = 450;

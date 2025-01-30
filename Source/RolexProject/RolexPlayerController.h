@@ -76,23 +76,56 @@ public:
 	void SetPoint(int idx);
 	void SetTakingGuage(float Agauge, float Bgauge);
 
+	void SetResult(EResult result);
+
 	void SetATeamCount(int32 Count);
 	void SetBTeamCount(int32 Count);
 	void SetPercent(EOccupation occupation, float APercent, float BPercent);
 
 	void SetClashing(EClashing clash);
 	void SetExtraTime(float Time);
+	void SetOffofTxtraTime();
 
 	void SetIsATeamExtraTime(bool bExtra);
 	void SetIsBTeamExtraTime(bool bExtra);
 
+	void OpenInGameEsc();
+	void CloseInGameEsc();
+
+
+	void OpenInGameTab();
+	void CloseInGameTab();
+
+
 public:
+	class ARolexPlayerState* RolexPS;
+
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UUI_Zone> UI_ZoneClass;
 
 	UPROPERTY(EditAnywhere, Category = "UI")
 	class UUI_Zone* UI_Zone;
 
-	FTimerHandle TimerHandleUI;
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UUI_GameEnd> UI_GameEndClass;
 
+	UPROPERTY(EditAnywhere, Category = "UI")
+	class UUI_GameEnd* UI_GameEnd;
+
+	FTimerHandle TimerHandleUI;
+	FTimerHandle TimerHandleTabUI;
+
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UUI_InGameEsc> UI_InGameEscClass;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	class UUI_InGameEsc* UI_InGameEsc;
+
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UUI_InGameTab> UI_InGameTabClass;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	class UUI_InGameTab* UI_InGameTab;
 };

@@ -48,7 +48,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	ERoleType RoleType;		// 역할
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString Name;			// 캐릭터 이름
+	FName Name;			// 캐릭터 이름
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	bool Team;				// 팀 여부 (true = Red , false = Blue)
 
@@ -164,6 +164,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	class UInputAction* IA_E;
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	class UInputAction* IA_Esc;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	class UInputAction* IA_Tab;
+
 	// CoolTimer
 	FTimerHandle SkillCooldownHandles[4];  // 4개의 타이머 핸들
 	// 각 스킬별 쿨타임 플래그
@@ -183,6 +189,21 @@ public:
 	void Sturn(UAnimMontage* montage);
 	void Die(UAnimMontage* montage);
 	void Start(UAnimMontage* montage);
+
+	UFUNCTION(Server, Reliable)
+	void ServerInputEsc();
+	UFUNCTION(Client, Reliable)
+	void ClientInputEsc(bool bIsClick);
+
+	void InputTab(const struct FInputActionValue& inputValue);
+	UFUNCTION(Server, Reliable)
+	void ServerInputTab(bool bIsClick);
+	UFUNCTION(Client, Reliable)
+	void ClientInputTab(bool bIsClick);
+
+	bool bIsClickEsc = false;
+	bool bIsClickTab = false;
+
 
 	void ModifyHP(int Value);
 	void ModifyShield(int shield);

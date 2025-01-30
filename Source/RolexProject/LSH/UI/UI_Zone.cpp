@@ -178,3 +178,8 @@ void UUI_Zone::SetExtraTime(float Time)
 		VB_ExtraTime->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
+
+void UUI_Zone::SetOffofTxtraTime()
+{
+	VB_ExtraTime->SetVisibility(ESlateVisibility::Hidden);
+}

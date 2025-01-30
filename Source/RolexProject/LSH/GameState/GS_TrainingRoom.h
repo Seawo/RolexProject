@@ -98,6 +98,8 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Info")
 	class ARolexPlayerController* PC;
 
+
+
 	UPROPERTY(ReplicatedUsing = OnRep_PlayTime)
 	float PlayTime = 0.0f;
 	UPROPERTY(VisibleAnywhere, Category = "Info")
@@ -163,4 +165,6 @@ public:
 	bool IsGetATeamExtraTime = false;
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_IsGetBTeamExtraTime, Category = "Info")
 	bool IsGetBTeamExtraTime = false;
+
+	bool bIsGameOver = false;
 };

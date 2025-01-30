@@ -36,4 +36,6 @@ private:
 	class UNiagaraSystem* HitNiagaraSystem;
 
 	FVector HitLocation1;
+
+	class ARolexPlayerState* RolexPS;
 };

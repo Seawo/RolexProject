@@ -5,6 +5,7 @@
 
 #include "PlayerController/PlayerController_TrainingRoom.h"
 #include "RolexPlayerController.h"
+#include "RolexGameInstance.h"
 #include "GM_TrainingRoom.h"
 #include "Kismet/GameplayStatics.h"
 #include "Point/Actor_FightPoint.h"
@@ -39,8 +40,15 @@ void AGS_TrainingRoom::BeginPlay()
 		//UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] PC is nullptr"));
 	}
 
-	//GetWorld()->GetWorldSettings()->SetTimeDilation(0.1f);
 
+	if (HasAuthority())
+	{
+
+	}
+
+
+	//GetWorld()->GetWorldSettings()->SetTimeDilation(0.1f);
+	//
 	//if (HasAuthority())
 	//{
 	//	// 맵에 있는 거점 가져오기
@@ -51,12 +59,10 @@ void AGS_TrainingRoom::BeginPlay()
 	//		point->OnPointOverlapChanged.AddDynamic(this, &AGS_TrainingRoom::ChangeNumberOfTeam);
 	//		Points.Add(point);
 	//	}
-
+	//
 	//	// PlayTime 1초마다 1씩 올려주기
-
+	//
 	//}
-
-
 }
 
 void AGS_TrainingRoom::Tick(float DeltaTime)
@@ -69,10 +75,10 @@ void AGS_TrainingRoom::Tick(float DeltaTime)
 	if (PC)
 	{
 		PC->SetPlayTime(PlayTime);
-
+		// 게임 시작 30초 후 거점 활성화
 		if (PlayTime > 30.0f)
 		{
-			if (not IsActiveBsePoint)
+			if (not IsActiveBsePoint) // 한번만 실행되도록 처리
 			{
 				AActor* foundPoint = UGameplayStatics::GetActorOfClass(GetWorld(), AActor_FightPoint::StaticClass());
 				if (foundPoint)
@@ -104,10 +110,22 @@ void AGS_TrainingRoom::Tick(float DeltaTime)
 				PC->SetIsATeamExtraTime(IsGetATeamExtraTime);
 				PC->SetIsBTeamExtraTime(IsGetBTeamExtraTime);
 			}
+			else
+			{
+				// 게임이 끝났을 경우
+				// 게임 결과를 클라이언트에게 전달
+				if (not bIsGameOver)
+				{
+					
+					PC->SetResult(Result);
+					bIsGameOver = true;
+				}
+			}
 		}
+		// 게임 시작 15초 후 스폰지역 문 오픈
 		else if (PlayTime > 15.0f)
 		{
-			if (not IsGameStart)
+			if (not IsGameStart) // 한번만 실행되도록 처리
 			{
 				TArray<AActor*> foundActors;
 				UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor_StartDoor::StaticClass(), foundActors);
@@ -261,6 +279,7 @@ void AGS_TrainingRoom::UpdatePointGauge(float DeltaTime)
 			UE_LOG(LogTemp, Warning, TEXT("ATeam Win"));
 			PointATeamGaugePercent = 100.0f;
 			Result = EResult::AWin;
+			PC->SetOffofTxtraTime();
 			return;
 		}
 
@@ -375,6 +394,7 @@ void AGS_TrainingRoom::UpdatePointGauge(float DeltaTime)
 			UE_LOG(LogTemp, Warning, TEXT("BTeam Win"));
 			PointBTeamGaugePercent = 100.0f;
 			Result = EResult::BWin;
+			PC->SetOffofTxtraTime();
 			return;
 		}
 
@@ -542,6 +562,8 @@ void AGS_TrainingRoom::OnRep_Occupation()
 void AGS_TrainingRoom::OnRep_Result()
 {
 	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] Result"));
+	PC->SetOffofTxtraTime();
+	PC->SetResult(Result);
 }
 void AGS_TrainingRoom::OnRep_Clash()
 {

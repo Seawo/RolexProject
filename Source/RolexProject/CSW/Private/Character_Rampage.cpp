@@ -24,7 +24,7 @@ ACharacter_Rampage::ACharacter_Rampage()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// character setting 
-	Data.RoleType = ERoleType::Dealer;
+	Data.RoleType = ERoleType::Tanker;
 	Data.Name = "Rampage";
 	Data.Team = true;
 	Data.MaxHp = 550;

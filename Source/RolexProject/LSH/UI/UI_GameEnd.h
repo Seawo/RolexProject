@@ -14,4 +14,24 @@ class ROLEXPROJECT_API UUI_GameEnd : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+	void UIInit();
+	void SetResultWin();
+	void SetResultLose();
+
+private:
+	UPROPERTY(Meta = (BindWidget))
+	class UBorder* B_BackGround;
+
+	UPROPERTY(Meta = (BindWidget))
+	class UTextBlock* TB_Win;
+
+	UPROPERTY(Meta = (BindWidget))
+	class UTextBlock* TB_Back_Win;
+
+	UPROPERTY(Meta = (BindWidget))
+	class UTextBlock* TB_Fail;
+
+	UPROPERTY(Meta = (BindWidget))
+	class UTextBlock* TB_Back_Fail;
 };

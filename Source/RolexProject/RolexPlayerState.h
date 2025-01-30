@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -9,6 +9,26 @@
 /**
  * 
  */
+USTRUCT(BlueprintType)
+struct FPlayerData
+{
+	GENERATED_BODY()
+
+	// 이미지
+
+	UPROPERTY(VisibleAnywhere, Category = "Info")
+	int32 KillCount;
+
+	UPROPERTY(VisibleAnywhere, Category = "Info")
+	int32 DeathCount;
+
+	UPROPERTY(VisibleAnywhere, Category = "Info")
+	int32 Damage;
+
+	UPROPERTY(VisibleAnywhere, Category = "Info")
+	int32 Healing;
+};
+
 UCLASS()
 class ROLEXPROJECT_API ARolexPlayerState : public APlayerState
 {
@@ -35,6 +55,7 @@ public:
 	
 	void FindUniqueID();
 
-	
+	UPROPERTY(VisibleAnywhere, Category = "Info")
+	FPlayerData PlayerData;
 };
 

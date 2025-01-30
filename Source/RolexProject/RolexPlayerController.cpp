@@ -13,6 +13,9 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "UI_Zone.h"
+#include "UI_GameEnd.h"
+#include "UI_InGameEsc.h"
+#include "UI_InGameTab.h"
 
 
 ARolexPlayerController::ARolexPlayerController()
@@ -23,6 +26,11 @@ void ARolexPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (IsLocalController())
+	{
+		//RolexPS = Cast<ARolexPlayerState>(PlayerState);
+	}
+
 	WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetWorld()->GetGameState()); 
 
 	//if (UI_ZoneClass)
@@ -178,19 +186,16 @@ void ARolexPlayerController::ClientRPC_SetPlayerSlotUI_Implementation(int32 Play
 	
 		ServerRPC_UpdateWholePlayerNumber();
 }
-
 void ARolexPlayerController::ServerRPC_BlockHero_Implementation(int32 HeroIndex, int32 PlayerIndex)
 {
 	WaitingRoomGameStateBase->MulticastRPC_BlockHero(HeroIndex, PlayerIndex);
 }
-
-//////////////////////////////////////////////////////////////////////////
-
-
 void ARolexPlayerController::ServerRPC_UnBlockHero_Implementation(int32 HeroIndex, int32 PlayerIndex)
 {
 	WaitingRoomGameStateBase->MulticastRPC_UnBlockHero(HeroIndex, PlayerIndex);
 }
+
+//////////////////////////////////////////////////////////////////////////
 
 void ARolexPlayerController::InitUI()
 {
@@ -220,15 +225,30 @@ void ARolexPlayerController::InitUI()
 			}
 	}, 0.1f, true);
 
+	if (UI_InGameTabClass)
+	{
+		UI_InGameTab = CreateWidget<UUI_InGameTab>(this, UI_InGameTabClass);
+		if (UI_InGameTab)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("UI_InGameTab is created"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("UI_InGameTab is nullptr"));
+		}
+	}
+
+
+
 	//if (IsLocalController() && UI_ZoneClass)
 	//{
 	//	UI_Zone = CreateWidget<UUI_Zone>(this, UI_ZoneClass);
-
+	//
 	//	if (UI_Zone)
 	//	{
 	//		UI_Zone->AddToViewport();
 	//		UI_Zone->UIInit();
-
+	//
 	//		UE_LOG(LogTemp, Warning, TEXT("[RolexPlayerController InitUI] UI_Zone is created"));
 	//	}
 	//	else
@@ -263,6 +283,60 @@ void ARolexPlayerController::SetTakingGuage(float Agauge, float Bgauge)
 		float A = (int)Agauge / 100.0f;
 		float B = (int)Bgauge / 100.0f;
 		UI_Zone->SetTakingGuage(A, B);
+	}
+}
+void ARolexPlayerController::SetResult(EResult result)
+{
+	if (not IsLocalController()) return;
+
+	if (UI_GameEndClass)
+	{
+		UI_GameEnd = CreateWidget<UUI_GameEnd>(this, UI_GameEndClass);
+		UE_LOG(LogTemp, Warning, TEXT("UI_GameEnd is created"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UI_GameEndClass is nullptr"));
+	}
+
+	if (UI_GameEnd)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UI_GameEnd is not nullptr"));
+		UI_GameEnd->AddToViewport();
+		//UI_GameEnd->UIInit();
+
+		ABaseCharacter* character = Cast<ABaseCharacter>(GetPawn());
+		if (character)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Character is %s"), *character->GetName());
+		}
+
+		if (result == EResult::AWin)
+		{
+			if (character and character->Data.Team)
+			{
+				UI_GameEnd->SetResultWin();
+			}
+			else if (character and not character->Data.Team)
+			{
+				UI_GameEnd->SetResultLose();
+			}
+		}
+		else if (result == EResult::BWin)
+		{
+			if (character and character->Data.Team)
+			{
+				UI_GameEnd->SetResultLose();
+			}
+			else if (character and not character->Data.Team)
+			{
+				UI_GameEnd->SetResultWin();
+			}
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UI_GameEnd is nullptr"));
 	}
 }
 void ARolexPlayerController::SetATeamCount(int32 Count)
@@ -300,6 +374,13 @@ void ARolexPlayerController::SetExtraTime(float Time)
 		UI_Zone->SetExtraTime(Time);
 	}
 }
+void ARolexPlayerController::SetOffofTxtraTime()
+{
+	if (IsLocalController() && UI_Zone)
+	{
+		UI_Zone->SetOffofTxtraTime();
+	}
+}
 void ARolexPlayerController::SetIsATeamExtraTime(bool bExtra)
 {
 	if (IsLocalController() and UI_Zone)
@@ -312,5 +393,57 @@ void ARolexPlayerController::SetIsBTeamExtraTime(bool bExtra)
 	if (IsLocalController() and UI_Zone)
 	{
 		UI_Zone->SetIsBTeamExtraTime(bExtra);
+	}
+}
+
+void ARolexPlayerController::OpenInGameEsc()
+{
+	if (IsLocalController() && UI_InGameEscClass)
+	{
+		if (UI_InGameEsc)
+		{
+			UI_InGameEsc->AddToViewport();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("UI_InGameEsc is nullptr"));
+			UI_InGameEsc = CreateWidget<UUI_InGameEsc>(this, UI_InGameEscClass);
+			UE_LOG(LogTemp, Warning, TEXT("UI_InGameEsc Create"));
+			if (UI_InGameEsc)
+			{
+				UI_InGameEsc->AddToViewport();
+			}
+		}
+	}
+}
+
+void ARolexPlayerController::CloseInGameEsc()
+{
+	if (IsLocalController() && UI_InGameEsc)
+	{
+		UI_InGameEsc->RemoveFromParent();
+	}
+}
+
+void ARolexPlayerController::OpenInGameTab()
+{
+	if (IsLocalController() && UI_InGameTab)
+	{
+		UI_InGameTab->AddToViewport();
+		// 플레이어가 Tab키를 누를때마다 데이터 업데이트
+
+		GetWorld()->GetTimerManager().SetTimer(TimerHandleTabUI, [this]()
+		{
+			UI_InGameTab->UpdateData();
+		}, 0.1f, true);
+	}
+}
+
+void ARolexPlayerController::CloseInGameTab()
+{
+	if (IsLocalController() && UI_InGameTab)
+	{
+		UI_InGameTab->RemoveFromParent();
+		GetWorld()->GetTimerManager().ClearTimer(TimerHandleTabUI);
 	}
 }

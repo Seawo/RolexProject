@@ -44,20 +44,14 @@ void AActor_FightPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 {
 	if (Finish != EFinish::None or ActivePoint == EActivePoint::Deactivate) return;
 
-	Super::OnOverlapBegin(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+	//Super::OnOverlapBegin(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 
 	UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapBegin"));
 
 	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
 	if (character)
 	{
-		/*ARolexPlayerState* rolexPS = Cast<ARolexPlayerState>(character->GetPlayerState());
-		if (rolexPS)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapBegin Character : %s"), *character->GetName());
-			UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapBegin RolexPS Team : %s"), rolexPS->Team ? TEXT("ATeam") : TEXT("BTeam"));
-			OnPointOverlapChanged.Broadcast(rolexPS->Team, 1);
-		}*/
+		bIsOverlap = true;
 
 		UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapBegin Character : %s"), *OtherActor->GetName());
 		UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapBegin RolexPS Team : %s"), character->Data.Team ? TEXT("ATeam") : TEXT("BTeam"));
@@ -69,19 +63,16 @@ void AActor_FightPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, A
 {
 	if (Finish != EFinish::None or ActivePoint == EActivePoint::Deactivate) return;
 
+	if (not bIsOverlap) return;
 
 
-	Super::OnOverlapEnd(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
+	//Super::OnOverlapEnd(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
 	UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapEnd"));
 
 	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
 	if (character)
 	{
-		/*ARolexPlayerState* rolexPS = Cast<ARolexPlayerState>(character->GetPlayerState());
-		if (rolexPS)
-		{
-			OnPointOverlapChanged.Broadcast(rolexPS->Team, -1);
-		}*/
+		bIsOverlap = false;
 		OnPointOverlapChanged.Broadcast(character->Data.Team, -1);
 	}
 }
@@ -89,16 +80,4 @@ void AActor_FightPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, A
 void AActor_FightPoint::DrawDebugS(float DeltaTime)
 {
 	DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 500), FString::Printf(TEXT("ActivePoint : %d"), ActivePoint), nullptr, FColor::Yellow, DeltaTime);
-
-	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 450), FString::Printf(TEXT("TakePointGauge : %.1f"), TakePointATeamGauge), nullptr, FColor::Red, DeltaTime);
-	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 400), FString::Printf(TEXT("TakePointGauge : %.1f"), TakePointBTeamGauge), nullptr, FColor::Blue, DeltaTime);
-	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 375), FString::Printf(TEXT("TakePointGauge : %.1f"), ExtraTimer), nullptr, FColor::Green, DeltaTime);
-	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 350), FString::Printf(TEXT("TakePointGauge : %.1f"), ExtraTimerDecrease), nullptr, FColor::Green, DeltaTime);
-	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 300), FString::Printf(TEXT("Team : %d"), Team), nullptr, FColor::Green, DeltaTime);
-	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 250), FString::Printf(TEXT("ATeamPointGauge : %.1f"), ATeamPointGauge / 120 * 100), nullptr, FColor::Red, DeltaTime);
-	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 225), FString::Printf(TEXT("ATeamPointGauge : %d"), IsAddATeamExtraTime), nullptr, FColor::Red, DeltaTime);
-	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 200), FString::Printf(TEXT("ActiveATeamCount : %d"), ActiveATeamCount), nullptr, FColor::Red, DeltaTime);
-	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 100), FString::Printf(TEXT("BTeamPointGauge : %.1f"), BTeamPointGauge / 120 * 100), nullptr, FColor::Blue, DeltaTime);
-	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 75), FString::Printf(TEXT("BTeamPointGauge : %d"), IsAddBTeamExtraTime), nullptr, FColor::Blue, DeltaTime);
-	//DrawDebugString(GetWorld(), GetActorLocation() + FVector(0, 0, 50), FString::Printf(TEXT("ActiveBTeamCount : %d"), ActiveBTeamCount), nullptr, FColor::Blue, DeltaTime);
 }

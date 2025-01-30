@@ -86,4 +86,6 @@ private:
 	EActivePoint ActivePoint = EActivePoint::Deactivate;
 	ETeam Team = ETeam::None;
 	EFinish Finish = EFinish::None;
+
+	bool bIsOverlap = false;
 };
