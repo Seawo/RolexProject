@@ -46,4 +46,11 @@ public:
 	class AWaitingRoomGameStateBase*  WaitingRoomGameStateBase;
 
 	class ARolexPlayerController* RolexPlayerController;
+
+	UPROPERTY()
+	class ACharacterCamera* CharacterCamera;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USkeletalMesh* CharacterSkeletalMeshAsset;
 };
+
