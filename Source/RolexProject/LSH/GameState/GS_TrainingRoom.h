@@ -93,8 +93,16 @@ protected:
 	UFUNCTION()
 	void OnRep_IsGetBTeamExtraTime();
 
+private:
+	void AddDynamicMaterialToPostProcessVolume();
 
 public:
+	UPROPERTY(VisibleAnywhere)
+	class APostProcessVolume* PostProcessVolume;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UMaterialInstance* MaterialInstance;
+
 	UPROPERTY(VisibleAnywhere, Category = "Info")
 	class ARolexPlayerController* PC;
 

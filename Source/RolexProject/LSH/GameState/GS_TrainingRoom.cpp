@@ -29,6 +29,12 @@ void AGS_TrainingRoom::BeginPlay()
 	IsActiveBsePoint = false;
 	IsGameStart = false;
 
+	PostProcessVolume = GetWorld()->SpawnActor<APostProcessVolume>();
+	PostProcessVolume->bUnbound = true;
+	PostProcessVolume->SetActorLocation(FVector(1500.0f, 1134.0f, 2460.0f));
+	PostProcessVolume->SetActorScale3D(FVector(86.0f, 44.0f, 20.0f));
+	AddDynamicMaterialToPostProcessVolume();
+
 	PC = Cast<ARolexPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (PC)
 	{
@@ -40,6 +46,7 @@ void AGS_TrainingRoom::BeginPlay()
 	{
 		//UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] PC is nullptr"));
 	}
+
 
 
 	//if (HasAuthority())
@@ -641,4 +648,12 @@ void AGS_TrainingRoom::OnRep_IsGetBTeamExtraTime()
 {
 	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] IsGetBTeamExtraTime"));
 	PC->SetIsBTeamExtraTime(IsGetBTeamExtraTime);
+}
+
+void AGS_TrainingRoom::AddDynamicMaterialToPostProcessVolume()
+{
+	if (PostProcessVolume && MaterialInstance)
+	{
+		//PostProcessVolume->AddOrUpdateBlendable(MaterialInstance);
+	}
 }

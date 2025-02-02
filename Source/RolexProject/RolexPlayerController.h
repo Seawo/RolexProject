@@ -105,33 +105,31 @@ public:
 	class ARolexPlayerState* RolexPS;
 
 	class UMaterialInstanceDynamic* MI_Overlay;
-
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<class UUI_Zone> UI_ZoneClass;
-
-	UPROPERTY(EditAnywhere, Category = "UI")
-	class UUI_Zone* UI_Zone;
-
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<class UUI_GameEnd> UI_GameEndClass;
-
-	UPROPERTY(EditAnywhere, Category = "UI")
-	class UUI_GameEnd* UI_GameEnd;
+	class UMaterialInstanceDynamic* MI_PostProcess;
 
 	FTimerHandle TimerHandleUI;
 	FTimerHandle TimerHandleTabUI;
 
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UUI_Zone> UI_ZoneClass;
+	UPROPERTY(EditAnywhere, Category = "UI")
+	class UUI_Zone* UI_Zone;
+
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UUI_GameEnd> UI_GameEndClass;
+	UPROPERTY(EditAnywhere, Category = "UI")
+	class UUI_GameEnd* UI_GameEnd;
+
 
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UUI_InGameEsc> UI_InGameEscClass;
-
 	UPROPERTY(EditAnywhere, Category = "UI")
 	class UUI_InGameEsc* UI_InGameEsc;
 
 
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UUI_InGameTab> UI_InGameTabClass;
-
 	UPROPERTY(EditAnywhere, Category = "UI")
 	class UUI_InGameTab* UI_InGameTab;
 };

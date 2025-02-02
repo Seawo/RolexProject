@@ -294,19 +294,61 @@ void ARolexPlayerController::SetCharacterOverlay()
 			ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(actor);
 			ABaseCharacter* owner = Cast<ABaseCharacter>(GetPawn());
 			
+			if (baseCharacter == owner) continue;
+
+			// 다른팀인경우
 			if (baseCharacter->Data.Team != owner->Data.Team)
 			{
 				UMaterialInterface* material = Cast<UMaterialInterface>(baseCharacter->GetMesh()->GetOverlayMaterial());
 
 				if (material)
 				{
-					//if (not MI_Overlay)
-					//{
-					//	
-					//}
 					MI_Overlay = UMaterialInstanceDynamic::Create(material, this);
 					baseCharacter->GetMesh()->SetOverlayMaterial(MI_Overlay);
+					// Overlay Material의 색을 빨간색으로 설정
 					MI_Overlay->SetVectorParameterValue("Color", FLinearColor(1.0f, 0.0f, 0.0f, 1.0f));
+				}
+
+				baseCharacter->GetMesh()->SetCustomDepthStencilValue(2);
+			}
+			// 같은 팀인 경우
+			else
+			{
+				UMaterialInterface* material = Cast<UMaterialInterface>(baseCharacter->GetMesh()->GetOverlayMaterial());
+
+				if (material)
+				{
+					MI_Overlay = UMaterialInstanceDynamic::Create(material, this);
+					baseCharacter->GetMesh()->SetOverlayMaterial(MI_Overlay);
+					// Overlay Material의 색을 청색으로 설정
+					MI_Overlay->SetVectorParameterValue("Color", FLinearColor(0.0f, 0.859375f, 0.250501f, 1.0f));
+				}
+				
+				AGS_TrainingRoom* GS = Cast<AGS_TrainingRoom>(GetWorld()->GetGameState());
+				if (GS)
+				{
+					UMaterialInterface* ppmaterial = Cast<UMaterialInterface>(GS->MaterialInstance);
+
+					if (ppmaterial)
+					{
+						MI_PostProcess = UMaterialInstanceDynamic::Create(ppmaterial, this);
+						GS->PostProcessVolume->AddOrUpdateBlendable(MI_PostProcess, 1.0f);
+						// PostProcess Material의 색을 청색으로 설정
+						
+					}
+				}
+
+
+				if (owner->Data.RoleType == ERoleType::Healer)
+				{
+					baseCharacter->GetMesh()->SetRenderCustomDepth(true);
+					baseCharacter->GetMesh()->SetCustomDepthStencilValue(1);
+
+					MI_PostProcess->SetScalarParameterValue("Scale", 0.0f);
+				}
+				else
+				{
+					MI_PostProcess->SetScalarParameterValue("Scale", 0.2f);
 				}
 			}
 		}
