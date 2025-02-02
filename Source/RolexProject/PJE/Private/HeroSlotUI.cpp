@@ -27,8 +27,6 @@ void UHeroSlotUI::NativeConstruct()
 	HeroSelectButton->OnClicked.AddDynamic(this, &UHeroSlotUI::OnHeroSelectButtonClicked);
 
 	HeroInfo->SetText(HeroDescription);
-
-	CharacterCamera = Cast<ACharacterCamera>(UGameplayStatics::GetActorOfClass(GetWorld(), ACharacterCamera::StaticClass()));
 }
 
 void UHeroSlotUI::OnHeroSelectButtonClicked()
@@ -74,7 +72,7 @@ void UHeroSlotUI::OnHeroSelectButtonClicked()
 
 	RolexPlayerController->PreviousSelectedHeroSlotIndex = HeroSlotIndex;
 
-	// set the hero image on the background
+	// set the hero image in the background
 	if (BaseCharacter)
 	{
 		// CDO class default object
@@ -82,13 +80,15 @@ void UHeroSlotUI::OnHeroSelectButtonClicked()
 		if (DefaultCharacter)
 		{
 			// get mesh asset from hero slot UI
-			CharacterSkeletalMeshAsset = DefaultCharacter->GetMesh()->GetSkeletalMeshAsset();
-			//CharacterCamera->SkeletalMesh->SetSkeletalMesh(CharacterSkeletalMesh);
-			UE_LOG(LogTemp, Warning, TEXT("Character Mesh Asset: %s"), *CharacterSkeletalMeshAsset->GetName());
-
-			// set mesh asset for character camera
-			CharacterCamera->CharacterSkeletalMeshAsset = CharacterSkeletalMeshAsset;
-			UE_LOG(LogTemp, Warning, TEXT("CharacterCamera Character Mesh Asset: %s"), *CharacterSkeletalMeshAsset->GetName());
+			// CharacterSkeletalMeshAsset = DefaultCharacter->GetMesh()->GetSkeletalMeshAsset();
+			// UE_LOG(LogTemp, Warning, TEXT("Character Mesh Asset: %s"), *CharacterSkeletalMeshAsset->GetName());
+			//
+			// // set mesh asset for character camera
+			// CharacterCamera->SkeletalMeshComponent->SetSkeletalMesh(CharacterSkeletalMeshAsset);
+			// CharacterCamera->SkeletalMeshComponent->SetAnimClass(CharacterAnimBlueprint->GetBlueprintClass());
+			// CharacterCamera->CharacterSkeletalMeshAsset = CharacterSkeletalMeshAsset;
+			// CharacterCamera->CharacterAnimBlueprint = CharacterAnimBlueprint;
+			// UE_LOG(LogTemp, Warning, TEXT("CharacterCamera Character Mesh Asset: %s"), *CharacterSkeletalMeshAsset->GetName());
 		}
 	}
 }

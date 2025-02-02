@@ -47,10 +47,10 @@ public:
 
 	class ARolexPlayerController* RolexPlayerController;
 
-	UPROPERTY()
-	class ACharacterCamera* CharacterCamera;
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USkeletalMesh* CharacterSkeletalMeshAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimBlueprint* CharacterAnimBlueprint;
 };
 

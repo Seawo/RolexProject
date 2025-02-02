@@ -35,4 +35,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USkeletalMesh* CharacterSkeletalMeshAsset;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimBlueprint* CharacterAnimBlueprint;
 };
