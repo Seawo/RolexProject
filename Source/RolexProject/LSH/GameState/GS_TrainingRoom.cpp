@@ -670,15 +670,6 @@ void AGS_TrainingRoom::OnRep_BTeamCharacters()
 {
 	for (ABaseCharacter* character : BTeamChracters)
 	{
-		//if (character)
-		//{
-		//	character->bTabTimer = true;
-		//	UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] BTeamChracters : %s"), *character->GetName());
-		//}
-		//else
-		//{
-		//	UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] BTeamChracters is nullptr"));
-		//}
 
 		if (not character)
 		{

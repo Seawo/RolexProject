@@ -42,16 +42,17 @@ void AActor_FightPoint::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 void AActor_FightPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapBegin"));
+
 	if (Finish != EFinish::None or ActivePoint == EActivePoint::Deactivate) return;
 
 	//Super::OnOverlapBegin(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 
-	UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapBegin"));
 
 	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
 	if (character)
 	{
-		bIsOverlap = true;
+		character->bPointInOut = true;
 
 		UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapBegin Character : %s"), *OtherActor->GetName());
 		UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapBegin RolexPS Team : %s"), character->Data.Team ? TEXT("ATeam") : TEXT("BTeam"));
@@ -61,18 +62,19 @@ void AActor_FightPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 
 void AActor_FightPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (Finish != EFinish::None or ActivePoint == EActivePoint::Deactivate) return;
+	UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapEnd"));
 
-	if (not bIsOverlap) return;
+	if (Finish != EFinish::None or ActivePoint == EActivePoint::Deactivate) return;
 
 
 	//Super::OnOverlapEnd(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
-	UE_LOG(LogTemp, Warning, TEXT("[FightPoint] OnOverlapEnd"));
 
 	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
 	if (character)
 	{
-		bIsOverlap = false;
+		if (not character->bPointInOut) return;
+
+		character->bPointInOut = false;
 		OnPointOverlapChanged.Broadcast(character->Data.Team, -1);
 	}
 }

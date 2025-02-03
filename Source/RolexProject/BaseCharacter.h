@@ -246,6 +246,8 @@ public:
 	// 카메라 동기화 
 	FVector StartPos;
 
+	bool bPointInOut = false;
+
 public:
 
 	// hero UI image
