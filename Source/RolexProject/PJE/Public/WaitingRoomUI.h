@@ -34,6 +34,7 @@ public:
 	
 	void AddPlayer();
 
+public:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* RoomName;
 	
@@ -48,6 +49,9 @@ public:
 	TArray<UHeroSlotUI*> HeroButtonArray;
 
 	bool HeroSelectionVisible = false;
+
+	UPROPERTY(meta = (BindWidget))
+	class UImage* SelectedHeroImage;
 	
 public:
 	UPROPERTY(meta = (BindWidget))
