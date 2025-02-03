@@ -21,9 +21,6 @@ void UEffectSpawnNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceB
 
     //AEffectActor* spawnActor = MeshComp->GetWorld()->SpawnActor<AEffectActor>(EffectActorClass, spawnLocation, SpawnRotation);
 
-    ACharacter_Rampage* rampage = Cast<ACharacter_Rampage>(MeshComp);
-
-
     AEffectActor* spawnActor = MeshComp->GetWorld()->SpawnActorDeferred<AEffectActor>(EffectActorClass, FTransform(SpawnRotation, spawnLocation), MeshComp->GetOwner());
 
     if (spawnActor)
