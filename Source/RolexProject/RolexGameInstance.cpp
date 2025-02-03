@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "RolexGameInstance.h"
@@ -6,6 +6,7 @@
 #include "OnlineSessionSettings.h"
 #include "Online/OnlineSessionNames.h"
 #include "Engine/Engine.h"
+#include "OnlineSubsystem.h"
 
 
 void URolexGameInstance::Init()
@@ -138,6 +139,37 @@ void URolexGameInstance::OnJoinSession(FName SessionName, EOnJoinSessionComplete
 			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 			PlayerController->ClientTravel(ConnectInfo, TRAVEL_Absolute);
 		}
+	}
+}
+
+void URolexGameInstance::LeaveSession()
+{
+	if (SessionInterface)
+	{
+		// 세션 파괴 완료 델리게이트를 바인딩
+		DestroySessionCompleteDelegateHandle = SessionInterface->AddOnDestroySessionCompleteDelegate_Handle(FOnDestroySessionCompleteDelegate::CreateUObject(this, &URolexGameInstance::OnDestroySessionComplete));
+
+		SessionInterface->DestroySession(FName(RoomName.ToString()));
+		return;
+	}
+}
+
+void URolexGameInstance::OnDestroySessionComplete(FName SessionName, bool bWasSuccessful)
+{
+	if (SessionInterface)
+	{
+		SessionInterface->ClearOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegateHandle);
+	}
+
+	// 세션 파괴 성공시 메인 메뉴로 이동
+	if (bWasSuccessful)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Destroy Session Success"));
+		GetWorld()->ServerTravel(TEXT("/Game/Rolex/Map/Lobby?listen"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Destroy Session Failed"));
 	}
 }
 

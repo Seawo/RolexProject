@@ -3,6 +3,7 @@
 
 #include "GS_TrainingRoom.h"
 
+#include "RolexGameInstance.h"
 #include "PlayerController/PlayerController_TrainingRoom.h"
 #include "RolexPlayerController.h"
 #include "RolexGameInstance.h"
@@ -123,6 +124,18 @@ void AGS_TrainingRoom::Tick(float DeltaTime)
 				{
 					GetWorld()->GetWorldSettings()->SetTimeDilation(0.5f);
 					PC->SetResult(Result);
+					// 게임 종료 후 서버에서 세션 나가기
+					FTimerHandle finishTH;
+					GetWorld()->GetTimerManager().SetTimer(finishTH, [this]()
+					{
+						URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
+						if (RolexGameInstance)
+						{
+							RolexGameInstance->LeaveSession();
+						}
+
+					}, 5.0f, false);
+
 					bIsGameOver = true;
 				}
 			}
@@ -314,6 +327,9 @@ void AGS_TrainingRoom::UpdatePointGauge(float DeltaTime)
 			PointATeamGaugePercent = 100.0f;
 			Result = EResult::AWin;
 			PC->SetOffofTxtraTime();
+
+
+
 			return;
 		}
 
@@ -663,23 +679,33 @@ void AGS_TrainingRoom::OnRep_ATeamCharacters()
 {
 	for (ABaseCharacter* character : ATeamChracters)
 	{
-		character->bTabTimer = true;
+		if (not character)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("[AGM_TrainingRoom] BTeamChracters is null on client. Possibly the local player Pawn."));
+
+			if (ARolexPlayerController* rolexPC = Cast<ARolexPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
+			{
+				APawn* localPawn = rolexPC->GetPawn();
+				if (localPawn)
+				{
+					if (ABaseCharacter* localCharacter = Cast<ABaseCharacter>(localPawn))
+					{
+						character = localCharacter;
+						localCharacter->bTabTimer = true;
+					}
+				}
+			}
+		}
+		else
+		{
+			character->bTabTimer = true;
+		}
 	}
 }
 void AGS_TrainingRoom::OnRep_BTeamCharacters()
 {
 	for (ABaseCharacter* character : BTeamChracters)
 	{
-		//if (character)
-		//{
-		//	character->bTabTimer = true;
-		//	UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] BTeamChracters : %s"), *character->GetName());
-		//}
-		//else
-		//{
-		//	UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] BTeamChracters is nullptr"));
-		//}
-
 		if (not character)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("[AGM_TrainingRoom] BTeamChracters is null on client. Possibly the local player Pawn."));
