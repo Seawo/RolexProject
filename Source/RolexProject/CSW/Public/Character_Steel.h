@@ -29,11 +29,26 @@ class ROLEXPROJECT_API ACharacter_Steel : public ABaseCharacter
 public:
 	EAttackState CurrAttackState;
 
+	// LMB 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	TSubclassOf<class AEffectActor> LMBEffectActorClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	class UParticleSystem* LMBParticleEffect;
+
+	class AEffectActor* LMBEffectActor;
+
 	// RMB
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AEffectActor> ShieldClass;
 
 	class AEffectActor* Shield;
+
+	// E
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	TSubclassOf<class AEffectActor> EEffectActorClass;
+
+	class AEffectActor* EEffectActor;
 
 	// Q
 	UPROPERTY(EditAnywhere)
@@ -89,5 +104,7 @@ private:
 	// completed
 	void RMBCompleted();
 
-
+	// spawnActor
+	void LMBAttackActor();
+	void EAttackActor();
 };
