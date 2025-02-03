@@ -31,8 +31,6 @@ public:
 	void GetAllDescendants(UPanelWidget* ParentWidget, TArray<class UHeroSlotUI*>& Descendants);
 	
 	int32 NumplayerSlots;
-	
-	void AddPlayer();
 
 public:
 	UPROPERTY(meta = (BindWidget))

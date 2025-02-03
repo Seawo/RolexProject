@@ -55,6 +55,7 @@ public:
 	FString TravelLevel = FString("/Game/Rolex/PublicMap/PlayMap/PlayLevel?listen");;
 	
 public:
+	// playerID - team
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TMap<FString, bool> PlayerTeam;
 	

@@ -83,11 +83,6 @@ void UWaitingRoomUI::GetAllDescendants(UPanelWidget* ParentWidget, TArray<UHeroS
 	}
 }
 
-void UWaitingRoomUI::AddPlayer()
-{
-	
-}
-
 void UWaitingRoomUI::OnRep_SetNotice()
 {
 	Notice->SetVisibility(ESlateVisibility::Visible);
