@@ -23,8 +23,6 @@ AActor_Effect_Phase_Orb::AActor_Effect_Phase_Orb()
 void AActor_Effect_Phase_Orb::BeginPlay()
 {
 	Super::BeginPlay();
-	ABaseCharacter* onwer = Cast<ABaseCharacter>(GetOwner());
-	RolexPS = Cast<ARolexPlayerState>(onwer->GetPlayerState());
 
 	OrbCollision->OnComponentBeginOverlap.AddDynamic(this, &AActor_Effect_Phase_Orb::OnOverlapBegin);
 
@@ -92,17 +90,17 @@ void AActor_Effect_Phase_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComp
 	{
 		if (character->Data.Hp <= 0)
 		{
-			RolexPS->PlayerData.KillCount++;
+			onwer->RolexPS->PlayerData.KillCount++;
 		}
 		else if (character->Data.Hp < 10)
 		{
-			RolexPS->PlayerData.Damage += character->Data.Hp;
+			onwer->RolexPS->PlayerData.Damage += character->Data.Hp;
 			character->ModifyHP(-character->Data.Hp);
 		}
 		else
 		{
 			character->ModifyHP(-10);
-			RolexPS->PlayerData.Damage += 10;
+			onwer->RolexPS->PlayerData.Damage += 10;
 		}
 	}
 

@@ -53,6 +53,8 @@ class ROLEXPROJECT_API AGS_TrainingRoom : public AGameStateBase
 	UFUNCTION()
 	void ChangeNumberOfTeam(bool bTeam, int32 ChangeValue);
 
+public:
+	void FindCharacterInWorld();
 	//UFUNCTION(NetMulticast, Reliable)
 	//void MulticastSetTimeDilation(float Dilation);
 
@@ -93,6 +95,11 @@ protected:
 	UFUNCTION()
 	void OnRep_IsGetBTeamExtraTime();
 
+	UFUNCTION()
+	void OnRep_ATeamCharacters();
+	UFUNCTION()
+	void OnRep_BTeamCharacters();
+
 private:
 	void AddDynamicMaterialToPostProcessVolume();
 
@@ -115,10 +122,11 @@ public:
 	bool IsGameStart = false;
 
 
-	UPROPERTY(VisibleAnywhere, Category = "Info")
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_ATeamCharacters, Category = "Info")
 	TArray<class ABaseCharacter*> ATeamChracters;		// Team == true (A팀)
-	UPROPERTY(VisibleAnywhere, Category = "Info")
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_BTeamCharacters, Category = "Info")
 	TArray<class ABaseCharacter*> BTeamChracters;		// Team == false (B팀)
+
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Doors, Category = "Info")
 	TArray<class AActor_StartDoor*> Doors;				// 시작 문들
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Points, Category = "Info")

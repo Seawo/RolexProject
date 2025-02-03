@@ -17,6 +17,9 @@ class ROLEXPROJECT_API UUI_InGameTab : public UUserWidget
 	virtual void NativeConstruct() override;
 
 public:
+	void InitData();
+
+
 	void UpdateData();
 
 private:

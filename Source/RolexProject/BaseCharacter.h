@@ -128,6 +128,11 @@ public:
 
 /*Input*/
 public:
+	class ARolexPlayerState* RolexPS;
+
+	FTimerHandle PSTimerHandle;
+
+
 	UPROPERTY(EditAnywhere)
 	class UCapsuleComponent* capsuleComp;
 
@@ -200,6 +205,12 @@ public:
 	bool bIsClickEsc = false;
 	bool bIsClickTab = false;
 
+	UFUNCTION()
+	void OnRep_TabTimer();
+
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_TabTimer, Category = "Input")
+	bool bTabTimer = false;
+
 
 	void ModifyHP(int Value);
 	void ModifyShield(int shield);
@@ -236,6 +247,7 @@ public:
 	FVector StartPos;
 
 public:
+
 	// hero UI image
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="UI")
 	class UTexture2D* BaseCharacterImage;
@@ -257,5 +269,5 @@ public:
 	UHeroUI* HeroUI; 
 
 	void InitHeroUI();
-	
+
 };

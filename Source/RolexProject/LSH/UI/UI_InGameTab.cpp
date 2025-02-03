@@ -8,14 +8,29 @@
 #include "Kismet/GameplayStatics.h"
 #include "BaseCharacter.h"
 #include "RolexPlayerState.h"
-
+#include "../GameState/GS_TrainingRoom.h"
 void UUI_InGameTab::NativeConstruct()
 {
 	Super::NativeConstruct();
 
 	if (not bOneTime)
 	{
-		TArray<AActor*> foundActors;
+		AGS_TrainingRoom* GS_TrainingRoom = Cast<AGS_TrainingRoom>(UGameplayStatics::GetGameState(GetWorld()));
+		if (GS_TrainingRoom)
+		{
+			//GS_TrainingRoom->FindCharacterInWorld();
+
+			for (ABaseCharacter* character : GS_TrainingRoom->ATeamChracters)
+			{
+				ATeam.Add(character);
+			}
+
+			for (ABaseCharacter* character : GS_TrainingRoom->BTeamChracters)
+			{
+				BTeam.Add(character);
+			}
+		}
+		/*TArray<AActor*> foundActors;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), foundActors);
 		for (AActor* actor : foundActors)
 		{
@@ -31,7 +46,7 @@ void UUI_InGameTab::NativeConstruct()
 					BTeam.Add(baseCharacter);
 				}
 			}
-		}
+		}*/
 
 		UE_LOG(LogTemp, Warning, TEXT("ATeam : %d, BTeam : %d"), ATeam.Num(), BTeam.Num());
 
@@ -78,6 +93,10 @@ void UUI_InGameTab::NativeConstruct()
 	//VB_Data->AddChild(PlayerData);
 
 
+}
+
+void UUI_InGameTab::InitData()
+{
 }
 
 void UUI_InGameTab::UpdateData()

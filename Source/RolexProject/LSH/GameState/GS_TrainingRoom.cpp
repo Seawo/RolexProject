@@ -48,33 +48,12 @@ void AGS_TrainingRoom::BeginPlay()
 	}
 
 
+	FTimerHandle TimerHandle;
 
-	//if (HasAuthority())
-	//{
-	//	TArray<AActor*> foundActors;
-	//	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), foundActors);
-	//
-	//	for (AActor* actor : foundActors)
-	//	{
-	//		ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(actor);
-	//		if (baseCharacter)
-	//		{
-	//			if (baseCharacter->Data.Team)
-	//			{
-	//				ATeamChracters.Add(baseCharacter);
-	//				
-	//			}
-	//			else
-	//			{
-	//				BTeamChracters.Add(baseCharacter);
-	//			}
-	//		}
-	//	}
-	//}
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGS_TrainingRoom::FindCharacterInWorld, 5.0f, false);
 
 
-	//GetWorld()->GetWorldSettings()->SetTimeDilation(0.1f);
-	//
+
 	//if (HasAuthority())
 	//{
 	//	// 맵에 있는 거점 가져오기
@@ -142,7 +121,7 @@ void AGS_TrainingRoom::Tick(float DeltaTime)
 				// 게임 결과를 클라이언트에게 전달
 				if (not bIsGameOver)
 				{
-					
+					GetWorld()->GetWorldSettings()->SetTimeDilation(0.5f);
 					PC->SetResult(Result);
 					bIsGameOver = true;
 				}
@@ -193,6 +172,35 @@ void AGS_TrainingRoom::ChangeNumberOfTeam(bool bTeam, int32 ChangeValue)
 		UE_LOG(LogTemp, Warning, TEXT("[RolexGameMode ChangeNumberOfTeam] PointBTeamCount: %d"), PointBTeamCount);
 	}
 }
+void AGS_TrainingRoom::FindCharacterInWorld()
+{
+	if (not HasAuthority()) return;
+
+	TArray<AActor*> foundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), foundActors);
+
+	for (AActor* actor : foundActors)
+	{
+		ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(actor);
+		if (baseCharacter)
+		{
+			if (baseCharacter->Data.Team)
+			{
+				ATeamChracters.Add(baseCharacter);
+
+			}
+			else
+			{
+				BTeamChracters.Add(baseCharacter);
+			}
+			baseCharacter->bTabTimer = true;
+		}
+	}
+
+	UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] ATeam Num : %d"), ATeamChracters.Num());
+	UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] BTeam Num : %d"), BTeamChracters.Num());
+}
+
 void AGS_TrainingRoom::UpdatePointGauge(float DeltaTime)
 {
 	// 거점을 아무도 점령하지 않은 상태
@@ -520,6 +528,8 @@ void AGS_TrainingRoom::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(AGS_TrainingRoom, PlayTime);
 	DOREPLIFETIME(AGS_TrainingRoom, Points);
 	DOREPLIFETIME(AGS_TrainingRoom, Doors);
+	DOREPLIFETIME(AGS_TrainingRoom, ATeamChracters);
+	DOREPLIFETIME(AGS_TrainingRoom, BTeamChracters);
 
 	DOREPLIFETIME(AGS_TrainingRoom, Occupation);
 	DOREPLIFETIME(AGS_TrainingRoom, Result);
@@ -649,7 +659,50 @@ void AGS_TrainingRoom::OnRep_IsGetBTeamExtraTime()
 	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] IsGetBTeamExtraTime"));
 	PC->SetIsBTeamExtraTime(IsGetBTeamExtraTime);
 }
+void AGS_TrainingRoom::OnRep_ATeamCharacters()
+{
+	for (ABaseCharacter* character : ATeamChracters)
+	{
+		character->bTabTimer = true;
+	}
+}
+void AGS_TrainingRoom::OnRep_BTeamCharacters()
+{
+	for (ABaseCharacter* character : BTeamChracters)
+	{
+		//if (character)
+		//{
+		//	character->bTabTimer = true;
+		//	UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] BTeamChracters : %s"), *character->GetName());
+		//}
+		//else
+		//{
+		//	UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] BTeamChracters is nullptr"));
+		//}
 
+		if (not character)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("[AGM_TrainingRoom] BTeamChracters is null on client. Possibly the local player Pawn."));
+
+			if (ARolexPlayerController* rolexPC = Cast<ARolexPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
+			{
+				APawn* localPawn = rolexPC->GetPawn();
+				if (localPawn)
+				{
+					if(ABaseCharacter* localCharacter = Cast<ABaseCharacter>(localPawn))
+					{
+						character = localCharacter;
+						localCharacter->bTabTimer = true;
+					}
+				}
+			}
+		}
+		else
+		{
+			character->bTabTimer = true;
+		}
+	}
+}
 void AGS_TrainingRoom::AddDynamicMaterialToPostProcessVolume()
 {
 	if (PostProcessVolume && MaterialInstance)

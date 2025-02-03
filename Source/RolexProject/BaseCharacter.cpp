@@ -67,11 +67,26 @@ void ABaseCharacter::BeginPlay()
 	Super::BeginPlay();
 	
 	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
-	ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(GetPlayerState());
-	if (RolexGameInstance && RolexPlayerState)
+
+	GetWorld()->GetTimerManager().SetTimer(PSTimerHandle, [this]()
 	{
-		if (RolexGameInstance->PlayerTeam.Find(RolexPlayerState->UniqueID))
-			Data.Team = *RolexGameInstance->PlayerTeam.Find(RolexPlayerState->UniqueID);
+		if (not RolexPS)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("RolexPlayerState does not exists"));
+			RolexPS = Cast<ARolexPlayerState>(GetPlayerState());
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("RolexPlayerState exists"));
+			GetWorld()->GetTimerManager().ClearTimer(PSTimerHandle);
+		}
+	}, 0.1f, true);
+
+	//RolexPS = Cast<ARolexPlayerState>(GetPlayerState());
+	if (RolexGameInstance && RolexPS)
+	{
+		if (RolexGameInstance->PlayerTeam.Find(RolexPS->UniqueID))
+			Data.Team = *RolexGameInstance->PlayerTeam.Find(RolexPS->UniqueID);
 	}
 	else
 	{
@@ -138,6 +153,11 @@ void ABaseCharacter::Tick(float DeltaTime)
 	//}
 }
 
+
+void ABaseCharacter::OnRep_TabTimer()
+{
+	bTabTimer = true;
+}
 
 void ABaseCharacter::ModifyHP(int Value)
 {
@@ -419,7 +439,7 @@ void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	// 동기화를 해준다?? 
 	DOREPLIFETIME(ABaseCharacter, MoveState);
 	DOREPLIFETIME(ABaseCharacter, Data);
-
+	DOREPLIFETIME(ABaseCharacter, bTabTimer);
 }
 
 void ABaseCharacter::StartSkillCool(int32 skillIndex)
@@ -565,6 +585,8 @@ void ABaseCharacter::ServerInputTab_Implementation(bool bIsClick)
 
 void ABaseCharacter::ClientInputTab_Implementation(bool bIsClick)
 {
+	if (not bTabTimer) return;
+
 	ARolexPlayerController* rolexPC = Cast<ARolexPlayerController>(GetController());
 	if (rolexPC)
 	{
