@@ -41,6 +41,7 @@ public:
 	void MulticastRPC_UpdatePlayerTeam(int32 PlayerSlotIndex, FLinearColor Color);
 	
 public:
+	// team matching
 	void MatchPlayers();
 
 	UPROPERTY(Replicated, BlueprintReadWrite)

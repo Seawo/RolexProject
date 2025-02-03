@@ -77,6 +77,7 @@ void AWaitingRoomGameStateBase::MulticastRPC_UpdatePlayerTeam_Implementation(int
 	}
 }
 
+// team matching
 void AWaitingRoomGameStateBase::MatchPlayers()
 {
 	// does not make random	
@@ -86,38 +87,32 @@ void AWaitingRoomGameStateBase::MatchPlayers()
 	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
 	
 	Algo::RandomShuffle(PlayerArray);
-	
+	UE_LOG(LogTemp, Warning, TEXT("Total player number: %d"), PlayerArray.Num());
 	int32 HalfPlayers = PlayerArray.Num()/2;
+	
 	for (int32 i = 0; i < PlayerArray.Num(); i++)
 	{
-		ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(PlayerArray[i]);
-		RolexPlayerState->FindUniqueID();
-		if (RolexPlayerState)
+		if (ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(PlayerArray[i]))
 		{
-			if (i < HalfPlayers)
+			RolexPlayerState->FindUniqueID();
+			if (i < HalfPlayers)	// team A, true, Red
 			{
 				RolexPlayerState->Team = true;
-				ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(RolexPlayerState->GetPlayerController());
-				if (RolexPlayerController)
+				if (ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(RolexPlayerState->GetPlayerController()))
 				{
 					RolexGameInstance->PlayerTeam.Add(RolexPlayerState->UniqueID, true);
 					MulticastRPC_UpdatePlayerTeam(RolexPlayerController->PlayerSlotIndex, FLinearColor::Red);
 				}
 			}
-			else
+			else		// team B, false, Blue
 			{
 				RolexPlayerState->Team = false;
-				ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(RolexPlayerState->GetPlayerController());
-				if (RolexPlayerController)
+				if (ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(RolexPlayerState->GetPlayerController()))
 				{
 					RolexGameInstance->PlayerTeam.Add(RolexPlayerState->UniqueID, false);
 					MulticastRPC_UpdatePlayerTeam(RolexPlayerController->PlayerSlotIndex, FLinearColor::Blue);
 				}
 			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Rolex Player State Not Exists, %d player"), i);
 		}
 	}
 
@@ -246,8 +241,11 @@ void AWaitingRoomGameStateBase::MulticastRPC_StartHeroSelection_Implementation()
 	WaitingRoomUI->WaitingRoomWidgetSwitcher->SetActiveWidgetIndex(1);
 
 	MulticastRPC_UpdateNotice("START MATCHING");
-	
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AWaitingRoomGameStateBase::MatchPlayers, 3.0f, false);
+
+	if (HasAuthority())
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AWaitingRoomGameStateBase::MatchPlayers, 3.0f, false);
+	}
 }
 

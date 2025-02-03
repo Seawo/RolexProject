@@ -32,10 +32,4 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USceneCaptureComponent2D* CaptureComponent;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	USkeletalMesh* CharacterSkeletalMeshAsset;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UAnimBlueprint* CharacterAnimBlueprint;
 };
