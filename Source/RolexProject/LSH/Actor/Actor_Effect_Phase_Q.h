@@ -32,6 +32,8 @@ class ROLEXPROJECT_API AActor_Effect_Phase_Q : public AActor_Effect
 	void DrawLineTrace();
 
 private:
+	class ABaseCharacter* onwer;
+
 
 	UPROPERTY(EditAnywhere, Category = "Effect")
 	class UBoxComponent* BeamCollision;

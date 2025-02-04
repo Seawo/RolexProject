@@ -25,8 +25,7 @@ void AActor_Effect_Phase_Q::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ABaseCharacter* onwer = Cast<ABaseCharacter>(GetOwner());
-	RolexPS = Cast<ARolexPlayerState>(onwer->GetPlayerState());
+	onwer = Cast<ABaseCharacter>(GetOwner());
 
 	// 충돌체 BeginOverlap
 	BeamCollision->OnComponentBeginOverlap.AddDynamic(this, &AActor_Effect_Phase_Q::OnOverlapBegin);
@@ -133,17 +132,17 @@ void AActor_Effect_Phase_Q::TakeDamageToCharacter()
 			{
 				if (character->Data.Hp <= 0)
 				{
-					RolexPS->PlayerData.KillCount++;
+					onwer->RolexPS->PlayerData.KillCount++;
 				}
 				else if (character->Data.Hp < 30)
 				{
-					RolexPS->PlayerData.Damage += character->Data.Hp;
+					onwer->RolexPS->PlayerData.Damage += character->Data.Hp;
 					character->ModifyHP(-character->Data.Hp);
 				}
 				else
 				{
 					character->ModifyHP(-30);
-					RolexPS->PlayerData.Damage += 30;
+					onwer->RolexPS->PlayerData.Damage += 30;
 				}
 				
 			}
