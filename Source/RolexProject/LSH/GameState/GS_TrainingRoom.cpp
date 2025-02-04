@@ -51,7 +51,7 @@ void AGS_TrainingRoom::BeginPlay()
 
 	FTimerHandle TimerHandle;
 
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGS_TrainingRoom::FindCharacterInWorld, 5.0f, false);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGS_TrainingRoom::FindCharacterInWorld, 4.0f, false);
 
 
 
@@ -84,7 +84,8 @@ void AGS_TrainingRoom::Tick(float DeltaTime)
 		// 게임 시작 30초 후 거점 활성화
 		if (PlayTime > 30.0f)
 		{
-			if (not IsActiveBsePoint) // 한번만 실행되도록 처리
+			// 한번만 실행되도록 처리
+			if (not IsActiveBsePoint)
 			{
 				AActor* foundPoint = UGameplayStatics::GetActorOfClass(GetWorld(), AActor_FightPoint::StaticClass());
 				if (foundPoint)
@@ -209,6 +210,8 @@ void AGS_TrainingRoom::FindCharacterInWorld()
 			baseCharacter->bTabTimer = true;
 		}
 	}
+
+	PC->InitInGameTab();
 
 	UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] ATeam Num : %d"), ATeamChracters.Num());
 	UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] BTeam Num : %d"), BTeamChracters.Num());
