@@ -218,6 +218,11 @@ void ARolexPlayerController::ServerRPC_UnBlockHero_Implementation(const int32 He
 
 //////////////////////////////////////////////////////////////////////////
 
+void ARolexPlayerController::ServerRPC_SetText_Implementation(const FString& String)
+{
+	WaitingRoomGameStateBase->MulticastRPC_SetText(String);
+}
+
 void ARolexPlayerController::InitUI()
 {
 	if (not IsLocalController()) return;

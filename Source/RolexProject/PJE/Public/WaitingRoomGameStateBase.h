@@ -27,7 +27,7 @@ public:
 	
 public:
 	class UWaitingRoomUI* WaitingRoomUI;
-
+	
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_SetText(const FString& String);
 	

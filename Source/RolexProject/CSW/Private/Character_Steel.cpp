@@ -36,6 +36,8 @@ void ACharacter_Steel::BeginPlay()
 	Super::BeginPlay();
 
 	InitHealBarColor();
+
+	UE_LOG(LogTemp, Warning, TEXT("[ACharacter_Steel] Data.Team: %d"), Data.Team);
 }
 
 void ACharacter_Steel::Tick(float DeltaTime)

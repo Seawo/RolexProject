@@ -65,11 +65,11 @@ void UWaitingRoomUI::NativeConstruct()
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
 	{
-		AWaitingRoomGameStateBase* WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetWorld()->GetGameState());
+		ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(GetWorld()->GetFirstPlayerController());
 		URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetWorld()->GetGameInstance());
-		if (WaitingRoomGameStateBase && RolexGameInstance)
+		if (RolexPlayerController && RolexGameInstance)
 		{
-			WaitingRoomGameStateBase->MulticastRPC_SetText(RolexGameInstance->RoomName.ToString());
+			RolexPlayerController->ServerRPC_SetText(RolexGameInstance->RoomName.ToString());
 		}
 	}, 0.2f, false);
 }

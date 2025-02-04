@@ -65,6 +65,9 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_SetSelectedHero(const FString& ID, TSubclassOf<class ABaseCharacter> BaseCharacter);
 
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_SetText(const FString& String);
+	
 	int32 PreviousSelectedHeroSlotIndex;
 
 	

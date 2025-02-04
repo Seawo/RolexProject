@@ -118,6 +118,8 @@ void ABaseCharacter::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABaseCharacter::InitHeroUI, 3.0f, false);
 
 	HidenHealthBar();
+
+	UE_LOG(LogTemp, Warning, TEXT("[BaseCharacter] Data.Team: %d"), Data.Team);
 }
 
 void ABaseCharacter::InitHeroUI()
