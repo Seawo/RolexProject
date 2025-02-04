@@ -121,6 +121,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	TMap<FString, UAnimMontage*> stateMontages;
 
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	TMap<FString, class USoundCue*> AnnouncerSound;
+
 	bool bIsShield = false;
 	float ShieldTime = 5.0f;
 
@@ -225,6 +228,10 @@ public:
 	void InitHealBarColor();
 
 	FRotator SetAimDirection(ABaseCharacter* character, FVector& targetLocation, FVector startLocation = FVector::ZeroVector);
+
+	// Sound
+	void AnnouncerAttackSound(FString key);
+
 
 
 	UFUNCTION()

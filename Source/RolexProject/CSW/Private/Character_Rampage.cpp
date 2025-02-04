@@ -138,15 +138,19 @@ void ACharacter_Rampage::Multi_ChangeAttackState_Implementation(EAttackState att
 	{
 	case EAttackState::QSkill:
 		QAttack();
+		AnnouncerAttackSound("Q");
 		break;
 	case EAttackState::ESkill:
 		EAttack();
+		AnnouncerAttackSound("E");
 		break;
 	case EAttackState::LMB:
 		LBMAttack();
+		AnnouncerAttackSound("LMB");
 		break;
 	case EAttackState::RMB:
 		RBMAttack();
+		AnnouncerAttackSound("RMB");
 		break;
 	case EAttackState::QSkill_Completed:
 		break;

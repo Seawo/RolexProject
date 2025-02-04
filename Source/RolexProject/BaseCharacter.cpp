@@ -24,6 +24,8 @@
 
 #include "HealthbarUserWidget.h"
 #include "Components/ProgressBar.h"
+#include "Sound/SoundCue.h"
+
 
 #include "Point/Actor_FightPoint.h"
 #include "Kismet/GameplayStatics.h"
@@ -336,6 +338,14 @@ FRotator ABaseCharacter::SetAimDirection(ABaseCharacter* character, FVector& tar
 
 
 	return rot;
+}
+
+void ABaseCharacter::AnnouncerAttackSound(FString key)
+{
+	if (AnnouncerSound[key])
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, AnnouncerSound[key], GetActorLocation());
+	}
 }
 
 void ABaseCharacter::OnRep_MoveState()

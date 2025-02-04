@@ -121,21 +121,26 @@ void ACharacter_Sparrow::Multi_ChangeAttackState_Implementation(EAttackState att
 	case EAttackState::QSkill:
 		sectionName = FName("start");
 		PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());
+		
 		break;
 	case EAttackState::ESkill:
 		PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f);
+		AnnouncerAttackSound("E");
 		break;
 	case EAttackState::LMB:
 		sectionName = FName("start");
 		PlayAnimMontage(AttackMontages[TEXT("LBM")], 1.0f, *sectionName.ToString());
+		AnnouncerAttackSound("LMB");
 		break;
 	case EAttackState::RMB:
 		sectionName = FName("start");
 		PlayAnimMontage(AttackMontages[TEXT("RBM")], 1.0f, *sectionName.ToString());
+		AnnouncerAttackSound("RMB");
 		break;
 	case EAttackState::QSkill_Completed:
 		sectionName = FName("fire");
 		PlayAnimMontage(AttackMontages[TEXT("Q")], 1.0f, *sectionName.ToString());
+		AnnouncerAttackSound("Q");
 		break;
 	case EAttackState::ESkill_Completed:
 		break;

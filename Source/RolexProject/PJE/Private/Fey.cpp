@@ -111,15 +111,19 @@ void AFey::ChangeAttackState(EAttackState newState)
 	{
 	case EAttackState::QSkill:
 		QAttack();
+		AnnouncerAttackSound("Q");
 		break;
 	case EAttackState::ESkill:
 		EAttack();
+		AnnouncerAttackSound("E");
 		break;
 	case EAttackState::LMB:
 		LMBAttackStart();
+		AnnouncerAttackSound("LMB");
 		break;
 	case EAttackState::RMB:
 		RMBAttackStart();
+		AnnouncerAttackSound("RMB");
 		break;
 	default:
 		break;
