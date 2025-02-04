@@ -43,7 +43,8 @@ void AWaitingRoomGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimePrope
 
 void AWaitingRoomGameStateBase::MulticastRPC_SetText_Implementation(const FText& Text)
 {
-	WaitingRoomUI->RoomName->SetText(Text);
+	if (WaitingRoomUI && WaitingRoomUI->RoomName)
+		WaitingRoomUI->RoomName->SetText(Text);
 }
 
 void AWaitingRoomGameStateBase::MulticastRPC_UpdateWaitingPlayerSlotID_Implementation(
