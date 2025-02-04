@@ -11,6 +11,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "EffectActor.h"
 #include "Components\CapsuleComponent.h"
+#include "Components/SphereComponent.h"
+#include "EffectActor.h"
 
 ACharacter_Steel::ACharacter_Steel()
 {
@@ -181,7 +183,7 @@ void ACharacter_Steel::LMBAttack()
 		FName sectionName = FName("Attack_" + FString::FromInt(ComboCnt));
 		// AttackMontages
 		PlayAnimMontage(AttackMontages[TEXT("LMB")], 1.0f, *sectionName.ToString());
-
+		LMBAttackActor();
 
 		// 콤보 리셋 타이머
 		GetWorld()->GetTimerManager().ClearTimer(ComboResetTimerHandle);
@@ -248,11 +250,11 @@ void ACharacter_Steel::EAttack()
 			return;
 	}
 
-	
-
-	SpringArmComp->SetRelativeLocation(FVector(-200, 10, 90));
+	//SpringArmComp->SetRelativeLocation(FVector(-200, 10, 90));
 	FName sectionName = FName("Start");
 	PlayAnimMontage(AttackMontages[TEXT("E")], 1.0f, *sectionName.ToString());
+
+	EAttackActor();
 }
 
 void ACharacter_Steel::RMBTriggered()
@@ -399,6 +401,62 @@ void ACharacter_Steel::RMBCompleted()
 	CurrAttackState = EAttackState::RMB_Completed;
 	ChangeAttackState(CurrAttackState);
 }
+
+void ACharacter_Steel::LMBAttackActor()
+{
+	if (!HasAuthority())
+		return;
+
+	// spawn 한다 엑터를
+	FVector spawnLocation = GetActorLocation() + GetActorForwardVector() * 150.0f + FVector(0.0f, 0.0f, 50.0f);
+
+	FRotator SpawnRotation = FRotator::ZeroRotator;
+
+	LMBEffectActor = GetMesh()->GetWorld()->SpawnActorDeferred<AEffectActor>(LMBEffectActorClass, FTransform(SpawnRotation, spawnLocation), this);
+
+	if (LMBEffectActor)
+	{
+		LMBEffectActor->SetReplicates(true);
+
+		USphereComponent* sphereComp = LMBEffectActor->FindComponentByClass<USphereComponent>();
+
+		sphereComp->SetSphereRadius(100.0f);
+
+		LMBEffectActor->FinishSpawning(FTransform(SpawnRotation, spawnLocation));
+
+		if (LMBParticleEffect)
+		{
+			LMBEffectActor->InitializeEffect(LMBParticleEffect, FVector(1, 1, 1));
+		}
+	}
+}
+
+void ACharacter_Steel::EAttackActor()
+{
+	if (!HasAuthority())
+		return;
+
+	// spawn 한다 엑터를
+	FVector spawnLocation = GetActorLocation() + GetActorForwardVector() * 100.0f + FVector(0.0f, 0.0f, 0.0f);
+
+	FRotator SpawnRotation = FRotator::ZeroRotator;
+
+	EEffectActor = GetMesh()->GetWorld()->SpawnActorDeferred<AEffectActor>(EEffectActorClass, FTransform(SpawnRotation, spawnLocation), this);
+
+	if (EEffectActor)
+	{
+		EEffectActor->SetReplicates(true);
+
+		USphereComponent* sphereComp = EEffectActor->FindComponentByClass<USphereComponent>();
+
+		sphereComp->SetSphereRadius(250.0f);
+
+		EEffectActor->FinishSpawning(FTransform(SpawnRotation, spawnLocation));
+	}
+}
+
+
+
 
 
 
