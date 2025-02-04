@@ -124,15 +124,19 @@ void ACharacter_Steel::Multi_ChangeAttackState_Implementation(EAttackState attac
 	{
 	case EAttackState::QSkill:
 		QAttack();
+		AnnouncerAttackSound("Q");
 		break;
 	case EAttackState::ESkill:
 		EAttack();
+		AnnouncerAttackSound("E");
 		break;
 	case EAttackState::LMB:
 		LMBAttack();
+		AnnouncerAttackSound("LMB");
 		break;
 	case EAttackState::RMB:
 		RMBAttack();
+		AnnouncerAttackSound("RMB");
 		break;
 	case EAttackState::QSkill_Completed:
 		break;

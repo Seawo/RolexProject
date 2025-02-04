@@ -24,6 +24,9 @@
 
 #include "HealthbarUserWidget.h"
 #include "Components/ProgressBar.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
+
 // Sets default values
 ABaseCharacter::ABaseCharacter()
 {
@@ -332,6 +335,14 @@ FRotator ABaseCharacter::SetAimDirection(ABaseCharacter* character, FVector& tar
 
 
 	return rot;
+}
+
+void ABaseCharacter::AnnouncerAttackSound(FString key)
+{
+	if (AnnouncerSound[key])
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, AnnouncerSound[key], GetActorLocation());
+	}
 }
 
 void ABaseCharacter::OnRep_MoveState()
