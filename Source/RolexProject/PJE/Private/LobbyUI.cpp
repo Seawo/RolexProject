@@ -91,6 +91,18 @@ void ULobbyUI::AddSession(int32 SessionIndex, const FString& Owner, const FStrin
 	SessionItem->SessionIndex = SessionIndex;
 	SessionItem->Owner->SetText(FText::FromString(Owner));
 	SessionItem->RoomName->SetText(FText::FromString(Name));
+	SessionItem->SessionJoinBtn->OnClicked.AddDynamic(this, &ULobbyUI::DisableButtonClick);
 	
 	SessionScrollBox->AddChild(SessionItem);
+}
+
+// make other buttons disabled when the player click join button
+void ULobbyUI::DisableButtonClick()
+{
+	GameStartButton->SetIsEnabled(false);
+	OptionButton->SetIsEnabled(false);
+	QuitButton->SetIsEnabled(false);
+	CreateSessionBtn->SetIsEnabled(false);
+	FindSessionBtn->SetIsEnabled(false);
+	UndoButton->SetIsEnabled(false);
 }

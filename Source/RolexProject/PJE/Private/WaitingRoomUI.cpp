@@ -29,11 +29,11 @@ void UWaitingRoomUI::NativeConstruct()
 		PlayerController ->bShowMouseCursor = true;
 	}
 
-	ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(PlayerController);
+	AWaitingRoomGameStateBase* WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetWorld()->GetGameState());
 	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetWorld()->GetGameInstance());
-	if (RolexPlayerController && RolexGameInstance)
+	if (WaitingRoomGameStateBase && RolexGameInstance)
 	{
-		RolexPlayerController->MulticastRPC_SetText(RolexGameInstance->RoomName);
+		WaitingRoomGameStateBase->MulticastRPC_SetText(RolexGameInstance->RoomName);
 	}
 	
 	//Notice->SetVisibility(ESlateVisibility::Hidden);

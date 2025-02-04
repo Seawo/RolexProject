@@ -27,9 +27,6 @@ public:
 	TSubclassOf<class UWaitingRoomUI> WaitingRoomUIFactory;
 
 	UWaitingRoomUI* WaitingRoomUI;
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastRPC_SetText(const FText& Text);
 	
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_CreateWaitingRoomUI();

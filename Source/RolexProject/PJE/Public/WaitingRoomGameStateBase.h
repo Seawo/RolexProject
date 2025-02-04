@@ -29,6 +29,9 @@ public:
 	class UWaitingRoomUI* WaitingRoomUI;
 
 	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPC_SetText(const FText& Text);
+	
+	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPC_UpdateWaitingPlayerSlotID(const FString& NewText);
 	
 	UFUNCTION(NetMulticast, Reliable)

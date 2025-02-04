@@ -52,11 +52,6 @@ void ARolexPlayerController::BeginPlay()
 	//}
 }
 
-void ARolexPlayerController::MulticastRPC_SetText_Implementation(const FText& Text)
-{
-	WaitingRoomUI->RoomName->SetText(Text);
-}
-
 // 서버 RPC : 플레이어가 선택한 영웅 정보를 서버에 전달
 void ARolexPlayerController::ServerRPC_SetSelectedHero_Implementation(const FString& ID,
 	const TSubclassOf<class ABaseCharacter> BaseCharacter)

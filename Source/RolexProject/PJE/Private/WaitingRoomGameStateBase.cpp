@@ -41,6 +41,11 @@ void AWaitingRoomGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimePrope
 	DOREPLIFETIME(AWaitingRoomGameStateBase, HeroSelectionCountdownTime);
 }
 
+void AWaitingRoomGameStateBase::MulticastRPC_SetText_Implementation(const FText& Text)
+{
+	WaitingRoomUI->RoomName->SetText(Text);
+}
+
 void AWaitingRoomGameStateBase::MulticastRPC_UpdateWaitingPlayerSlotID_Implementation(
 	const FString& NewText)
 {
