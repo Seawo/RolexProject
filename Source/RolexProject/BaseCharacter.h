@@ -121,6 +121,13 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	TMap<FString, UAnimMontage*> stateMontages;
 
+	// sound 
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	TMap<FString, class USoundCue*> AnnouncerSound;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundAttenuation* AttenuationSetting;
+
 	bool bIsShield = false;
 	float ShieldTime = 5.0f;
 
@@ -226,6 +233,10 @@ public:
 
 	FRotator SetAimDirection(ABaseCharacter* character, FVector& targetLocation, FVector startLocation = FVector::ZeroVector);
 
+	// Sound
+	void AnnouncerAttackSound(FString key);
+
+
 
 	UFUNCTION()
 	void OnRep_MoveState();
@@ -246,7 +257,7 @@ public:
 	// 카메라 동기화 
 	FVector StartPos;
 
-	bool bPointInOut = false;
+	bool bPointInOut = false;		// true : 캐릭터가 거점에 들어옴, false : 캐릭터가 거점에서 나감
 
 public:
 

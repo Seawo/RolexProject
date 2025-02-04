@@ -104,6 +104,7 @@ public:
 	void OpenInGameTab();
 	void CloseInGameTab();
 
+	void InitInGameTab();
 
 public:
 	class ARolexPlayerState* RolexPS;

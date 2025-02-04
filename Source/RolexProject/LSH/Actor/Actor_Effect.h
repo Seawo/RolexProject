@@ -54,4 +54,6 @@ protected:
 	bool bIsLMB = false;		// true : LMB, false : RMB
 
 	class ARolexPlayerState* RolexPS;
+
+	int32 Damage = 0;
 };

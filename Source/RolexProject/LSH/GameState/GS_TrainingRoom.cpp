@@ -3,6 +3,7 @@
 
 #include "GS_TrainingRoom.h"
 
+#include "RolexGameInstance.h"
 #include "PlayerController/PlayerController_TrainingRoom.h"
 #include "RolexPlayerController.h"
 #include "RolexGameInstance.h"
@@ -50,7 +51,7 @@ void AGS_TrainingRoom::BeginPlay()
 
 	FTimerHandle TimerHandle;
 
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGS_TrainingRoom::FindCharacterInWorld, 5.0f, false);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGS_TrainingRoom::FindCharacterInWorld, 4.0f, false);
 
 
 
@@ -83,7 +84,8 @@ void AGS_TrainingRoom::Tick(float DeltaTime)
 		// 게임 시작 30초 후 거점 활성화
 		if (PlayTime > 30.0f)
 		{
-			if (not IsActiveBsePoint) // 한번만 실행되도록 처리
+			// 한번만 실행되도록 처리
+			if (not IsActiveBsePoint)
 			{
 				AActor* foundPoint = UGameplayStatics::GetActorOfClass(GetWorld(), AActor_FightPoint::StaticClass());
 				if (foundPoint)
@@ -123,6 +125,18 @@ void AGS_TrainingRoom::Tick(float DeltaTime)
 				{
 					GetWorld()->GetWorldSettings()->SetTimeDilation(0.5f);
 					PC->SetResult(Result);
+					// 게임 종료 후 서버에서 세션 나가기
+					FTimerHandle finishTH;
+					GetWorld()->GetTimerManager().SetTimer(finishTH, [this]()
+					{
+						URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
+						if (RolexGameInstance)
+						{
+							RolexGameInstance->LeaveSession();
+						}
+
+					}, 5.0f, false);
+
 					bIsGameOver = true;
 				}
 			}
@@ -196,6 +210,8 @@ void AGS_TrainingRoom::FindCharacterInWorld()
 			baseCharacter->bTabTimer = true;
 		}
 	}
+
+	PC->InitInGameTab();
 
 	UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] ATeam Num : %d"), ATeamChracters.Num());
 	UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] BTeam Num : %d"), BTeamChracters.Num());
@@ -314,6 +330,9 @@ void AGS_TrainingRoom::UpdatePointGauge(float DeltaTime)
 			PointATeamGaugePercent = 100.0f;
 			Result = EResult::AWin;
 			PC->SetOffofTxtraTime();
+
+
+
 			return;
 		}
 
@@ -663,14 +682,33 @@ void AGS_TrainingRoom::OnRep_ATeamCharacters()
 {
 	for (ABaseCharacter* character : ATeamChracters)
 	{
-		character->bTabTimer = true;
+		if (not character)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("[AGM_TrainingRoom] BTeamChracters is null on client. Possibly the local player Pawn."));
+
+			if (ARolexPlayerController* rolexPC = Cast<ARolexPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
+			{
+				APawn* localPawn = rolexPC->GetPawn();
+				if (localPawn)
+				{
+					if (ABaseCharacter* localCharacter = Cast<ABaseCharacter>(localPawn))
+					{
+						character = localCharacter;
+						localCharacter->bTabTimer = true;
+					}
+				}
+			}
+		}
+		else
+		{
+			character->bTabTimer = true;
+		}
 	}
 }
 void AGS_TrainingRoom::OnRep_BTeamCharacters()
 {
 	for (ABaseCharacter* character : BTeamChracters)
 	{
-
 		if (not character)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("[AGM_TrainingRoom] BTeamChracters is null on client. Possibly the local player Pawn."));

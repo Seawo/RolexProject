@@ -24,6 +24,12 @@
 
 #include "HealthbarUserWidget.h"
 #include "Components/ProgressBar.h"
+#include "Sound/SoundCue.h"
+
+
+#include "Point/Actor_FightPoint.h"
+#include "Kismet/GameplayStatics.h"
+
 // Sets default values
 ABaseCharacter::ABaseCharacter()
 {
@@ -334,6 +340,22 @@ FRotator ABaseCharacter::SetAimDirection(ABaseCharacter* character, FVector& tar
 	return rot;
 }
 
+void ABaseCharacter::AnnouncerAttackSound(FString key)
+{
+	if (AnnouncerSound[key] && AttenuationSetting)
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+			this,
+			AnnouncerSound[key],
+			GetActorLocation(),
+			1.0f,
+			1.0f,
+			0.0f,
+			AttenuationSetting
+		);
+	}
+}
+
 void ABaseCharacter::OnRep_MoveState()
 {
 	switch (MoveState)
@@ -533,6 +555,19 @@ void ABaseCharacter::Die(UAnimMontage* montage)
 	if (rolexPS)
 	{
 		rolexPS->PlayerData.DeathCount++;
+	}
+
+	// 캐릭터가 거점 안에 있다면
+	if (bPointInOut)
+	{
+		// 월드에 있는 거점 찾기
+		AActor* findActor = UGameplayStatics::GetActorOfClass(GetWorld(), AActor_FightPoint::StaticClass());
+		AActor_FightPoint* fightPoint = Cast<AActor_FightPoint>(findActor);
+		if (fightPoint)
+		{
+			// 거점에서 한명 나갔다고 전달하기
+			fightPoint->OnPointOverlapChanged.Broadcast(Data.Team, -1);
+		}
 	}
 
 	FTimerHandle montageTimer;

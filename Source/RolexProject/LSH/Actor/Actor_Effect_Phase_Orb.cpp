@@ -78,29 +78,37 @@ void AActor_Effect_Phase_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComp
 	//UE_LOG(LogTemp, Warning, TEXT("[Orb] HitLocation x : %.2f, y : %.2f, z : %.2f"), HitLocation1.X, HitLocation1.Y, HitLocation1.Z);
 
 	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
-	ABaseCharacter* onwer = Cast<ABaseCharacter>(GetOwner());
+	ABaseCharacter* owner = Cast<ABaseCharacter>(GetOwner());
+	if (bIsLMB)
+	{
+		Damage = 10;
+	}
+	else
+	{
+		Damage = 15;
+	}
 
-	if (character && character->Data.Team == onwer->Data.Team)
+	if (character && character->Data.Team == owner->Data.Team)
 	{
 		// 팀이면 충돌x
 		return;
 	}
 	// 캐릭터 이면서 다른 팀이라면
-	else if (character && character->Data.Team != onwer ->Data.Team)
+	else if (character && character->Data.Team != owner->Data.Team)
 	{
 		if (character->Data.Hp <= 0)
 		{
-			onwer->RolexPS->PlayerData.KillCount++;
+			owner->RolexPS->PlayerData.KillCount++;
 		}
-		else if (character->Data.Hp < 10)
+		else if (character->Data.Hp < Damage)
 		{
-			onwer->RolexPS->PlayerData.Damage += character->Data.Hp;
+			owner->RolexPS->PlayerData.Damage += character->Data.Hp;
 			character->ModifyHP(-character->Data.Hp);
 		}
 		else
 		{
-			character->ModifyHP(-10);
-			onwer->RolexPS->PlayerData.Damage += 10;
+			character->ModifyHP(-Damage);
+			owner->RolexPS->PlayerData.Damage += Damage;
 		}
 	}
 

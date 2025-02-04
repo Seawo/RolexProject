@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -34,6 +34,8 @@ public:
 	UPROPERTY()
 	FText RoomName;
 	
+	FDelegateHandle DestroySessionCompleteDelegateHandle;
+
 public:
 	void CreateSession(FName Name);
 	void OnCreateSession(FName SessionName, bool bWasSuccessful);
@@ -43,6 +45,9 @@ public:
 
 	void JoinOtherSession(int32 Index, FString Name);
 	void OnJoinSession(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+
+	void LeaveSession();
+	void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
 
 	FAddSession AddSession;
 

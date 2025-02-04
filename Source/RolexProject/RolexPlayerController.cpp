@@ -546,3 +546,11 @@ void ARolexPlayerController::CloseInGameTab()
 		GetWorld()->GetTimerManager().ClearTimer(TimerHandleTabUI);
 	}
 }
+
+void ARolexPlayerController::InitInGameTab()
+{
+	if (IsLocalController() && UI_InGameTab)
+	{
+		UI_InGameTab->InitData();
+	}
+}

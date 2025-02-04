@@ -27,30 +27,30 @@ void UAnimInstance_Phase::NativeUpdateAnimation(float DeltaSeconds)
 void UAnimInstance_Phase::AnimNotify_Attack1Spawn()
 {
 	UE_LOG(LogTemp, Warning, TEXT("AnimNotify_Attack1Spawn"));
-	Phase->SpawnEffect("FX_Hand_R4", "LMBRMB");
+	Phase->SpawnEffect("FX_Hand_R4", "RMB");
 }
 
 void UAnimInstance_Phase::AnimNotify_Attack2Spawn()
 {
 	UE_LOG(LogTemp, Warning, TEXT("AnimNotify_Attack2Spawn"));
-	Phase->SpawnEffect("FX_Hand_L4", "LMBRMB");
+	Phase->SpawnEffect("FX_Hand_L4", "RMB");
 }
 
 void UAnimInstance_Phase::AnimNotify_Attack3Spawn()
 {
 	UE_LOG(LogTemp, Warning, TEXT("AnimNotify_Attack3Spawn"));
-	Phase->SpawnEffect("FX_Hand_R4", "LMBRMB");
+	Phase->SpawnEffect("FX_Hand_R4", "RMB");
 }
 
 void UAnimInstance_Phase::AnimNotify_Attack4Spawn()
 {
 	UE_LOG(LogTemp, Warning, TEXT("AnimNotify_Attack4Spawn"));
-	Phase->SpawnEffect("FX_Hand_L4", "LMBRMB");
+	Phase->SpawnEffect("FX_Hand_L4", "RMB");
 }
 
 void UAnimInstance_Phase::AnimNotify_LMBAttack()
 {
-	Phase->SpawnEffect("FX_Hand_R4", "LMBRMB");
+	Phase->SpawnEffect("FX_Hand_R4", "LMB");
 }
 
 void UAnimInstance_Phase::AnimNotify_QAttack()
