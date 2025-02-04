@@ -246,7 +246,7 @@ public:
 	// 카메라 동기화 
 	FVector StartPos;
 
-	bool bPointInOut = false;
+	bool bPointInOut = false;		// true : 캐릭터가 거점에 들어옴, false : 캐릭터가 거점에서 나감
 
 public:
 

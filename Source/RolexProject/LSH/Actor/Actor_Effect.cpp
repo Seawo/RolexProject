@@ -35,6 +35,7 @@ void AActor_Effect::BeginPlay()
 
 
 
+	Damage = 0;
 
 	// 나중에 변경해야할수도있음
 	Phase = Cast<ACharacter_Phase>(GetOwner());

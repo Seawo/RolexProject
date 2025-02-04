@@ -305,7 +305,22 @@ void ACharacter_Phase::Server_SpawnEffect_Implementation(FName socketName, FName
 
 			FActorSpawnParameters spawnParams;
 			spawnParams.Owner = this;
-			AActor_Effect* effect = GetWorld()->SpawnActor<AActor_Effect>(effectClass, socketLocation, rot, spawnParams);
+			//AActor_Effect* effect = GetWorld()->SpawnActor<AActor_Effect>(effectClass, socketLocation, rot, spawnParams);
+
+			AActor_Effect* effect = GetWorld()->SpawnActorDeferred<AActor_Effect>(effectClass, FTransform(rot, socketLocation), this);
+			if (effect)
+			{
+				if (key == "LMB")
+				{
+					effect->SetIsLMB(true);
+				}
+				else if (key == "RMB")
+				{
+					effect->SetIsLMB(false);
+				}
+
+				effect->FinishSpawning(FTransform(rot, socketLocation));
+			}
 		}
 	}
 }

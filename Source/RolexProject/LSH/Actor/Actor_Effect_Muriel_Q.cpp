@@ -5,6 +5,7 @@
 
 #include "BaseCharacter.h"
 #include "Components/SphereComponent.h"
+#include "RolexPlayerState.h"
 
 
 AActor_Effect_Muriel_Q::AActor_Effect_Muriel_Q()
@@ -53,7 +54,20 @@ void AActor_Effect_Muriel_Q::OnOverlapBegin(UPrimitiveComponent* OverlappedCompo
 		// 적팀인 경우
 		if (character->Data.Team != owner->Data.Team)
 		{
-			character->ModifyHP(-1);
+			if (character->Data.Hp <= 0)
+			{
+				owner->RolexPS->PlayerData.KillCount++;
+			}
+			else if (character->Data.Hp < 60)
+			{
+				owner->RolexPS->PlayerData.Damage += character->Data.Hp;
+				character->ModifyHP(-character->Data.Hp);
+			}
+			else
+			{
+				character->ModifyHP(-60);
+				owner->RolexPS->PlayerData.Damage += 60;
+			}
 		}
 		// 아군인 경우
 		else if (character->Data.Team == owner->Data.Team)
