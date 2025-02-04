@@ -23,7 +23,7 @@ ACharacter_Steel::ACharacter_Steel()
 	Data.MaxHp = 450;
 	Data.Hp = 450;
 	Data.Shield = 0;
-	Data.MaxShield = 500;
+	Data.MaxShield = 300;
 	Data.Speed = 600.0f;
 	Data.Power = 20;
 

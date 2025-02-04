@@ -342,9 +342,17 @@ FRotator ABaseCharacter::SetAimDirection(ABaseCharacter* character, FVector& tar
 
 void ABaseCharacter::AnnouncerAttackSound(FString key)
 {
-	if (AnnouncerSound[key])
+	if (AnnouncerSound[key] && AttenuationSetting)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, AnnouncerSound[key], GetActorLocation());
+		UGameplayStatics::PlaySoundAtLocation(
+			this,
+			AnnouncerSound[key],
+			GetActorLocation(),
+			1.0f,
+			1.0f,
+			0.0f,
+			AttenuationSetting
+		);
 	}
 }
 

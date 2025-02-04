@@ -121,8 +121,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	TMap<FString, UAnimMontage*> stateMontages;
 
+	// sound 
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	TMap<FString, class USoundCue*> AnnouncerSound;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundAttenuation* AttenuationSetting;
 
 	bool bIsShield = false;
 	float ShieldTime = 5.0f;

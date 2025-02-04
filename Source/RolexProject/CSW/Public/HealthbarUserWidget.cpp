@@ -14,6 +14,8 @@ void UHealthbarUserWidget::SetHealthPercentage(float Percentage)
 
 void UHealthbarUserWidget::SetShieldPercentage(float Percentage)
 {
+    UE_LOG(LogTemp, Warning, TEXT("percentage : %f"), Percentage);
+
     if (ShieldProgressBar)
     {
         ShieldProgressBar->SetPercent(Percentage);
