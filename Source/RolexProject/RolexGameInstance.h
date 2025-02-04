@@ -31,6 +31,7 @@ public:
 	
 	TSharedPtr<FOnlineSessionSearch> SessionSearched;
 
+	UPROPERTY()
 	FText RoomName;
 	
 public:

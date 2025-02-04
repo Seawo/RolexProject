@@ -457,7 +457,7 @@ void ABaseCharacter::StartSkillCool(int32 skillIndex)
 	// synchronize UI cool time
 	if (HeroUI)
 	{
-		if (skillIndex == 1 || skillIndex == 3)
+		if (skillIndex != 2)
 			HeroUI->StartCoolTime(skillIndex, SkillCooldownDurations[skillIndex]);
 	}
 }

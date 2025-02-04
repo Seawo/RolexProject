@@ -61,11 +61,25 @@ void ULobbyUI::CreateSession()
 void ULobbyUI::FindSession()
 {
 	SessionScrollBoxBorder->SetVisibility(ESlateVisibility::Visible);
+
+	// clear SessionScrollBox
+	SessionScrollBox->ClearChildren();
+	
 	RolexGameInstace->FindSession();
 }
 
 void ULobbyUI::UndoSwitchWidget()
 {
+	if (MapSelectUI->IsVisible())
+		MapSelectUI->SetVisibility(ESlateVisibility::Hidden);
+
+	if (CreateSessionUI->IsVisible())
+		CreateSessionUI->SetVisibility(ESlateVisibility::Hidden);
+	
+	// find session scroll box
+	if (SessionScrollBoxBorder->IsVisible())
+		SessionScrollBoxBorder->SetVisibility(ESlateVisibility::Hidden);
+	
 	if (LobbyWidgetSwitcher)
 		LobbyWidgetSwitcher->SetActiveWidgetIndex(0);
 }

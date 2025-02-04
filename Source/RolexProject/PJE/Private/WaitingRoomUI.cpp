@@ -6,6 +6,7 @@
 #include "HeroSlotUI.h"
 #include "PlayerSlotUI.h"
 #include "RolexGameInstance.h"
+#include "RolexPlayerController.h"
 #include "WaitingRoomGameStateBase.h"
 #include "Components/Button.h"
 #include "Components/UniformGridPanel.h"
@@ -28,9 +29,12 @@ void UWaitingRoomUI::NativeConstruct()
 		PlayerController ->bShowMouseCursor = true;
 	}
 
+	ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(PlayerController);
 	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetWorld()->GetGameInstance());
-	if (RolexGameInstance)
-		RoomName->SetText(RolexGameInstance->RoomName);
+	if (RolexPlayerController && RolexGameInstance)
+	{
+		RolexPlayerController->MulticastRPC_SetText(RolexGameInstance->RoomName);
+	}
 	
 	//Notice->SetVisibility(ESlateVisibility::Hidden);
 	CountDown->SetVisibility(ESlateVisibility::Hidden);

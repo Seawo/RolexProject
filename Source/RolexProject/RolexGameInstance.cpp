@@ -2,6 +2,8 @@
 
 
 #include "RolexGameInstance.h"
+
+#include "LobbyUI.h"
 #include "Kismet/GameplayStatics.h"
 #include "OnlineSessionSettings.h"
 #include "Online/OnlineSessionNames.h"
@@ -77,11 +79,14 @@ void URolexGameInstance::FindSession()
 	if (OnlineSubsystem)
 	{
 		if (SessionInterface.IsValid())
-		{			 
+		{
+			// use MakeShared when asynchronous operations are involved: finding sessions is asynchronous operation
 			SessionSearched = MakeShared<FOnlineSessionSearch>();
+			
 			FName SubsystemName = OnlineSubsystem->GetSubsystemName();
 			UE_LOG(LogTemp, Warning, TEXT("String Subsystem Name: %s"), *SubsystemName.ToString());
 			SessionSearched->bIsLanQuery = SubsystemName.IsEqual(FName(TEXT("NULL")));
+			
 			SessionSearched->MaxSearchResults = 100;
 			SessionSearched->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 			
@@ -96,8 +101,9 @@ void URolexGameInstance::OnFindSession(bool bWasSuccessful)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("FindSession Succeed"));
 		UE_LOG(LogTemp, Warning, TEXT("Number of search results: %d"), SessionSearched->SearchResults.Num());
-		auto results = SessionSearched->SearchResults;
 
+		// get the created sessions and add to the SessionScrollBox
+		auto results = SessionSearched->SearchResults;
 		for (int32 i = 0; i < results.Num(); i++)
 		{
 			FOnlineSessionSearchResult SearchResult = results[i];
@@ -110,10 +116,6 @@ void URolexGameInstance::OnFindSession(bool bWasSuccessful)
 			
 			AddSession.ExecuteIfBound(i, OwnerName, SessionName);
 		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("FindSession Failed"));
 	}
 }
 
