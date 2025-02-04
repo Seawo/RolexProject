@@ -124,6 +124,11 @@ public:
 	// sound 
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	TMap<FString, class USoundCue*> AnnouncerSound;
+	
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	TMap<FString, class USoundWave*> EffectSound;
+
+
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundAttenuation* AttenuationSetting;
@@ -235,7 +240,7 @@ public:
 
 	// Sound
 	void AnnouncerAttackSound(FString key);
-
+	void EffectAttackSound(FString key);
 
 
 	UFUNCTION()

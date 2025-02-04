@@ -356,6 +356,22 @@ void ABaseCharacter::AnnouncerAttackSound(FString key)
 	}
 }
 
+void ABaseCharacter::EffectAttackSound(FString key)
+{
+	if (EffectSound[key] && AttenuationSetting)
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+			this,
+			EffectSound[key],
+			GetActorLocation(),
+			1.0f,
+			1.0f,
+			0.0f,
+			AttenuationSetting
+		);
+	}
+}
+
 void ABaseCharacter::OnRep_MoveState()
 {
 	switch (MoveState)

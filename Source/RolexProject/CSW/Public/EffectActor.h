@@ -67,6 +67,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	class UParticleSystem* ParticleCollusionEffect;
 
+	// Sound
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	class USoundWave* SpawnSound;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	class USoundWave* CollisionSound;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundAttenuation* AttenuationSetting;
 
 
 	// Initialize Niagara Effect
@@ -77,6 +85,8 @@ public:
 	void InitializeEffect(UParticleSystem* particleEffect, FVector effectScale);
 
 	void InititalizeThrowStone(const FVector& dir, float speed);
+
+	void PlayEffectSound(USoundWave* sound);
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
