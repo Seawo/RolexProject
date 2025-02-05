@@ -6,7 +6,7 @@ public class RolexProject : ModuleRules
 {
 	public RolexProject(ReadOnlyTargetRules Target) : base(Target)
 	{
-        // Public 파일 경로 추가
+		// Public 파일 경로 추가
         PublicIncludePaths.AddRange(new string[] { 
             "RolexProject",
             "RolexProject/LSH",
@@ -39,7 +39,8 @@ public class RolexProject : ModuleRules
             "OnlineSubsystemSteam",
             "Niagara",
             "Slate",
-            "SlateCore"
+            "SlateCore",
+            "AdvancedWidgets"	// for RadialSlider
         });
 	}
 }

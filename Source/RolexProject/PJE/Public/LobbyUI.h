@@ -72,5 +72,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class USessionItemUI> SessionItemUIFactory;
-	
+
+public:
+	UFUNCTION()
+	void DisableButtonClick();
 };

@@ -6,6 +6,7 @@
 #include "HeroSlotUI.h"
 #include "PlayerSlotUI.h"
 #include "RolexGameInstance.h"
+#include "RolexPlayerController.h"
 #include "WaitingRoomGameStateBase.h"
 #include "Components/Button.h"
 #include "Components/UniformGridPanel.h"
@@ -27,10 +28,6 @@ void UWaitingRoomUI::NativeConstruct()
 		PlayerController->SetInputMode(FInputModeUIOnly());
 		PlayerController ->bShowMouseCursor = true;
 	}
-
-	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetWorld()->GetGameInstance());
-	if (RolexGameInstance)
-		RoomName->SetText(RolexGameInstance->RoomName);
 	
 	//Notice->SetVisibility(ESlateVisibility::Hidden);
 	CountDown->SetVisibility(ESlateVisibility::Hidden);
@@ -64,6 +61,17 @@ void UWaitingRoomUI::NativeConstruct()
 		for (int32 i = 0; i < HeroButtonArray.Num(); i++)
 			HeroButtonArray[i]->HeroSlotIndex = i;
 	}
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+	{
+		ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(GetWorld()->GetFirstPlayerController());
+		URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetWorld()->GetGameInstance());
+		if (RolexPlayerController && RolexGameInstance)
+		{
+			RolexPlayerController->ServerRPC_SetText(RolexGameInstance->RoomName.ToString());
+		}
+	}, 0.2f, false);
 }
 
 void UWaitingRoomUI::GetAllDescendants(UPanelWidget* ParentWidget, TArray<UHeroSlotUI*>& Descendants)

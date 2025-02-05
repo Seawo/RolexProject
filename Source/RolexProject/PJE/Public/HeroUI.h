@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -20,9 +20,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class ABaseCharacter* BaseCharacter;
 
-	// //Skill CoolTime Bar
-	// UPROPERTY(meta = (BindWidget))
-	// class URadialSlider* QSkillCoolTimeRadialBar;
+	//Skill CoolTime Bar
+	UPROPERTY(meta = (BindWidget))
+	class URadialSlider* QSkillCoolTimeRadialBar;	
+
+	// index order: Q, E, LMB, RMB
+	TMap<int32, URadialSlider*> RadialBarMap;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UProgressBar* RMBSkillCoolTimeBar;
@@ -37,30 +40,23 @@ public:
 	FTimerHandle ETimerHandle;
 
 	UPROPERTY()
+	FTimerHandle QTimerHandle;
+	
+	UPROPERTY()
 	FTimerHandle RMBTimerHandle;
 	
 	TMap<int32, FTimerHandle> TimerMap;
 	
 	float EAccumulateTime = 0.0f;
 
+	float QAccumulateTime = 0.0f;
+	
 	float RMBAccumulateTime = 0.0f;
 	
 	TMap<int32, float> AccumulateTimeMap;
 	
 	// Skill CoolTime
 	int32 CoolTime;
-
-	// Ammo
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* Ammo;
-	
-	// MaxAmmo
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* MaxAmmo;
-	
-	// Weapon Image
-	UPROPERTY(meta = (BindWidget))
-	class UImage* WeaponImage;
 	
 	void StartCoolTime(int32 SkillIndex, int32 Time);
 

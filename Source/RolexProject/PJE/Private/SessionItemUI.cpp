@@ -17,6 +17,7 @@ void USessionItemUI::NativeConstruct()
 
 void USessionItemUI::JoinSession()
 {
+	
 	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetWorld()->GetGameInstance());
 
 	if (RolexGameInstance)

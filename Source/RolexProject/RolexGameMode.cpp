@@ -119,12 +119,12 @@ void ARolexGameMode::PostLogin(APlayerController* NewPlayer)
 
 	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
 	ARolexPlayerState* RolexPlayerState = NewPlayer->GetPlayerState<ARolexPlayerState>();
-	UE_LOG(LogTemp, Warning, TEXT("[GameMode PostLogin]"));
+	UE_LOG(LogTemp, Warning, TEXT("[RolexGameMode PostLogin]"));
 
 	if (RolexGameInstance->PlayerTeam.Find(RolexPlayerState->UniqueID))
 	{
 		RolexPlayerState->Team = *RolexGameInstance->PlayerTeam.Find(RolexPlayerState->UniqueID);
-		UE_LOG(LogTemp, Warning, TEXT("[GameMode PostLogin] Player : %s, Team : %s"), *NewPlayer->GetPawn()->GetName(), RolexPlayerState->Team ? TEXT("ATeam") : TEXT("BTeam"));
+		UE_LOG(LogTemp, Warning, TEXT("[RolexGameMode PostLogin] Player : %s, Team : %s"), *NewPlayer->GetPawn()->GetName(), RolexPlayerState->Team ? TEXT("ATeam") : TEXT("BTeam"));
 
 		// True == A Team, False == B Team
 		TArray<AActor*> PlayerStartArray;
@@ -141,7 +141,12 @@ void ARolexGameMode::PostLogin(APlayerController* NewPlayer)
 					if (BaseCharacter)
 					{
 						BaseCharacter->Data.Team = true;
+						UE_LOG(LogTemp, Warning, TEXT("[RolexGameMode PostLogin] BaseCharacter->Data.Team: %d"), BaseCharacter->Data.Team);
 						BaseCharacter->SetActorLocation(PlayerStart->GetActorLocation());
+					}
+					else
+					{
+						UE_LOG(LogTemp, Warning, TEXT("[RolexGameMode PostLogin] No BaseCharacter"));
 					}
 				}
 			}
@@ -153,7 +158,12 @@ void ARolexGameMode::PostLogin(APlayerController* NewPlayer)
 					if (BaseCharacter)
 					{
 						BaseCharacter->Data.Team = false;
+						UE_LOG(LogTemp, Warning, TEXT("[RolexGameMode PostLogin] BaseCharacter->Data.Team: %d"), BaseCharacter->Data.Team);
 						BaseCharacter->SetActorLocation(PlayerStart->GetActorLocation());
+					}
+					else
+					{
+						UE_LOG(LogTemp, Warning, TEXT("[RolexGameMode PostLogin] No BaseCharacter"));
 					}
 				}
 			}

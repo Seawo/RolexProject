@@ -24,6 +24,8 @@
 
 #include "HealthbarUserWidget.h"
 #include "Components/ProgressBar.h"
+#include "Sound/SoundCue.h"
+
 
 #include "Point/Actor_FightPoint.h"
 #include "Kismet/GameplayStatics.h"
@@ -127,6 +129,8 @@ void ABaseCharacter::BeginPlay()
 		}, 10.0f, false);
 
 	HidenHealthBar();
+
+	UE_LOG(LogTemp, Warning, TEXT("[BaseCharacter] Data.Team: %d"), Data.Team);
 }
 
 void ABaseCharacter::InitHeroUI()
@@ -351,6 +355,38 @@ FRotator ABaseCharacter::SetAimDirection(ABaseCharacter* character, FVector& tar
 	return rot;
 }
 
+void ABaseCharacter::AnnouncerAttackSound(FString key)
+{
+	if (AnnouncerSound[key] && AttenuationSetting)
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+			this,
+			AnnouncerSound[key],
+			GetActorLocation(),
+			1.0f,
+			1.0f,
+			0.0f,
+			AttenuationSetting
+		);
+	}
+}
+
+void ABaseCharacter::EffectAttackSound(FString key)
+{
+	if (EffectSound[key] && AttenuationSetting)
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+			this,
+			EffectSound[key],
+			GetActorLocation(),
+			1.0f,
+			1.0f,
+			0.0f,
+			AttenuationSetting
+		);
+	}
+}
+
 void ABaseCharacter::OnRep_MoveState()
 {
 	switch (MoveState)
@@ -474,7 +510,7 @@ void ABaseCharacter::StartSkillCool(int32 skillIndex)
 	// synchronize UI cool time
 	if (HeroUI)
 	{
-		if (skillIndex == 1 || skillIndex == 3)
+		if (skillIndex != 2)
 			HeroUI->StartCoolTime(skillIndex, SkillCooldownDurations[skillIndex]);
 	}
 }

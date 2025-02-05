@@ -36,7 +36,7 @@ void AWaitingRoomGameModeBase::BeginPlay()
 	}
 }
 
-// called when a new player joins the server
+// function called when a new player joins the session
 void AWaitingRoomGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
 {
 	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
@@ -84,18 +84,32 @@ FString AWaitingRoomGameModeBase::GetSteamID(APlayerController* NewPlayer)
 	FString SteamNickName = FString::FromInt(NewPlayer->GetUniqueID());
 	
 	OnlineSubsystem = Online::GetSubsystem(GetWorld(), "STEAM");
-	if (OnlineSubsystem)
+
+	APlayerState* PlayerState = NewPlayer->GetPlayerState<APlayerState>();
+	if (PlayerState)
 	{
-		IOnlineIdentityPtr Identity = OnlineSubsystem->GetIdentityInterface();
-		
-		ULocalPlayer* LocalPlayer =NewPlayer->GetLocalPlayer();
-		if (LocalPlayer)
-		{
-			// get Steam ID
-			FUniqueNetIdPtr NetId = LocalPlayer->GetPreferredUniqueNetId().GetUniqueNetId();
-			SteamNickName = Identity->GetPlayerNickname(*NetId);
-		}
+		SteamNickName = PlayerState->GetPlayerName();	
 	}
+	
+	// if (OnlineSubsystem)
+	// {
+	// 	const FUniqueNetIdRepl& UniqueNetId = NewPlayer->PlayerState->GetUniqueId();
+	// 	SteamNickName = UniqueNetId->ToString();
+	// }
+	
+	// if (OnlineSubsystem)
+	// {
+	// 	// interface for accessing identity online services
+	// 	IOnlineIdentityPtr IdentityInterface = OnlineSubsystem->GetIdentityInterface();
+	// 	
+	// 	ULocalPlayer* LocalPlayer =NewPlayer->GetLocalPlayer();
+	// 	if (LocalPlayer)
+	// 	{
+	// 		// get Steam ID
+	// 		FUniqueNetIdPtr NetId = LocalPlayer->GetPreferredUniqueNetId().GetUniqueNetId();
+	// 		SteamNickName = IdentityInterface->GetPlayerNickname(*NetId);
+	// 	}
+	// }
 
 	UE_LOG(LogTemp, Warning, TEXT("Steam Nick Name: %s"), *SteamNickName);
 	return SteamNickName;

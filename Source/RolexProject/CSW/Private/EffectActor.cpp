@@ -17,6 +17,9 @@
 
 #include "Net/UnrealNetwork.h"
 
+#include "Sound/SoundCue.h"
+#include "Kismet/GameplayStatics.h"
+
 // Sets default values
 AEffectActor::AEffectActor()
 {
@@ -51,6 +54,7 @@ void AEffectActor::BeginPlay()
 	
 	SetReplicates(true);
 	SetReplicatingMovement(true);
+	PlayEffectSound(SpawnSound);
 	
 
 	if (bIsDamage)
@@ -128,7 +132,21 @@ void AEffectActor::InititalizeThrowStone(const FVector& dir, float speed)
 	ThrowSpeed = speed;
 }
 
-
+void AEffectActor::PlayEffectSound(USoundWave* sound)
+{
+	if (AttenuationSetting && sound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+			this,
+			sound,
+			GetActorLocation(),
+			1.0f,
+			1.0f,
+			0.0f,
+			AttenuationSetting
+		);
+	}
+}
 
 // 충돌 났을때
 void AEffectActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -169,6 +187,8 @@ void AEffectActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 					FRotator::ZeroRotator,
 					true // 자동 크기 조정
 				);
+
+				PlayEffectSound(CollisionSound);
 			}
 
 			FTimerHandle handle;

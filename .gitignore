@@ -102,3 +102,6 @@ RolexProject.bat
 # UI Assests
 Content/ProgressBarsPack
 Content/ProIconPack
+
+# Include 
+!Content/ProIconPack/UI

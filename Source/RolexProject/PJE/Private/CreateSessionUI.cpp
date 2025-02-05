@@ -29,7 +29,9 @@ void UCreateSessionUI::Confirm()
 		RolexGameInstance->MaxPlayersNum = Num;
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("[UCreateSessionUI] Session Name: %s"), *SessionNameBox->GetText().ToString());
 	RolexGameInstance->RoomName = SessionNameBox->GetText();
+	UE_LOG(LogTemp, Warning, TEXT("[UCreateSessionUI] RolexGameInstance->RoomName: %s"), *SessionNameBox->GetText().ToString());
 	// create a new sessions
 	RolexGameInstance->CreateSession(*SessionNameBox->GetText().ToString());
 }

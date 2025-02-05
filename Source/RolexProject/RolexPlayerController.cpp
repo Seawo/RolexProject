@@ -51,9 +51,10 @@ void ARolexPlayerController::BeginPlay()
 	//	}
 	//}
 }
+
 // 서버 RPC : 플레이어가 선택한 영웅 정보를 서버에 전달
 void ARolexPlayerController::ServerRPC_SetSelectedHero_Implementation(const FString& ID,
-	TSubclassOf<class ABaseCharacter> BaseCharacter)
+	const TSubclassOf<class ABaseCharacter> BaseCharacter)
 {
 	// RolexGameInstance 가져오기
 	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
@@ -99,14 +100,14 @@ void ARolexPlayerController::ServerRPC_SetSelectedHero_Implementation(const FStr
 // 		// }
 // 	}
 // }
-void ARolexPlayerController::ServerRPC_SetPlayerSlotHeroImage_Implementation(UTexture2D* PlayerHeroTexture, int32 Index)
+void ARolexPlayerController::ServerRPC_SetPlayerSlotHeroImage_Implementation(UTexture2D* PlayerHeroTexture, const int32 Index)
 {
 	// cannot implement MulticastRPC_SetPlayerHeroImage in RolexPlayerController since clients only have its own controller
 	// client GameStateBase cannot call RPC functions since clients doesn't have an ownership for GameStateBase
 	WaitingRoomGameStateBase->MulticastRPC_SetPlayerHeroImage(PlayerHeroTexture, Index); 
 }
 
-void ARolexPlayerController::ServerRPC_InformClientPlayerSlotIndex_Implementation(int32 PlayerNumber, UPlayerSlotUI* PlayerSlotUI)
+void ARolexPlayerController::ServerRPC_InformClientPlayerSlotIndex_Implementation(const int32 PlayerNumber, UPlayerSlotUI* PlayerSlotUI)
 {
 	PlayerSlotIndex = PlayerNumber;
 	OwnPlayerSlot = PlayerSlotUI;
@@ -172,7 +173,7 @@ void ARolexPlayerController::ClientRPC_CreateWaitingRoomUI_Implementation()
 	}
 }
 
-void ARolexPlayerController::ClientRPC_SetPlayerSlotUI_Implementation(int32 PlayerNumber)
+void ARolexPlayerController::ClientRPC_SetPlayerSlotUI_Implementation(const int32 PlayerNumber)
 {
 	// set Steam ID on player slot textbox
 	PlayerSlotIndex = PlayerNumber;
@@ -205,17 +206,22 @@ void ARolexPlayerController::ClientRPC_SetPlayerSlotUI_Implementation(int32 Play
 	ServerRPC_UpdateWholePlayerNumber();
 }
 
-void ARolexPlayerController::ServerRPC_BlockHero_Implementation(int32 HeroIndex, int32 PlayerIndex)
+void ARolexPlayerController::ServerRPC_BlockHero_Implementation(const int32 HeroIndex, const int32 PlayerIndex)
 {
 	WaitingRoomGameStateBase->MulticastRPC_BlockHero(HeroIndex, PlayerIndex);
 }
 
-void ARolexPlayerController::ServerRPC_UnBlockHero_Implementation(int32 HeroIndex, int32 PlayerIndex)
+void ARolexPlayerController::ServerRPC_UnBlockHero_Implementation(const int32 HeroIndex, const int32 PlayerIndex)
 {
 	WaitingRoomGameStateBase->MulticastRPC_UnBlockHero(HeroIndex, PlayerIndex);
 }
 
 //////////////////////////////////////////////////////////////////////////
+
+void ARolexPlayerController::ServerRPC_SetText_Implementation(const FString& String)
+{
+	WaitingRoomGameStateBase->MulticastRPC_SetText(String);
+}
 
 void ARolexPlayerController::InitUI()
 {
@@ -492,21 +498,21 @@ void ARolexPlayerController::SetCharacterOverlay(class AGS_TrainingRoom* gs)
 	}
 }
 
-void ARolexPlayerController::SetPlayTime(float Time)
+void ARolexPlayerController::SetPlayTime(const float Time)
 {
 	if (IsLocalController() && UI_Zone)
 	{
 		UI_Zone->SetPlayTime(Time);
 	}
 }
-void ARolexPlayerController::SetPoint(int idx)
+void ARolexPlayerController::SetPoint(const int idx)
 {
 	if (IsLocalController() && UI_Zone)
 	{
 		UI_Zone->SetPoint(idx);
 	}
 }
-void ARolexPlayerController::SetTakingGuage(float Agauge, float Bgauge)
+void ARolexPlayerController::SetTakingGuage(const float Agauge, const float Bgauge)
 {
 	if (IsLocalController() && UI_Zone)
 	{
@@ -515,7 +521,7 @@ void ARolexPlayerController::SetTakingGuage(float Agauge, float Bgauge)
 		UI_Zone->SetTakingGuage(A, B);
 	}
 }
-void ARolexPlayerController::SetResult(EResult result)
+void ARolexPlayerController::SetResult(const EResult result)
 {
 	if (not IsLocalController()) return;
 
@@ -569,35 +575,35 @@ void ARolexPlayerController::SetResult(EResult result)
 		UE_LOG(LogTemp, Warning, TEXT("UI_GameEnd is nullptr"));
 	}
 }
-void ARolexPlayerController::SetATeamCount(int32 Count)
+void ARolexPlayerController::SetATeamCount(const int32 Count)
 {
 	if (IsLocalController() && UI_Zone)
 	{
 		UI_Zone->SetATeamCount(Count);
 	}
 }
-void ARolexPlayerController::SetBTeamCount(int32 Count)
+void ARolexPlayerController::SetBTeamCount(const int32 Count)
 {
 	if (IsLocalController() && UI_Zone)
 	{
 		UI_Zone->SetBTeamCount(Count);
 	}
 }
-void ARolexPlayerController::SetPercent(EOccupation occupation, float APercent, float BPercent)
+void ARolexPlayerController::SetPercent(const EOccupation occupation, const float APercent, const float BPercent)
 {
 	if (IsLocalController() && UI_Zone)
 	{
 		UI_Zone->SetPercent(occupation, APercent, BPercent);
 	}
 }
-void ARolexPlayerController::SetClashing(EClashing clash)
+void ARolexPlayerController::SetClashing(const EClashing clash)
 {
 	if (IsLocalController() && UI_Zone)
 	{
 		UI_Zone->SetClashing(clash);
 	}
 }
-void ARolexPlayerController::SetExtraTime(float Time)
+void ARolexPlayerController::SetExtraTime(const float Time)
 {
 	if (IsLocalController() && UI_Zone)
 	{
@@ -611,14 +617,14 @@ void ARolexPlayerController::SetOffofTxtraTime()
 		UI_Zone->SetOffofTxtraTime();
 	}
 }
-void ARolexPlayerController::SetIsATeamExtraTime(bool bExtra)
+void ARolexPlayerController::SetIsATeamExtraTime(const bool bExtra)
 {
 	if (IsLocalController() and UI_Zone)
 	{
 		UI_Zone->SetIsATeamExtraTime(bExtra);
 	}
 }
-void ARolexPlayerController::SetIsBTeamExtraTime(bool bExtra)
+void ARolexPlayerController::SetIsBTeamExtraTime(const bool bExtra)
 {
 	if (IsLocalController() and UI_Zone)
 	{

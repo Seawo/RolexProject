@@ -26,11 +26,11 @@ ACharacter_Rampage::ACharacter_Rampage()
 	// character setting 
 	Data.RoleType = ERoleType::Tanker;
 	Data.Name = "Rampage";
-	Data.Team = true;
+	Data.Team = false;
 	Data.MaxHp = 550;
 	Data.Hp = 550;
-	Data.Shield = 0;
 	Data.MaxShield = 500;
+	Data.Shield = 0;
 	Data.Speed = 850.0f;
 	Data.Power = 20;
 
@@ -52,6 +52,8 @@ void ACharacter_Rampage::BeginPlay()
 
 	//ChangeState(EMoveState::Start, stateMontages[TEXT("Start")]);
 	InitHealBarColor();
+
+
 }
 
 void ACharacter_Rampage::Tick(float DeltaTime)
@@ -73,7 +75,6 @@ void ACharacter_Rampage::Tick(float DeltaTime)
 
 			// Re-enable normal movement
 			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-
 			return;
 		}
 		
@@ -138,15 +139,19 @@ void ACharacter_Rampage::Multi_ChangeAttackState_Implementation(EAttackState att
 	{
 	case EAttackState::QSkill:
 		QAttack();
+		AnnouncerAttackSound("Q");
 		break;
 	case EAttackState::ESkill:
 		EAttack();
+		AnnouncerAttackSound("E");
 		break;
 	case EAttackState::LMB:
 		LBMAttack();
+		AnnouncerAttackSound("LMB");
 		break;
 	case EAttackState::RMB:
 		RBMAttack();
+		AnnouncerAttackSound("RMB");
 		break;
 	case EAttackState::QSkill_Completed:
 		break;
