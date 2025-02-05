@@ -28,8 +28,51 @@ ARolexGameMode::ARolexGameMode()
 
 void ARolexGameMode::BeginPlay()
 {
-	UE_LOG(LogTemp, Warning, TEXT("------------ RolexGameMode BeginPlay ------------"));
 	Super::BeginPlay();
+
+	UE_LOG(LogTemp, Warning, TEXT("------------ RolexGameMode BeginPlay ------------"));
+
+	FTimerHandle timerHandle;
+	GetWorld()->GetTimerManager().SetTimer(timerHandle, [this]()
+		{
+			URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
+
+			TArray<AActor*> PlayerStartArray;
+			UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), PlayerStartArray);
+
+			TArray<AActor*> foundCharacters;
+			UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), foundCharacters);
+
+			UE_LOG(LogTemp, Error, TEXT("[RolexGameMode BeginPlay] foundCharacters.Num(): %d"), foundCharacters.Num());
+
+			for (AActor* character : foundCharacters)
+			{
+				ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(character);
+				ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(baseCharacter->GetController()->PlayerState);
+				baseCharacter->Data.Team = *RolexGameInstance->PlayerTeam.Find(RolexPlayerState->UniqueID);
+				UE_LOG(LogTemp, Error, TEXT("[RolexGameMode BeginPlay] BaseCharacter->Data.Team: %d"), baseCharacter->Data.Team);
+
+				for (AActor* playerStart : PlayerStartArray)
+				{
+					if (baseCharacter->Data.Team)
+					{
+						if (playerStart->GetName().Contains(TEXT("PlayerStart_4")))
+						{
+							baseCharacter->SetActorLocation(playerStart->GetActorLocation());
+						}
+					}
+					else
+					{
+						if (playerStart->GetName().Contains(TEXT("PlayerStart_3")))
+						{
+							baseCharacter->SetActorLocation(playerStart->GetActorLocation());
+						}
+					}
+				}
+			}
+		}, 1.0f, false);
+
+	
 }
 
 void ARolexGameMode::Tick(float DeltaTime)
@@ -50,7 +93,7 @@ UClass* ARolexGameMode::GetDefaultPawnClassForController_Implementation(AControl
 		RolexPlayerState->FindUniqueID();
 		if (TSubclassOf<ABaseCharacter>* BaseCharacterFactory = RolexGameInstance->PlayerHeroSelections.Find(RolexPlayerState->UniqueID))
 		{
-			BaseCharacterFactory->GetDefaultObject()->Data.Team = RolexGameInstance->PlayerTeam[RolexPlayerState->UniqueID];
+			/*BaseCharacterFactory->GetDefaultObject()->Data.Team = RolexGameInstance->PlayerTeam[RolexPlayerState->UniqueID];*/
 
 			UE_LOG(LogTemp, Warning, TEXT("[GameMode GetDefaultPawnClassForController] Player ID : %s"), *RolexPlayerState->UniqueID);
 			return *BaseCharacterFactory;	
@@ -63,40 +106,42 @@ UClass* ARolexGameMode::GetDefaultPawnClassForController_Implementation(AControl
 
 APawn* ARolexGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot)
 {
+	UE_LOG(LogTemp, Warning, TEXT("------------ RolexGameMode SpawnDefaultPawnFor ------------"));
+
 	return GetWorld()->SpawnActor<ABaseCharacter>(GetDefaultPawnClassForController(NewPlayer),
 													StartSpot->GetActorLocation(), 
 													StartSpot->GetActorRotation());
 }
 
-AActor* ARolexGameMode::ChoosePlayerStart_Implementation(AController* Player)
-{
-	TArray<AActor*> PlayerStartArray;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), PlayerStartArray);
-
-	for (AActor* playerStart : PlayerStartArray)
-	{
-		ABaseCharacter* character = Cast<ABaseCharacter>(Player->GetPawn());
-		if (character->Data.Team)
-		{
-			if (playerStart->GetName().Contains(TEXT("PlayerStart_4")))
-			{
-				return playerStart;
-			}
-		}
-		else
-		{
-			if (playerStart->GetName().Contains(TEXT("PlayerStart_3")))
-			{
-				return playerStart;
-			}
-		}
-	}
-
-
-
-
-	return Super::ChoosePlayerStart_Implementation(Player);
-}
+//AActor* ARolexGameMode::ChoosePlayerStart_Implementation(AController* Player)
+//{
+//	TArray<AActor*> PlayerStartArray;
+//	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), PlayerStartArray);
+//
+//	for (AActor* playerStart : PlayerStartArray)
+//	{
+//		ABaseCharacter* character = Cast<ABaseCharacter>(Player->GetPawn());
+//		if (character->Data.Team)
+//		{
+//			if (playerStart->GetName() == TEXT("PlayerStart_4"))
+//			{
+//				return playerStart;
+//			}
+//		}
+//		else
+//		{
+//			if (playerStart->GetName().Contains(TEXT("PlayerStart_3")))
+//			{
+//				return playerStart;
+//			}
+//		}
+//	}
+//
+//
+//
+//
+//	return Super::ChoosePlayerStart_Implementation(Player);
+//}
 
 
 

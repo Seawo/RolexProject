@@ -23,7 +23,7 @@ public:
 
 	virtual APawn* SpawnDefaultPawnFor_Implementation(AController* NewPlayer, class AActor* StartSpot) override;
 
-	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+	//virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
