@@ -3,6 +3,7 @@
 
 #include "WaitingRoomGameStateBase.h"
 
+#include "AudioManager.h"
 #include "HeroSlotUI.h"
 #include "PlayerSlotUI.h"
 #include "RolexGameInstance.h"
@@ -11,12 +12,14 @@
 #include "WaitingPlayerSlotUI.h"
 #include "WaitingRoomUI.h"
 #include "Algo/RandomShuffle.h"
+#include "Components/AudioComponent.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Components/UniformGridPanel.h"
 #include "Components/VerticalBox.h"
 #include "Components/WidgetSwitcher.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -246,6 +249,15 @@ void AWaitingRoomGameStateBase::MulticastRPC_StartHeroSelection_Implementation()
 {
 	WaitingRoomUI->WaitingRoomWidgetSwitcher->SetActiveWidgetIndex(1);
 
+	// change sound
+	AAudioManager* AudioManager = Cast<AAudioManager>(UGameplayStatics::GetActorOfClass(this, AAudioManager::StaticClass()));
+	if (AudioManager && WaitingRoomUI->HeroSelectionSound)
+	{
+		AudioManager->AudioComponent->Stop();
+		AudioManager->AudioComponent->SetSound(WaitingRoomUI->HeroSelectionSound);
+		AudioManager->AudioComponent->Play();
+	}
+	
 	MulticastRPC_UpdateNotice("START MATCHING");
 
 	if (HasAuthority())

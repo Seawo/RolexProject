@@ -2,6 +2,8 @@
 
 
 #include "LobbyUI.h"
+
+#include "AudioManager.h"
 #include "Blueprint/UserWidget.h"
 #include "NavigationSystemTypes.h"
 #include "RolexGameInstance.h"
@@ -13,8 +15,11 @@
 #include "Kismet/GameplayStatics.h"
 #include "CreateSessionUI.h"
 #include "MapSelectUI.h"
+#include "Components/AudioComponent.h"
 #include "Components/Border.h"
 #include "Components/WidgetSwitcher.h"
+
+class AAudioManager;
 
 void ULobbyUI::NativeConstruct()
 {
@@ -44,6 +49,14 @@ void ULobbyUI::NativeConstruct()
 
 	if (RolexGameInstace)
 		RolexGameInstace->AddSession.BindUObject(this, &ULobbyUI::AddSession);
+
+	// set sound
+	AAudioManager* AudioManager = Cast<AAudioManager>(UGameplayStatics::GetActorOfClass(this, AAudioManager::StaticClass()));
+	if (AudioManager && LobbySound)
+	{
+		AudioManager->AudioComponent->SetSound(LobbySound);
+		AudioManager->AudioComponent->Play();
+	}
 }
 
 void ULobbyUI::SwitchWidget()
