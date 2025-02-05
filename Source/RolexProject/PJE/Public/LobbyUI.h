@@ -76,4 +76,7 @@ public:
 public:
 	UFUNCTION()
 	void DisableButtonClick();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USoundBase* LobbySound;
 };
