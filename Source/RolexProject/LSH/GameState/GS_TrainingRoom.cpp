@@ -62,7 +62,7 @@ void AGS_TrainingRoom::BeginPlay()
 
 			PC->SetCharacterOverlay(this);
 			PlayTime = 0;
-		}, 5.0f, false);
+		}, 6.0f, false);
 }
 
 void AGS_TrainingRoom::Tick(float DeltaTime)
