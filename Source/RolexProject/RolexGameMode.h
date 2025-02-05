@@ -21,6 +21,10 @@ public:
 
 	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
 
+	virtual APawn* SpawnDefaultPawnFor_Implementation(AController* NewPlayer, class AActor* StartSpot) override;
+
+	//virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
 

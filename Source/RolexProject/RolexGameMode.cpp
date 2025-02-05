@@ -28,62 +28,51 @@ ARolexGameMode::ARolexGameMode()
 
 void ARolexGameMode::BeginPlay()
 {
-	UE_LOG(LogTemp, Warning, TEXT("------------ RolexGameMode BeginPlay ------------"));
 	Super::BeginPlay();
-	
-	//FTimerHandle timer;
-	//GetWorldTimerManager().SetTimer(timer, [this]()
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("[GameMode BeginPlay] GS_TrainingRoom is valid"));
-	//	TArray<AActor*> foundActors;
-	//	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), foundActors);
 
-	//	for (AActor* actor : foundActors)
-	//	{
-	//		ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(actor);
-	//		if (baseCharacter)
-	//		{
-	//			baseCharacter->bTabTimer = true;
-	//			if (ARolexPlayerController* rolexPC = Cast<ARolexPlayerController>(baseCharacter->GetController()))
-	//			{
-	//				UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] FindCharacterInWorld client PC : %p"), rolexPC);
-	//			}
+	UE_LOG(LogTemp, Warning, TEXT("------------ RolexGameMode BeginPlay ------------"));
 
-	//			if (baseCharacter->Data.Team)
-	//			{
-	//				ATeamChracters.Add(baseCharacter);
+	FTimerHandle timerHandle;
+	GetWorld()->GetTimerManager().SetTimer(timerHandle, [this]()
+		{
+			URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
 
-	//			}
-	//			else
-	//			{
-	//				BTeamChracters.Add(baseCharacter);
-	//			}
+			TArray<AActor*> PlayerStartArray;
+			UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), PlayerStartArray);
 
-	//		}
-	//	}
-	//}, 5.0f, false);
-	
+			TArray<AActor*> foundCharacters;
+			UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), foundCharacters);
 
-	
+			UE_LOG(LogTemp, Error, TEXT("[RolexGameMode BeginPlay] foundCharacters.Num(): %d"), foundCharacters.Num());
 
-	/*
-	// print player name and team
-	FTimerHandle timerPlayer;
-	GetWorldTimerManager().SetTimer(timerPlayer, [this]()
-	{
-			TArray<AActor*> PlayerArray;
-			UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), PlayerArray);
-			for (AActor* Player : PlayerArray)
+			for (AActor* character : foundCharacters)
 			{
-				ABaseCharacter* BaseCharacter = Cast<ABaseCharacter>(Player);
-				if (BaseCharacter)
+				ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(character);
+				ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(baseCharacter->GetController()->PlayerState);
+				baseCharacter->Data.Team = *RolexGameInstance->PlayerTeam.Find(RolexPlayerState->UniqueID);
+				UE_LOG(LogTemp, Error, TEXT("[RolexGameMode BeginPlay] BaseCharacter->Data.Team: %d"), baseCharacter->Data.Team);
+
+				for (AActor* playerStart : PlayerStartArray)
 				{
-					// ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(BaseCharacter->GetPlayerState());
-					//BaseCharacter->Data.Team = RolexPlayerState->Team;
-					UE_LOG(LogTemp, Warning, TEXT("[GameMode BeginPlay] Name : %s, Team : %s"), *BaseCharacter->GetName(), BaseCharacter->Data.Team ? TEXT("ATeam") : TEXT("BTeam"));
+					if (baseCharacter->Data.Team)
+					{
+						if (playerStart->GetName().Contains(TEXT("PlayerStart_4")))
+						{
+							baseCharacter->SetActorLocation(playerStart->GetActorLocation());
+						}
+					}
+					else
+					{
+						if (playerStart->GetName().Contains(TEXT("PlayerStart_3")))
+						{
+							baseCharacter->SetActorLocation(playerStart->GetActorLocation());
+						}
+					}
 				}
 			}
-	}, 3.0f, false);*/
+		}, 1.0f, false);
+
+	
 }
 
 void ARolexGameMode::Tick(float DeltaTime)
@@ -104,6 +93,8 @@ UClass* ARolexGameMode::GetDefaultPawnClassForController_Implementation(AControl
 		RolexPlayerState->FindUniqueID();
 		if (TSubclassOf<ABaseCharacter>* BaseCharacterFactory = RolexGameInstance->PlayerHeroSelections.Find(RolexPlayerState->UniqueID))
 		{
+			/*BaseCharacterFactory->GetDefaultObject()->Data.Team = RolexGameInstance->PlayerTeam[RolexPlayerState->UniqueID];*/
+
 			UE_LOG(LogTemp, Warning, TEXT("[GameMode GetDefaultPawnClassForController] Player ID : %s"), *RolexPlayerState->UniqueID);
 			return *BaseCharacterFactory;	
 		}
@@ -113,6 +104,47 @@ UClass* ARolexGameMode::GetDefaultPawnClassForController_Implementation(AControl
 	return Super::GetDefaultPawnClassForController_Implementation(InController);
 }
 
+APawn* ARolexGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot)
+{
+	UE_LOG(LogTemp, Warning, TEXT("------------ RolexGameMode SpawnDefaultPawnFor ------------"));
+
+	return GetWorld()->SpawnActor<ABaseCharacter>(GetDefaultPawnClassForController(NewPlayer),
+													StartSpot->GetActorLocation(), 
+													StartSpot->GetActorRotation());
+}
+
+//AActor* ARolexGameMode::ChoosePlayerStart_Implementation(AController* Player)
+//{
+//	TArray<AActor*> PlayerStartArray;
+//	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), PlayerStartArray);
+//
+//	for (AActor* playerStart : PlayerStartArray)
+//	{
+//		ABaseCharacter* character = Cast<ABaseCharacter>(Player->GetPawn());
+//		if (character->Data.Team)
+//		{
+//			if (playerStart->GetName() == TEXT("PlayerStart_4"))
+//			{
+//				return playerStart;
+//			}
+//		}
+//		else
+//		{
+//			if (playerStart->GetName().Contains(TEXT("PlayerStart_3")))
+//			{
+//				return playerStart;
+//			}
+//		}
+//	}
+//
+//
+//
+//
+//	return Super::ChoosePlayerStart_Implementation(Player);
+//}
+
+
+
 void ARolexGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
@@ -120,11 +152,12 @@ void ARolexGameMode::PostLogin(APlayerController* NewPlayer)
 	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
 	ARolexPlayerState* RolexPlayerState = NewPlayer->GetPlayerState<ARolexPlayerState>();
 	UE_LOG(LogTemp, Warning, TEXT("[RolexGameMode PostLogin]"));
-
+	
 	if (RolexGameInstance->PlayerTeam.Find(RolexPlayerState->UniqueID))
 	{
 		RolexPlayerState->Team = *RolexGameInstance->PlayerTeam.Find(RolexPlayerState->UniqueID);
-		UE_LOG(LogTemp, Warning, TEXT("[RolexGameMode PostLogin] Player : %s, Team : %s"), *NewPlayer->GetPawn()->GetName(), RolexPlayerState->Team ? TEXT("ATeam") : TEXT("BTeam"));
+		UE_LOG(LogTemp, Warning, TEXT("[RolexGameMode PostLogin] GI Player : %s, Team : %s"), *NewPlayer->GetPawn()->GetName(), RolexGameInstance->PlayerTeam[RolexPlayerState->UniqueID] ? TEXT("ATeam") : TEXT("BTeam"));
+		UE_LOG(LogTemp, Warning, TEXT("[RolexGameMode PostLogin] PS Player : %s, Team : %s"), *NewPlayer->GetPawn()->GetName(), RolexPlayerState->Team ? TEXT("ATeam") : TEXT("BTeam"));
 
 		// True == A Team, False == B Team
 		TArray<AActor*> PlayerStartArray;
@@ -133,14 +166,14 @@ void ARolexGameMode::PostLogin(APlayerController* NewPlayer)
 		// set player start for the player
 		for (AActor* PlayerStart : PlayerStartArray)
 		{
-			if (RolexPlayerState and RolexPlayerState->Team) // A team starts in PlayerStart_4
+			if (RolexPlayerState and RolexGameInstance->PlayerTeam[RolexPlayerState->UniqueID]) // A team starts in PlayerStart_4
 			{
 				if (PlayerStart->GetName().Contains(TEXT("PlayerStart_4")))
 				{
 					ABaseCharacter* BaseCharacter = Cast<ABaseCharacter>(NewPlayer->GetPawn());
 					if (BaseCharacter)
 					{
-						BaseCharacter->Data.Team = true;
+						BaseCharacter->Data.Team = RolexGameInstance->PlayerTeam[RolexPlayerState->UniqueID];
 						UE_LOG(LogTemp, Warning, TEXT("[RolexGameMode PostLogin] BaseCharacter->Data.Team: %d"), BaseCharacter->Data.Team);
 						BaseCharacter->SetActorLocation(PlayerStart->GetActorLocation());
 					}
@@ -150,14 +183,14 @@ void ARolexGameMode::PostLogin(APlayerController* NewPlayer)
 					}
 				}
 			}
-			else if (RolexPlayerState and !RolexPlayerState->Team) // B team starts in PlayerStart_3
+			else if (RolexPlayerState and !RolexGameInstance->PlayerTeam[RolexPlayerState->UniqueID]) // B team starts in PlayerStart_3
 			{
 				if (PlayerStart->GetName().Contains(TEXT("PlayerStart_3")))
 				{
 					ABaseCharacter* BaseCharacter = Cast<ABaseCharacter>(NewPlayer->GetPawn());
 					if (BaseCharacter)
 					{
-						BaseCharacter->Data.Team = false;
+						BaseCharacter->Data.Team = RolexGameInstance->PlayerTeam[RolexPlayerState->UniqueID];
 						UE_LOG(LogTemp, Warning, TEXT("[RolexGameMode PostLogin] BaseCharacter->Data.Team: %d"), BaseCharacter->Data.Team);
 						BaseCharacter->SetActorLocation(PlayerStart->GetActorLocation());
 					}
