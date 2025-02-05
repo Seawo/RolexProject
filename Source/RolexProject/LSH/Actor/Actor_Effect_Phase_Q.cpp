@@ -125,7 +125,7 @@ void AActor_Effect_Phase_Q::OnOverlapEnd(UPrimitiveComponent* OverlappedComponen
 
 void AActor_Effect_Phase_Q::TakeDamageToCharacter()
 {
-	//if (not HasAuthority()) return;
+	if (not HasAuthority()) return;
 
 	// 데미지 주기
 	if (bIsOverlap)

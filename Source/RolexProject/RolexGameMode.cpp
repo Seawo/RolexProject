@@ -50,29 +50,33 @@ void ARolexGameMode::BeginPlay()
 			{
 				ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(character);
 				ARolexPlayerState* RolexPlayerState = Cast<ARolexPlayerState>(baseCharacter->GetController()->PlayerState);
-				if (RolexGameInstance->PlayerTeam.Contains(RolexPlayerState->UniqueID))
+				if (RolexPlayerState)
 				{
-					baseCharacter->Data.Team = *RolexGameInstance->PlayerTeam.Find(RolexPlayerState->UniqueID);
-					UE_LOG(LogTemp, Error, TEXT("[RolexGameMode BeginPlay] BaseCharacter->Data.Team: %d"), baseCharacter->Data.Team);
-
-					for (AActor* playerStart : PlayerStartArray)
+					if (RolexGameInstance->PlayerTeam.Contains(RolexPlayerState->UniqueID))
 					{
-						if (baseCharacter->Data.Team)
+						baseCharacter->Data.Team = *RolexGameInstance->PlayerTeam.Find(RolexPlayerState->UniqueID);
+						UE_LOG(LogTemp, Error, TEXT("[RolexGameMode BeginPlay] BaseCharacter->Data.Team: %d"), baseCharacter->Data.Team);
+
+						for (AActor* playerStart : PlayerStartArray)
 						{
-							if (playerStart->GetName().Contains(TEXT("PlayerStart_4")))
+							if (baseCharacter->Data.Team)
 							{
-								baseCharacter->SetActorLocation(playerStart->GetActorLocation());
+								if (playerStart->GetName().Contains(TEXT("PlayerStart_4")))
+								{
+									baseCharacter->SetActorLocation(playerStart->GetActorLocation());
+								}
 							}
-						}
-						else
-						{
-							if (playerStart->GetName().Contains(TEXT("PlayerStart_3")))
+							else
 							{
-								baseCharacter->SetActorLocation(playerStart->GetActorLocation());
+								if (playerStart->GetName().Contains(TEXT("PlayerStart_3")))
+								{
+									baseCharacter->SetActorLocation(playerStart->GetActorLocation());
+								}
 							}
 						}
 					}
 				}
+				
 
 			}
 		}, 5.0f, false);

@@ -146,7 +146,8 @@ void AActor_Effect_Muriel_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedCom
 	//	*OtherActor->GetName(), *GetOwner()->GetName());
 	//UE_LOG(LogTemp, Log, TEXT("[Orb] Overlap Begin"));
 	//UE_LOG(LogTemp, Warning, TEXT("[Orb] HitLocation x : %.2f, y : %.2f, z : %.2f"), HitLocation1.X, HitLocation1.Y, HitLocation1.Z);
-
+	if (HasAuthority())
+	{
 	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
 	ABaseCharacter* onwer = Cast<ABaseCharacter>(GetOwner());
 
@@ -247,7 +248,7 @@ void AActor_Effect_Muriel_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedCom
 			}
 		}
 	}
-
+	}
 
 	Destroy();
 }

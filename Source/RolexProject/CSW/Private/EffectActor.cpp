@@ -172,24 +172,27 @@ void AEffectActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 				return;
 
 			//character->ModifyHP(-Damage);
+			//if (HasAuthority())
+			{
+				if (character->Data.Hp <= Damage)
+				{
+					if (onwer->RolexPS)
+					{
+						onwer->RolexPS->ServerPlayerDamage(character->Data.Hp);
+						onwer->RolexPS->ServerPlayerKillCount();
+					}
+					character->ModifyHP(-character->Data.Hp);
+				}
+				else
+				{
+					character->ModifyHP(-Damage);
+					if (onwer->RolexPS)
+					{
+						onwer->RolexPS->ServerPlayerDamage(Damage);
+					}
+				}
+			}
 			
-			if (character->Data.Hp <= Damage)
-			{
-				if (onwer->RolexPS)
-				{
-					onwer->RolexPS->ServerPlayerDamage(character->Data.Hp);
-					onwer->RolexPS->ServerPlayerKillCount();
-				}
-				character->ModifyHP(-character->Data.Hp);
-			}
-			else
-			{
-				character->ModifyHP(-Damage);
-				if (onwer->RolexPS)
-				{
-					onwer->RolexPS->ServerPlayerDamage(Damage);
-				}
-			}
 
 			UE_LOG(LogTemp, Log, TEXT("character : %s Hp : %d"), *OtherActor->GetName(), character->Data.Hp);
 
@@ -278,26 +281,29 @@ void AEffectActor::CheckOverlapAndApplyDamage()
 				}
 				
 				//character->ModifyHP(-Damage);
-
-				if (character->Data.Hp <= Damage)
+				//if (HasAuthority())
 				{
-					//onwer->RolexPS->PlayerData.Damage += character->Data.Hp;
-					if (onwer->RolexPS)
+					if (character->Data.Hp <= Damage)
 					{
-						onwer->RolexPS->ServerPlayerDamage(character->Data.Hp);
-						onwer->RolexPS->ServerPlayerKillCount();
+						//onwer->RolexPS->PlayerData.Damage += character->Data.Hp;
+						if (onwer->RolexPS)
+						{
+							onwer->RolexPS->ServerPlayerDamage(character->Data.Hp);
+							onwer->RolexPS->ServerPlayerKillCount();
+						}
+						character->ModifyHP(-character->Data.Hp);
 					}
-					character->ModifyHP(-character->Data.Hp);
-				}
-				else
-				{
-					character->ModifyHP(-Damage);
-					if (onwer->RolexPS)
+					else
 					{
-						onwer->RolexPS->ServerPlayerDamage(Damage);
+						character->ModifyHP(-Damage);
+						if (onwer->RolexPS)
+						{
+							onwer->RolexPS->ServerPlayerDamage(Damage);
+						}
+						//onwer->RolexPS->PlayerData.Damage += 10;
 					}
-					//onwer->RolexPS->PlayerData.Damage += 10;
 				}
+				
 			}
 
 		}

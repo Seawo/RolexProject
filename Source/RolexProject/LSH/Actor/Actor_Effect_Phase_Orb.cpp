@@ -56,7 +56,6 @@ void AActor_Effect_Phase_Orb::UpdateLocation(float DeltaTime)
 
 void AActor_Effect_Phase_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	//if (not HasAuthority()) return;
 
 
 	if (OtherActor == this)
@@ -79,46 +78,49 @@ void AActor_Effect_Phase_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComp
 	//	*OtherActor->GetName(), *GetOwner()->GetName());
 	//UE_LOG(LogTemp, Log, TEXT("[Orb] Overlap Begin"));
 	//UE_LOG(LogTemp, Warning, TEXT("[Orb] HitLocation x : %.2f, y : %.2f, z : %.2f"), HitLocation1.X, HitLocation1.Y, HitLocation1.Z);
-
-	ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
-	ABaseCharacter* owner = Cast<ABaseCharacter>(GetOwner());
-	if (bIsLMB)
+	if (HasAuthority())
 	{
-		Damage = 10;
-	}
-	else
-	{
-		Damage = 15;
-	}
-
-	if (character && character->Data.Team == owner->Data.Team)
-	{
-		// 팀이면 충돌x
-		return;
-	}
-	// 캐릭터 이면서 다른 팀이라면
-	else if (character && character->Data.Team != owner->Data.Team)
-	{
-		if (character->Data.Hp <= Damage)
+		ABaseCharacter* character = Cast<ABaseCharacter>(OtherActor);
+		ABaseCharacter* owner = Cast<ABaseCharacter>(GetOwner());
+		if (bIsLMB)
 		{
-			if (owner->RolexPS)
-			{
-				owner->RolexPS->ServerPlayerDamage(character->Data.Hp);
-				owner->RolexPS->ServerPlayerKillCount();
-			}
-
-			character->ModifyHP(-character->Data.Hp);
+			Damage = 10;
 		}
 		else
 		{
-			character->ModifyHP(-Damage);
-			//owner->RolexPS->ServerPlayerDamage(Damage);
-			if (owner->RolexPS)
+			Damage = 15;
+		}
+
+		if (character && character->Data.Team == owner->Data.Team)
+		{
+			// 팀이면 충돌x
+			return;
+		}
+		// 캐릭터 이면서 다른 팀이라면
+		else if (character && character->Data.Team != owner->Data.Team)
+		{
+			if (character->Data.Hp <= Damage)
 			{
-				owner->RolexPS->ServerPlayerDamage(Damage);
+				if (owner->RolexPS)
+				{
+					owner->RolexPS->ServerPlayerDamage(character->Data.Hp);
+					owner->RolexPS->ServerPlayerKillCount();
+				}
+
+				character->ModifyHP(-character->Data.Hp);
+			}
+			else
+			{
+				character->ModifyHP(-Damage);
+				//owner->RolexPS->ServerPlayerDamage(Damage);
+				if (owner->RolexPS)
+				{
+					owner->RolexPS->ServerPlayerDamage(Damage);
+				}
 			}
 		}
 	}
+	
 
 	// NiagaraSystem 실행
 	if (HitNiagaraSystem)
