@@ -66,31 +66,22 @@ void ARolexPlayerState::FindUniqueID()
 }
 void ARolexPlayerState::ServerPlayerKillCount_Implementation()
 {
-	PlayerData.KillCount++;
-	MultiPlayerKillCount(PlayerData.KillCount);
+	MultiPlayerKillCount(1);
 }
 
 void ARolexPlayerState::ServerPlayerDeathCount_Implementation()
 {
+	MultiPlayerDeathCount(1);
 }
 
 void ARolexPlayerState::ServerPlayerDamage_Implementation(int damage)
 {
-	//PlayerData.Damage += damage;
-
-	if (HasAuthority())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("ServerPlayerDamage"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("ClientPlayerDamage"));
-	}
 	MultiPlayerDamage(damage);
 }
 
 void ARolexPlayerState::ServerPlayerHealing_Implementation(int healing)
 {
+	MultiPlayerHealing(healing);
 }
 
 void ARolexPlayerState::MultiPlayerKillCount_Implementation(int count)

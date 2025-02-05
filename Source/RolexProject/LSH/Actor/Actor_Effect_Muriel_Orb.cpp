@@ -117,7 +117,7 @@ void AActor_Effect_Muriel_Orb::UpdateRotation()
 
 void AActor_Effect_Muriel_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (not HasAuthority()) return;
+	//if (not HasAuthority()) return;
 
 	if (OtherActor == this)
 	{
@@ -156,21 +156,23 @@ void AActor_Effect_Muriel_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedCom
 		// 캐릭터가 있고, 다른 팀이라면 데미지 주기
 		if (character && character->Data.Team != onwer->Data.Team)
 		{
-			if (character->Data.Hp <= 0)
-			{
-				//onwer->RolexPS->PlayerData.KillCount++;
-			}
-			else if (character->Data.Hp <= Damage)
+			if (character->Data.Hp <= Damage)
 			{
 				//onwer->RolexPS->PlayerData.Damage += character->Data.Hp;
-				onwer->RolexPS->MultiPlayerDamage(character->Data.Hp);
-				onwer->RolexPS->MultiPlayerKillCount(1);
+				if (onwer->RolexPS)
+				{
+					onwer->RolexPS->ServerPlayerDamage(character->Data.Hp);
+					onwer->RolexPS->ServerPlayerKillCount();
+				}
 				character->ModifyHP(-character->Data.Hp);
 			}
 			else
 			{
 				character->ModifyHP(-Damage);
-				onwer->RolexPS->MultiPlayerDamage(Damage);
+				if (onwer->RolexPS)
+				{
+					onwer->RolexPS->ServerPlayerDamage(Damage);
+				}
 				//onwer->RolexPS->PlayerData.Damage += 10;
 			}
 		}
@@ -184,14 +186,20 @@ void AActor_Effect_Muriel_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedCom
 			else if (character->Data.Hp + (Damage *2) >= character->Data.MaxHp)
 			{
 				//onwer->RolexPS->PlayerData.Healing += character->Data.MaxHp - character->Data.Hp;
-				onwer->RolexPS->MultiPlayerHealing(character->Data.MaxHp - character->Data.Hp);
+				if (onwer->RolexPS)
+				{
+					onwer->RolexPS->ServerPlayerHealing(character->Data.MaxHp - character->Data.Hp);
+				}
 				character->ModifyHP(character->Data.MaxHp - character->Data.Hp);
 			}
 			else
 			{
 				character->ModifyHP(Damage * 2);
 				//onwer->RolexPS->PlayerData.Healing += 10;
-				onwer->RolexPS->MultiPlayerHealing(Damage * 2);
+				if (onwer->RolexPS)
+				{
+					onwer->RolexPS->ServerPlayerHealing(Damage * 2);
+				}
 			}
 		}
 	}
@@ -208,15 +216,15 @@ void AActor_Effect_Muriel_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedCom
 			else if (character->Data.Hp <= (Damage * 2.5f * GetActorScale3D().X))
 			{
 				//onwer->RolexPS->PlayerData.Damage += character->Data.Hp;
-				onwer->RolexPS->MultiPlayerDamage(character->Data.Hp);
-				onwer->RolexPS->MultiPlayerKillCount(1);
+				onwer->RolexPS->ServerPlayerDamage(character->Data.Hp);
+				onwer->RolexPS->ServerPlayerKillCount();
 				character->ModifyHP(-character->Data.Hp);
 			}
 			else
 			{
 				character->ModifyHP(-(Damage * 2.5f * GetActorScale3D().X));
 				//onwer->RolexPS->PlayerData.Damage += (1 * 25 * GetActorScale3D().X);
-				onwer->RolexPS->MultiPlayerDamage(Damage * 2.5f * GetActorScale3D().X);
+				onwer->RolexPS->ServerPlayerDamage(Damage * 2.5f * GetActorScale3D().X);
 			}
 		}
 		else if (character && character->Data.Team == onwer->Data.Team)
@@ -228,14 +236,14 @@ void AActor_Effect_Muriel_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedCom
 			else if (character->Data.Hp + (Damage * 4 * GetActorScale3D().X) >= character->Data.MaxHp)
 			{
 				//onwer->RolexPS->PlayerData.Healing += character->Data.MaxHp - character->Data.Hp;
-				onwer->RolexPS->MultiPlayerHealing(character->Data.MaxHp - character->Data.Hp);
+				onwer->RolexPS->ServerPlayerHealing(character->Data.MaxHp - character->Data.Hp);
 				character->ModifyHP(character->Data.MaxHp - character->Data.Hp);
 			}
 			else
 			{
 				character->ModifyHP(Damage * 4 * GetActorScale3D().X);
 				//onwer->RolexPS->PlayerData.Healing += 1 * 25 * GetActorScale3D().X;
-				onwer->RolexPS->MultiPlayerHealing(Damage * 4 * GetActorScale3D().X);
+				onwer->RolexPS->ServerPlayerHealing(Damage * 4 * GetActorScale3D().X);
 			}
 		}
 	}

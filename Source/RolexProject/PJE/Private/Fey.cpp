@@ -226,7 +226,26 @@ void AFey::EAttack()
 		{
 			if (TargetCharacter == this) continue;
 			UE_LOG(LogTemp, Warning, TEXT("TargetCharacter Name: %s"), *TargetCharacter->GetName());
-			TargetCharacter->Data.Hp += EAttackHealAmount;
+			//TargetCharacter->Data.Hp += EAttackHealAmount;
+
+			if (TargetCharacter->Data.Hp == TargetCharacter->Data.MaxHp)
+			{
+				return;
+			}
+			else if (TargetCharacter->Data.Hp + EAttackHealAmount >= TargetCharacter->Data.MaxHp)
+			{
+				//onwer->RolexPS->PlayerData.Healing += character->Data.MaxHp - character->Data.Hp;
+				RolexPS->ServerPlayerHealing(TargetCharacter->Data.MaxHp - TargetCharacter->Data.Hp);
+				TargetCharacter->ModifyHP(TargetCharacter->Data.MaxHp - TargetCharacter->Data.Hp);
+			}
+			else
+			{
+				TargetCharacter->ModifyHP(EAttackHealAmount);
+				//onwer->RolexPS->PlayerData.Healing += 10;
+				RolexPS->ServerPlayerHealing(EAttackHealAmount);
+			}
+
+
 			// if (TargetCharacter->Data.Hp > TargetCharacter->Data.MaxHp)
 			// 	TargetCharacter->Data.Hp = TargetCharacter->Data.MaxHp;
 		}

@@ -56,7 +56,7 @@ void AActor_Effect_Phase_Orb::UpdateLocation(float DeltaTime)
 
 void AActor_Effect_Phase_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (not HasAuthority()) return;
+	//if (not HasAuthority()) return;
 
 
 	if (OtherActor == this)
@@ -99,24 +99,24 @@ void AActor_Effect_Phase_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComp
 	// 캐릭터 이면서 다른 팀이라면
 	else if (character && character->Data.Team != owner->Data.Team)
 	{
-		if (character->Data.Hp <= 0)
+		if (character->Data.Hp <= Damage)
 		{
-			//owner->RolexPS->PlayerData.KillCount++;
-			//owner->RolexPS->MultiPlayerKillCount(1);
-		}
-		else if (character->Data.Hp <= Damage)
-		{
-			//owner->RolexPS->PlayerData.Damage += character->Data.Hp;
-			owner->RolexPS->MultiPlayerDamage(character->Data.Hp);
-			owner->RolexPS->MultiPlayerKillCount(1);
+			if (owner->RolexPS)
+			{
+				owner->RolexPS->ServerPlayerDamage(character->Data.Hp);
+				owner->RolexPS->ServerPlayerKillCount();
+			}
+
 			character->ModifyHP(-character->Data.Hp);
 		}
 		else
 		{
 			character->ModifyHP(-Damage);
 			//owner->RolexPS->ServerPlayerDamage(Damage);
-			owner->RolexPS->MultiPlayerDamage(Damage);
-			//owner->RolexPS->PlayerData.Damage += Damage;
+			if (owner->RolexPS)
+			{
+				owner->RolexPS->ServerPlayerDamage(Damage);
+			}
 		}
 	}
 

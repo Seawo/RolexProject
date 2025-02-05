@@ -18,6 +18,8 @@
 #include "UI_GameEnd.h"
 #include "UI_InGameEsc.h"
 #include "UI_InGameTab.h"
+#include "UI_Loding.h"
+
 
 #include "Kismet/GameplayStatics.h"
 
@@ -495,6 +497,26 @@ void ARolexPlayerController::SetCharacterOverlay(class AGS_TrainingRoom* gs)
 		
 		
 		}
+	}
+}
+
+void ARolexPlayerController::AddLodingUI()
+{
+	if (IsLocalController() && UI_LodingClass)
+	{
+		UI_Loding = CreateWidget<UUI_Loding>(this, UI_LodingClass);
+		if (UI_Loding)
+		{
+			UI_Loding->AddToViewport();
+		}
+	}
+}
+
+void ARolexPlayerController::RemoveLodingUI()
+{
+	if (IsLocalController() && UI_Loding)
+	{
+		UI_Loding->RemoveFromParent();
 	}
 }
 

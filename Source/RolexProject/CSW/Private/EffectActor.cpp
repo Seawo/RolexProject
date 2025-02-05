@@ -171,8 +171,26 @@ void AEffectActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 			if (character->Data.Team == onwer->Data.Team || character->MoveState == EMoveState::Die)
 				return;
 
-			character->ModifyHP(-Damage);
+			//character->ModifyHP(-Damage);
 			
+			if (character->Data.Hp <= Damage)
+			{
+				if (onwer->RolexPS)
+				{
+					onwer->RolexPS->ServerPlayerDamage(character->Data.Hp);
+					onwer->RolexPS->ServerPlayerKillCount();
+				}
+				character->ModifyHP(-character->Data.Hp);
+			}
+			else
+			{
+				character->ModifyHP(-Damage);
+				if (onwer->RolexPS)
+				{
+					onwer->RolexPS->ServerPlayerDamage(Damage);
+				}
+			}
+
 			UE_LOG(LogTemp, Log, TEXT("character : %s Hp : %d"), *OtherActor->GetName(), character->Data.Hp);
 
 			if (NiagaraCollusionEffect)
@@ -259,7 +277,27 @@ void AEffectActor::CheckOverlapAndApplyDamage()
 					);
 				}
 				
-				character->ModifyHP(-Damage);
+				//character->ModifyHP(-Damage);
+
+				if (character->Data.Hp <= Damage)
+				{
+					//onwer->RolexPS->PlayerData.Damage += character->Data.Hp;
+					if (onwer->RolexPS)
+					{
+						onwer->RolexPS->ServerPlayerDamage(character->Data.Hp);
+						onwer->RolexPS->ServerPlayerKillCount();
+					}
+					character->ModifyHP(-character->Data.Hp);
+				}
+				else
+				{
+					character->ModifyHP(-Damage);
+					if (onwer->RolexPS)
+					{
+						onwer->RolexPS->ServerPlayerDamage(Damage);
+					}
+					//onwer->RolexPS->PlayerData.Damage += 10;
+				}
 			}
 
 		}

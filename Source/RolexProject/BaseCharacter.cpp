@@ -116,7 +116,7 @@ void ABaseCharacter::BeginPlay()
 
 	// create widget
 	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABaseCharacter::InitHeroUI, 3.0f, false);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABaseCharacter::InitHeroUI, 6.0f, false);
 
 	FTimerHandle TimerHandleTab;
 

@@ -10,6 +10,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
+#include "RolexPlayerState.h"
+
 // Sets default values
 AUltimateBall::AUltimateBall()
 {
@@ -100,13 +102,53 @@ void AUltimateBall::OnHit(
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Heal Ball"));
 				//Character->Data.Hp += 15.0f;
-				Character->ModifyHP(15.0f);
+				//Character->ModifyHP(15.0f);
+
+				if (Character->Data.Hp == Character->Data.MaxHp)
+				{
+					return;
+				}
+				else if (Character->Data.Hp + 15 >= Character->Data.MaxHp)
+				{
+					if (OwnCharacter->RolexPS)
+					{
+						OwnCharacter->RolexPS->ServerPlayerHealing(Character->Data.MaxHp - Character->Data.Hp);
+						Character->ModifyHP(Character->Data.MaxHp - Character->Data.Hp);
+					}
+				}
+				else
+				{
+					Character->ModifyHP(15);
+					if (OwnCharacter->RolexPS)
+					{
+						OwnCharacter->RolexPS->ServerPlayerHealing(15);
+					}
+				}
+
 			}
 			if (Character->Data.Team != OwnCharacter->Data.Team)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Attack Ball"));
 				//Character->Data.Hp -= 15.0f;
 				Character->ModifyHP(-15.0f);
+				if (Character->Data.Hp <= 15)
+				{
+					if (OwnCharacter->RolexPS)
+					{
+						OwnCharacter->RolexPS->ServerPlayerDamage(Character->Data.Hp);
+						OwnCharacter->RolexPS->ServerPlayerKillCount();
+					}
+
+					Character->ModifyHP(-Character->Data.Hp);
+				}
+				else
+				{
+					Character->ModifyHP(-15);
+					if (OwnCharacter->RolexPS)
+					{
+						OwnCharacter->RolexPS->ServerPlayerDamage(15);
+					}
+				}
 			}
 		}
 	}

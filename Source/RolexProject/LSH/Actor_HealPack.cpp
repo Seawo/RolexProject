@@ -46,14 +46,17 @@ void AActor_HealPack::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 
 	if (character)
 	{
+		if (character->Data.Hp == character->Data.MaxHp) return;
+
+
 		UE_LOG(LogTemp, Warning, TEXT("HealPack Overlap Begin2"));
 
-		character->ModifyHP(3);
+		character->ModifyHP(100);
 		NiagaraComponentHealPack->SetVisibility(false);
 		bIsActivated = false;
 	}
 
-	// 2초 후에 다시 활성화
+	// 5초 후에 다시 활성화
 	FTimerHandle timerHandle;
 	GetWorld()->GetTimerManager().SetTimer(timerHandle, [this]()
 		{

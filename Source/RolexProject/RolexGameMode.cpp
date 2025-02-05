@@ -32,6 +32,7 @@ void ARolexGameMode::BeginPlay()
 
 	UE_LOG(LogTemp, Warning, TEXT("------------ RolexGameMode BeginPlay ------------"));
 
+
 	FTimerHandle timerHandle;
 	GetWorld()->GetTimerManager().SetTimer(timerHandle, [this]()
 		{
@@ -70,9 +71,7 @@ void ARolexGameMode::BeginPlay()
 					}
 				}
 			}
-		}, 1.0f, false);
-
-	
+		}, 5.0f, false);
 }
 
 void ARolexGameMode::Tick(float DeltaTime)

@@ -34,12 +34,6 @@ public:
 	TArray<class ABaseCharacter*> ATeamChracters;		// Team == true (A팀)
 	UPROPERTY(VisibleAnywhere, Category = "Info")
 	TArray<class ABaseCharacter*> BTeamChracters;		// Team == false (B팀)
-
-	UPROPERTY(VisibleAnywhere, Category = "Info")
-	TSubclassOf<class UI_Loding> LodingWidgetClass;
-
-	UPROPERTY(VisibleAnywhere, Category = "Info")
-	class UI_Loding* LodingWidget;
 };
 
 

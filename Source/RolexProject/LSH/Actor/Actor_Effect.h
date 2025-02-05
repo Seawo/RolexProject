@@ -43,7 +43,7 @@ protected:
 	FVector Direction;
 
 	UPROPERTY(EditAnywhere)
-	float Speed = 2500.0f;
+	float Speed = 5000.0f;
 
 	UPROPERTY(EditAnywhere)
 	FName SkillName = "LMBRMB";

@@ -125,7 +125,7 @@ void AActor_Effect_Phase_Q::OnOverlapEnd(UPrimitiveComponent* OverlappedComponen
 
 void AActor_Effect_Phase_Q::TakeDamageToCharacter()
 {
-	if (not HasAuthority()) return;
+	//if (not HasAuthority()) return;
 
 	// 데미지 주기
 	if (bIsOverlap)
@@ -141,15 +141,21 @@ void AActor_Effect_Phase_Q::TakeDamageToCharacter()
 				else if (character->Data.Hp <= Damage)
 				{
 					//onwer->RolexPS->PlayerData.Damage += character->Data.Hp;
-					onwer->RolexPS->MultiPlayerDamage(character->Data.Hp);
-					onwer->RolexPS->MultiPlayerKillCount(1);
+					if (onwer->RolexPS)
+					{
+					onwer->RolexPS->ServerPlayerDamage(character->Data.Hp);
+					onwer->RolexPS->ServerPlayerKillCount();
+					}
 					character->ModifyHP(-character->Data.Hp);
 				}
 				else
 				{
 					character->ModifyHP(-Damage);
 					//onwer->RolexPS->PlayerData.Damage += Damage;
-					onwer->RolexPS->MultiPlayerDamage(Damage);
+					if (onwer->RolexPS)
+					{
+					onwer->RolexPS->ServerPlayerDamage(Damage);
+					}
 				}
 				
 			}

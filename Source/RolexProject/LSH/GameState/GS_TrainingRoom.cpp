@@ -40,7 +40,7 @@ void AGS_TrainingRoom::BeginPlay()
 	PC = Cast<ARolexPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (PC)
 	{
-		PC->InitUI();
+		PC->AddLodingUI();
 		/*PC->SetCharacterOverlay(this);*/
 	}
 	else
@@ -57,7 +57,11 @@ void AGS_TrainingRoom::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
 		{
 			//PC->InitInGameTab();
+			PC->RemoveLodingUI();
+			PC->InitUI();
+
 			PC->SetCharacterOverlay(this);
+			PlayTime = 0;
 		}, 5.0f, false);
 }
 
@@ -122,12 +126,12 @@ void AGS_TrainingRoom::Tick(float DeltaTime)
 					FTimerHandle finishTH;
 					GetWorld()->GetTimerManager().SetTimer(finishTH, [this]()
 					{
-						URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
+						/*URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
 						if (RolexGameInstance)
 						{
 							RolexGameInstance->LeaveSession();
-						}
-
+						}*/
+						UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
 					}, 5.0f, false);
 
 					bIsGameOver = true;
@@ -590,6 +594,15 @@ void AGS_TrainingRoom::OnRep_Result()
 	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] Result"));
 	PC->SetOffofTxtraTime();
 	PC->SetResult(Result);
+
+	if (Result != EResult::None)
+	{
+		FTimerHandle finishTH;
+		GetWorld()->GetTimerManager().SetTimer(finishTH, [this]()
+			{
+				UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
+			}, 5.0f, false);
+	}
 }
 void AGS_TrainingRoom::OnRep_Clash()
 {

@@ -79,6 +79,8 @@ public:
 	void InitUI();
 	void SetCharacterOverlay(class AGS_TrainingRoom* gs);
 
+	void AddLodingUI();
+	void RemoveLodingUI();
 public:
 	void SetPlayTime(float Time);
 	void SetPoint(int idx);
@@ -137,4 +139,10 @@ public:
 	TSubclassOf<class UUI_InGameTab> UI_InGameTabClass;
 	UPROPERTY(EditAnywhere, Category = "UI")
 	class UUI_InGameTab* UI_InGameTab;
+
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UUI_Loding> UI_LodingClass;
+	UPROPERTY(EditAnywhere, Category = "UI")
+	class UUI_Loding* UI_Loding;
 };

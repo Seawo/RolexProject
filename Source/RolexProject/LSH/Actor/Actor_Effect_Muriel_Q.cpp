@@ -65,14 +65,14 @@ void AActor_Effect_Muriel_Q::OnOverlapBegin(UPrimitiveComponent* OverlappedCompo
 			else if (character->Data.Hp <= Damage)
 			{
 				//owner->RolexPS->PlayerData.Damage += character->Data.Hp;
-				owner->RolexPS->MultiPlayerDamage(character->Data.Hp);
-				owner->RolexPS->MultiPlayerDamage(1);
+				owner->RolexPS->ServerPlayerDamage(character->Data.Hp);
+				owner->RolexPS->ServerPlayerDamage(1);
 				character->ModifyHP(-character->Data.Hp);
 			}
 			else
 			{
 				character->ModifyHP(-Damage);
-				owner->RolexPS->MultiPlayerDamage(Damage);
+				owner->RolexPS->ServerPlayerDamage(Damage);
 				//owner->RolexPS->PlayerData.Damage += 60;
 			}
 		}
