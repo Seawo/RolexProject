@@ -120,11 +120,12 @@ void ARolexGameMode::PostLogin(APlayerController* NewPlayer)
 	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
 	ARolexPlayerState* RolexPlayerState = NewPlayer->GetPlayerState<ARolexPlayerState>();
 	UE_LOG(LogTemp, Warning, TEXT("[RolexGameMode PostLogin]"));
-
+	
 	if (RolexGameInstance->PlayerTeam.Find(RolexPlayerState->UniqueID))
 	{
 		RolexPlayerState->Team = *RolexGameInstance->PlayerTeam.Find(RolexPlayerState->UniqueID);
-		UE_LOG(LogTemp, Warning, TEXT("[RolexGameMode PostLogin] Player : %s, Team : %s"), *NewPlayer->GetPawn()->GetName(), RolexPlayerState->Team ? TEXT("ATeam") : TEXT("BTeam"));
+		UE_LOG(LogTemp, Warning, TEXT("[RolexGameMode PostLogin] GI Player : %s, Team : %s"), *NewPlayer->GetPawn()->GetName(), RolexGameInstance->PlayerTeam[RolexPlayerState->UniqueID] ? TEXT("ATeam") : TEXT("BTeam"));
+		UE_LOG(LogTemp, Warning, TEXT("[RolexGameMode PostLogin] PS Player : %s, Team : %s"), *NewPlayer->GetPawn()->GetName(), RolexPlayerState->Team ? TEXT("ATeam") : TEXT("BTeam"));
 
 		// True == A Team, False == B Team
 		TArray<AActor*> PlayerStartArray;
@@ -133,14 +134,14 @@ void ARolexGameMode::PostLogin(APlayerController* NewPlayer)
 		// set player start for the player
 		for (AActor* PlayerStart : PlayerStartArray)
 		{
-			if (RolexPlayerState and RolexPlayerState->Team) // A team starts in PlayerStart_4
+			if (RolexPlayerState and RolexGameInstance->PlayerTeam[RolexPlayerState->UniqueID]) // A team starts in PlayerStart_4
 			{
 				if (PlayerStart->GetName().Contains(TEXT("PlayerStart_4")))
 				{
 					ABaseCharacter* BaseCharacter = Cast<ABaseCharacter>(NewPlayer->GetPawn());
 					if (BaseCharacter)
 					{
-						BaseCharacter->Data.Team = true;
+						BaseCharacter->Data.Team = RolexGameInstance->PlayerTeam[RolexPlayerState->UniqueID];
 						UE_LOG(LogTemp, Warning, TEXT("[RolexGameMode PostLogin] BaseCharacter->Data.Team: %d"), BaseCharacter->Data.Team);
 						BaseCharacter->SetActorLocation(PlayerStart->GetActorLocation());
 					}
@@ -150,14 +151,14 @@ void ARolexGameMode::PostLogin(APlayerController* NewPlayer)
 					}
 				}
 			}
-			else if (RolexPlayerState and !RolexPlayerState->Team) // B team starts in PlayerStart_3
+			else if (RolexPlayerState and !RolexGameInstance->PlayerTeam[RolexPlayerState->UniqueID]) // B team starts in PlayerStart_3
 			{
 				if (PlayerStart->GetName().Contains(TEXT("PlayerStart_3")))
 				{
 					ABaseCharacter* BaseCharacter = Cast<ABaseCharacter>(NewPlayer->GetPawn());
 					if (BaseCharacter)
 					{
-						BaseCharacter->Data.Team = false;
+						BaseCharacter->Data.Team = RolexGameInstance->PlayerTeam[RolexPlayerState->UniqueID];
 						UE_LOG(LogTemp, Warning, TEXT("[RolexGameMode PostLogin] BaseCharacter->Data.Team: %d"), BaseCharacter->Data.Team);
 						BaseCharacter->SetActorLocation(PlayerStart->GetActorLocation());
 					}
