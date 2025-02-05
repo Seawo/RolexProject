@@ -129,6 +129,7 @@ public:
 /*Input*/
 public:
 	class ARolexPlayerState* RolexPS;
+	class ARolexPlayerController* RolexPC;
 
 	FTimerHandle PSTimerHandle;
 
@@ -191,16 +192,9 @@ public:
 	void Die(UAnimMontage* montage);
 	void Start(UAnimMontage* montage);
 
-	UFUNCTION(Server, Reliable)
-	void ServerInputEsc();
-	UFUNCTION(Client, Reliable)
-	void ClientInputEsc(bool bIsClick);
-
+	void InputEsc();
 	void InputTab(const struct FInputActionValue& inputValue);
-	UFUNCTION(Server, Reliable)
-	void ServerInputTab(bool bIsClick);
-	UFUNCTION(Client, Reliable)
-	void ClientInputTab(bool bIsClick);
+
 
 	bool bIsClickEsc = false;
 	bool bIsClickTab = false;

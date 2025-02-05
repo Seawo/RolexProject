@@ -22,6 +22,14 @@ public:
 	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
 
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+
+
+
+
+	UPROPERTY(VisibleAnywhere, Category = "Info")
+	TArray<class ABaseCharacter*> ATeamChracters;		// Team == true (A팀)
+	UPROPERTY(VisibleAnywhere, Category = "Info")
+	TArray<class ABaseCharacter*> BTeamChracters;		// Team == false (B팀)
 };
 
 

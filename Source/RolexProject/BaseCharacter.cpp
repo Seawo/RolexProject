@@ -63,6 +63,7 @@ ABaseCharacter::ABaseCharacter()
 	bUseControllerRotationRoll = false;
 
 	bReplicates = true;
+	bOnlyRelevantToOwner = false;
 }
 
 // Called when the game starts or when spawned
@@ -70,13 +71,15 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	SetNetDormancy(ENetDormancy::DORM_Awake);
+
 	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
 
 	GetWorld()->GetTimerManager().SetTimer(PSTimerHandle, [this]()
 	{
 		if (not RolexPS)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("RolexPlayerState does not exists"));
+			//UE_LOG(LogTemp, Warning, TEXT("RolexPlayerState does not exists"));
 			RolexPS = Cast<ARolexPlayerState>(GetPlayerState());
 		}
 		else
@@ -98,6 +101,7 @@ void ABaseCharacter::BeginPlay()
 	}
 
 	auto pc = Cast<APlayerController>(Controller);
+	RolexPC = Cast<ARolexPlayerController>(pc);
 
 	if (pc)
 	{
@@ -114,6 +118,13 @@ void ABaseCharacter::BeginPlay()
 	// create widget
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABaseCharacter::InitHeroUI, 3.0f, false);
+
+	FTimerHandle TimerHandleTab;
+
+	GetWorld()->GetTimerManager().SetTimer(TimerHandleTab, [this]()
+		{
+			bTabTimer = true;
+		}, 10.0f, false);
 
 	HidenHealthBar();
 }
@@ -156,6 +167,8 @@ void ABaseCharacter::Tick(float DeltaTime)
 	//	}
 	//}
 }
+
+
 
 
 void ABaseCharacter::OnRep_TabTimer()
@@ -432,7 +445,7 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		characterInput->BindAction(IA_Rotation, ETriggerEvent::Triggered, this, &ABaseCharacter::InputRotation);
 		characterInput->BindAction(IA_Tab, ETriggerEvent::Started, this, &ABaseCharacter::InputTab);
 		characterInput->BindAction(IA_Tab, ETriggerEvent::Completed, this, &ABaseCharacter::InputTab);
-		characterInput->BindAction(IA_Esc, ETriggerEvent::Started, this, &ABaseCharacter::ServerInputEsc);
+		characterInput->BindAction(IA_Esc, ETriggerEvent::Started, this, &ABaseCharacter::InputEsc);
 	}
 }
 
@@ -533,10 +546,12 @@ void ABaseCharacter::Die(UAnimMontage* montage)
 	
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("NoCollision"));
 
-	ARolexPlayerState* rolexPS = Cast<ARolexPlayerState>(GetPlayerState());
-	if (rolexPS)
+	//ARolexPlayerState* rolexPS = Cast<ARolexPlayerState>(GetPlayerState());
+	if (RolexPS)
 	{
-		rolexPS->PlayerData.DeathCount++;
+		UE_LOG(LogTemp, Warning, TEXT("[BaseCharacter] Die RolexPS is valid."));
+		//rolexPS->PlayerData.DeathCount++;
+		RolexPS->MultiPlayerDeathCount(1);
 	}
 
 	// 캐릭터가 거점 안에 있다면
@@ -587,63 +602,48 @@ void ABaseCharacter::Start(UAnimMontage* montage)
 	
 }
 
-void ABaseCharacter::InputTab(const FInputActionValue& inputValue)
-{
-	bool bIsClick = inputValue.Get<bool>();
-
-	ServerInputTab(bIsClick);
-}
-
-void ABaseCharacter::ServerInputTab_Implementation(bool bIsClick)
-{
-	//bIsClickTab = !bIsClickTab;
-	ClientInputTab(bIsClick);
-}
-
-void ABaseCharacter::ClientInputTab_Implementation(bool bIsClick)
-{
-	if (not bTabTimer) return;
-
-	ARolexPlayerController* rolexPC = Cast<ARolexPlayerController>(GetController());
-	if (rolexPC)
-	{
-		if (bIsClick)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Tab Open"));
-			rolexPC->OpenInGameTab();
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Tab Close"));
-			rolexPC->CloseInGameTab();
-		}
-	}
-}
-
-void ABaseCharacter::ServerInputEsc_Implementation()
+void ABaseCharacter::InputEsc()
 {
 	bIsClickEsc = !bIsClickEsc;
-	ClientInputEsc(bIsClickEsc);
-}
-
-void ABaseCharacter::ClientInputEsc_Implementation(bool bIsClick)
-{
-	ARolexPlayerController* rolexPC = Cast<ARolexPlayerController>(GetController());
-	if (rolexPC)
+	if (RolexPC)
 	{
-		if (bIsClick)
+		if (bIsClickEsc)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("ESC Open"));
-			rolexPC->OpenInGameEsc();
-			rolexPC->SetInputMode(FInputModeGameAndUI());
-			rolexPC->bShowMouseCursor = true;
+			RolexPC->OpenInGameEsc();
+			RolexPC->SetInputMode(FInputModeGameAndUI());
+			RolexPC->bShowMouseCursor = true;
 		}
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("ESC Close"));
-			rolexPC->CloseInGameEsc();
-			rolexPC->SetInputMode(FInputModeGameOnly());
-			rolexPC->bShowMouseCursor = false;
+			RolexPC->CloseInGameEsc();
+			RolexPC->SetInputMode(FInputModeGameOnly());
+			RolexPC->bShowMouseCursor = false;
+		}
+	}
+}
+
+void ABaseCharacter::InputTab(const FInputActionValue& inputValue)
+{
+	if (not bTabTimer) return;
+	//TArray<AActor*> foundActors;
+	//UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), foundActors);
+	//UE_LOG(LogTemp, Warning, TEXT("basecharacter foundActors Num : %d"), foundActors.Num());
+
+	bool bIsClick = inputValue.Get<bool>();
+
+	if (RolexPC)
+	{
+		if (bIsClick)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Tab Open"));
+			RolexPC->OpenInGameTab();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Tab Close"));
+			RolexPC->CloseInGameTab();
 		}
 	}
 }

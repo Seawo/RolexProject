@@ -53,6 +53,11 @@ class ROLEXPROJECT_API AGS_TrainingRoom : public AGameStateBase
 	UFUNCTION()
 	void ChangeNumberOfTeam(bool bTeam, int32 ChangeValue);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void Multi_SetATeamCharacters(class ABaseCharacter* ATeam);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multi_SetBTeamCharacters(class ABaseCharacter* BTeam);
+
 public:
 	void FindCharacterInWorld();
 	//UFUNCTION(NetMulticast, Reliable)
@@ -60,6 +65,8 @@ public:
 
 	// 클라이언트들에게 변경된 데이터 값 전달 (ReplicatedUsing 함수들)
 protected:
+	UFUNCTION()
+	void OnRep_SetPlayerController();
 	UFUNCTION()
 	void OnRep_PlayTime();
 	UFUNCTION()
@@ -95,11 +102,6 @@ protected:
 	UFUNCTION()
 	void OnRep_IsGetBTeamExtraTime();
 
-	UFUNCTION()
-	void OnRep_ATeamCharacters();
-	UFUNCTION()
-	void OnRep_BTeamCharacters();
-
 private:
 	void AddDynamicMaterialToPostProcessVolume();
 
@@ -122,9 +124,9 @@ public:
 	bool IsGameStart = false;
 
 
-	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_ATeamCharacters, Category = "Info")
+	UPROPERTY(VisibleAnywhere, Category = "Info")
 	TArray<class ABaseCharacter*> ATeamChracters;		// Team == true (A팀)
-	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_BTeamCharacters, Category = "Info")
+	UPROPERTY(VisibleAnywhere, Category = "Info")
 	TArray<class ABaseCharacter*> BTeamChracters;		// Team == false (B팀)
 
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Doors, Category = "Info")
@@ -171,7 +173,7 @@ public:
 	// 추가 시간 (거점 점령 퍼센트가 90퍼센트가 넘어 가게 될때 상대팀이 거점을 밟을 경우 추가 시간이 주어지며, 거점 게이지는 동결된다.)
 	// (추가 시간은 시간이 지날수록 최대치가 줄어들며, 상대팀이 거점을 밟고 있을 경우 추가 시간은 줄어들지 않는다. 추가 시간이 0이 되면 거점 게이지는 다시 작동한다.)
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_ExtraTime, Category = "Info")
-	float ExtraTime = 0;
+	float ExtraTime = 8.0f;
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_ExtraTimeDecrease, Category = "Info")
 	float ExtraTimeDecrease = 0;
 

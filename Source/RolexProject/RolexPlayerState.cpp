@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "RolexPlayerState.h"
@@ -63,4 +63,52 @@ void ARolexPlayerState::FindUniqueID()
 		UE_LOG(LogTemp, Warning, TEXT("Failed to get unique ID"));
 	}
 	
+}
+void ARolexPlayerState::ServerPlayerKillCount_Implementation()
+{
+	PlayerData.KillCount++;
+	MultiPlayerKillCount(PlayerData.KillCount);
+}
+
+void ARolexPlayerState::ServerPlayerDeathCount_Implementation()
+{
+}
+
+void ARolexPlayerState::ServerPlayerDamage_Implementation(int damage)
+{
+	//PlayerData.Damage += damage;
+
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ServerPlayerDamage"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ClientPlayerDamage"));
+	}
+	MultiPlayerDamage(damage);
+}
+
+void ARolexPlayerState::ServerPlayerHealing_Implementation(int healing)
+{
+}
+
+void ARolexPlayerState::MultiPlayerKillCount_Implementation(int count)
+{
+	PlayerData.KillCount += count;
+}
+
+void ARolexPlayerState::MultiPlayerDeathCount_Implementation(int count)
+{
+	PlayerData.DeathCount += count;
+}
+
+void ARolexPlayerState::MultiPlayerDamage_Implementation(int damage)
+{
+	PlayerData.Damage += damage;
+}
+
+void ARolexPlayerState::MultiPlayerHealing_Implementation(int healing)
+{
+	PlayerData.Healing += healing;
 }

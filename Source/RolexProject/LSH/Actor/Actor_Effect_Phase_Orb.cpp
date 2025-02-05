@@ -56,6 +56,9 @@ void AActor_Effect_Phase_Orb::UpdateLocation(float DeltaTime)
 
 void AActor_Effect_Phase_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (not HasAuthority()) return;
+
+
 	if (OtherActor == this)
 	{
 		UE_LOG(LogTemp, Log, TEXT("OtherActor Equal This"));
@@ -98,17 +101,22 @@ void AActor_Effect_Phase_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComp
 	{
 		if (character->Data.Hp <= 0)
 		{
-			owner->RolexPS->PlayerData.KillCount++;
+			//owner->RolexPS->PlayerData.KillCount++;
+			owner->RolexPS->MultiPlayerKillCount(1);
 		}
-		else if (character->Data.Hp < Damage)
+		else if (character->Data.Hp <= Damage)
 		{
-			owner->RolexPS->PlayerData.Damage += character->Data.Hp;
+			//owner->RolexPS->PlayerData.Damage += character->Data.Hp;
+			owner->RolexPS->MultiPlayerDamage(character->Data.Hp);
+			owner->RolexPS->MultiPlayerKillCount(1);
 			character->ModifyHP(-character->Data.Hp);
 		}
 		else
 		{
 			character->ModifyHP(-Damage);
-			owner->RolexPS->PlayerData.Damage += Damage;
+			//owner->RolexPS->ServerPlayerDamage(Damage);
+			owner->RolexPS->MultiPlayerDamage(Damage);
+			//owner->RolexPS->PlayerData.Damage += Damage;
 		}
 	}
 

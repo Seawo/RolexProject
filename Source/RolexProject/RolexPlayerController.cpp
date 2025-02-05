@@ -282,10 +282,142 @@ void ARolexPlayerController::InitUI()
 	//}
 }
 
-void ARolexPlayerController::SetCharacterOverlay()
+void ARolexPlayerController::SetCharacterOverlay(class AGS_TrainingRoom* gs)
 {
 	if (IsLocalController())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("SetCharacterOverlay() 실행됨! - %p, IsLocalController: %d"), this, IsLocalController());
+
+		//ABaseCharacter* owner = Cast<ABaseCharacter>(GetPawn());
+		/*
+		for (ABaseCharacter* character : gs->ATeamChracters)
+		{
+			if (character == owner) continue;
+			
+			// 다른팀인경우
+			if (character->Data.Team != owner->Data.Team)
+			{
+				UMaterialInterface* material = Cast<UMaterialInterface>(character->GetMesh()->GetOverlayMaterial());
+
+				if (material)
+				{
+					MI_Overlay = UMaterialInstanceDynamic::Create(material, this);
+					character->GetMesh()->SetOverlayMaterial(MI_Overlay);
+					// Overlay Material의 색을 빨간색으로 설정
+					MI_Overlay->SetVectorParameterValue("Color", FLinearColor(1.0f, 0.0f, 0.0f, 1.0f));
+				}
+
+				character->GetMesh()->SetCustomDepthStencilValue(2);
+				//baseCharacter->GetMesh()->MarkRenderStateDirty();
+			}
+			// 같은 팀인 경우
+			else
+			{
+				UMaterialInterface* material = Cast<UMaterialInterface>(character->GetMesh()->GetOverlayMaterial());
+
+				if (material)
+				{
+					MI_Overlay = UMaterialInstanceDynamic::Create(material, this);
+					character->GetMesh()->SetOverlayMaterial(MI_Overlay);
+					// Overlay Material의 색을 청색으로 설정
+					MI_Overlay->SetVectorParameterValue("Color", FLinearColor(0.0f, 0.859375f, 0.250501f, 1.0f));
+				}
+
+				//AGS_TrainingRoom* GS = Cast<AGS_TrainingRoom>(GetWorld()->GetGameState());
+				if (gs)
+				{
+					UMaterialInterface* ppmaterial = Cast<UMaterialInterface>(gs->MaterialInstance);
+
+					if (ppmaterial)
+					{
+						MI_PostProcess = UMaterialInstanceDynamic::Create(ppmaterial, this);
+						gs->PostProcessVolume->AddOrUpdateBlendable(MI_PostProcess, 1.0f);
+						// PostProcess Material의 색을 청색으로 설정
+
+					}
+				}
+
+
+				if (owner->Data.RoleType == ERoleType::Healer)
+				{
+					character->GetMesh()->SetRenderCustomDepth(true);
+					character->GetMesh()->SetCustomDepthStencilValue(1);
+
+					MI_PostProcess->SetScalarParameterValue("Scale", 0.0f);
+				}
+				else
+				{
+					MI_PostProcess->SetScalarParameterValue("Scale", 0.2f);
+				}
+
+				//baseCharacter->GetMesh()->MarkRenderStateDirty();
+			}
+		}
+		for (ABaseCharacter* character : gs->BTeamChracters)
+		{
+			if (character == owner) continue;
+
+			// 다른팀인경우
+			if (character->Data.Team != owner->Data.Team)
+			{
+				UMaterialInterface* material = Cast<UMaterialInterface>(character->GetMesh()->GetOverlayMaterial());
+
+				if (material)
+				{
+					MI_Overlay = UMaterialInstanceDynamic::Create(material, this);
+					character->GetMesh()->SetOverlayMaterial(MI_Overlay);
+					// Overlay Material의 색을 빨간색으로 설정
+					MI_Overlay->SetVectorParameterValue("Color", FLinearColor(1.0f, 0.0f, 0.0f, 1.0f));
+				}
+
+				character->GetMesh()->SetCustomDepthStencilValue(2);
+				//baseCharacter->GetMesh()->MarkRenderStateDirty();
+			}
+			// 같은 팀인 경우
+			else
+			{
+				UMaterialInterface* material = Cast<UMaterialInterface>(character->GetMesh()->GetOverlayMaterial());
+
+				if (material)
+				{
+					MI_Overlay = UMaterialInstanceDynamic::Create(material, this);
+					character->GetMesh()->SetOverlayMaterial(MI_Overlay);
+					// Overlay Material의 색을 청색으로 설정
+					MI_Overlay->SetVectorParameterValue("Color", FLinearColor(0.0f, 0.859375f, 0.250501f, 1.0f));
+				}
+
+				//AGS_TrainingRoom* GS = Cast<AGS_TrainingRoom>(GetWorld()->GetGameState());
+				if (gs)
+				{
+					UMaterialInterface* ppmaterial = Cast<UMaterialInterface>(gs->MaterialInstance);
+
+					if (ppmaterial)
+					{
+						MI_PostProcess = UMaterialInstanceDynamic::Create(ppmaterial, this);
+						gs->PostProcessVolume->AddOrUpdateBlendable(MI_PostProcess, 1.0f);
+						// PostProcess Material의 색을 청색으로 설정
+
+					}
+				}
+
+
+				if (owner->Data.RoleType == ERoleType::Healer)
+				{
+					character->GetMesh()->SetRenderCustomDepth(true);
+					character->GetMesh()->SetCustomDepthStencilValue(1);
+
+					MI_PostProcess->SetScalarParameterValue("Scale", 0.0f);
+				}
+				else
+				{
+					MI_PostProcess->SetScalarParameterValue("Scale", 0.2f);
+				}
+
+				//baseCharacter->GetMesh()->MarkRenderStateDirty();
+			}
+		}
+		*/
+
 		TArray<AActor*> foundActors;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), foundActors);
 		UE_LOG(LogTemp, Warning, TEXT("foundActors Num : %d"), foundActors.Num());
@@ -295,12 +427,12 @@ void ARolexPlayerController::SetCharacterOverlay()
 			ABaseCharacter* owner = Cast<ABaseCharacter>(GetPawn());
 			
 			if (baseCharacter == owner) continue;
-
+		
 			// 다른팀인경우
 			if (baseCharacter->Data.Team != owner->Data.Team)
 			{
 				UMaterialInterface* material = Cast<UMaterialInterface>(baseCharacter->GetMesh()->GetOverlayMaterial());
-
+		
 				if (material)
 				{
 					MI_Overlay = UMaterialInstanceDynamic::Create(material, this);
@@ -308,14 +440,15 @@ void ARolexPlayerController::SetCharacterOverlay()
 					// Overlay Material의 색을 빨간색으로 설정
 					MI_Overlay->SetVectorParameterValue("Color", FLinearColor(1.0f, 0.0f, 0.0f, 1.0f));
 				}
-
+		
 				baseCharacter->GetMesh()->SetCustomDepthStencilValue(2);
+				//baseCharacter->GetMesh()->MarkRenderStateDirty();
 			}
 			// 같은 팀인 경우
 			else
 			{
 				UMaterialInterface* material = Cast<UMaterialInterface>(baseCharacter->GetMesh()->GetOverlayMaterial());
-
+		
 				if (material)
 				{
 					MI_Overlay = UMaterialInstanceDynamic::Create(material, this);
@@ -324,33 +457,37 @@ void ARolexPlayerController::SetCharacterOverlay()
 					MI_Overlay->SetVectorParameterValue("Color", FLinearColor(0.0f, 0.859375f, 0.250501f, 1.0f));
 				}
 				
-				AGS_TrainingRoom* GS = Cast<AGS_TrainingRoom>(GetWorld()->GetGameState());
-				if (GS)
+				//AGS_TrainingRoom* GS = Cast<AGS_TrainingRoom>(GetWorld()->GetGameState());
+				if (gs)
 				{
-					UMaterialInterface* ppmaterial = Cast<UMaterialInterface>(GS->MaterialInstance);
-
+					UMaterialInterface* ppmaterial = Cast<UMaterialInterface>(gs->MaterialInstance);
+		
 					if (ppmaterial)
 					{
 						MI_PostProcess = UMaterialInstanceDynamic::Create(ppmaterial, this);
-						GS->PostProcessVolume->AddOrUpdateBlendable(MI_PostProcess, 1.0f);
+						gs->PostProcessVolume->AddOrUpdateBlendable(MI_PostProcess, 1.0f);
 						// PostProcess Material의 색을 청색으로 설정
 						
 					}
 				}
-
-
+		
+		
 				if (owner->Data.RoleType == ERoleType::Healer)
 				{
 					baseCharacter->GetMesh()->SetRenderCustomDepth(true);
 					baseCharacter->GetMesh()->SetCustomDepthStencilValue(1);
-
+		
 					MI_PostProcess->SetScalarParameterValue("Scale", 0.0f);
 				}
 				else
 				{
 					MI_PostProcess->SetScalarParameterValue("Scale", 0.2f);
 				}
+		
+				//baseCharacter->GetMesh()->MarkRenderStateDirty();
 			}
+		
+		
 		}
 	}
 }

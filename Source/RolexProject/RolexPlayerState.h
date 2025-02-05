@@ -55,6 +55,26 @@ public:
 	
 	void FindUniqueID();
 
+	UFUNCTION(Server, Reliable)
+	void ServerPlayerKillCount();
+	UFUNCTION(Server, Reliable)
+	void ServerPlayerDeathCount();
+	UFUNCTION(Server, Reliable)
+	void ServerPlayerDamage(int damage);
+	UFUNCTION(Server, Reliable)
+	void ServerPlayerHealing(int healing);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiPlayerKillCount(int count);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiPlayerDeathCount(int count);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiPlayerDamage(int damage);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiPlayerHealing(int healing);
+
+
+
 	UPROPERTY(VisibleAnywhere, Category = "Info")
 	FPlayerData PlayerData;
 };

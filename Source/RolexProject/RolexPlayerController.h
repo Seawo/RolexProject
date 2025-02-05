@@ -74,7 +74,7 @@ public:
 
 public:
 	void InitUI();
-	void SetCharacterOverlay();
+	void SetCharacterOverlay(class AGS_TrainingRoom* gs);
 
 public:
 	void SetPlayTime(float Time);

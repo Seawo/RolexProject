@@ -6,6 +6,7 @@
 #include "RolexGameInstance.h"
 #include "RolexProjectCharacter.h"
 #include "RolexPlayerController.h"
+#include "GameState/GS_TrainingRoom.h"
 #include "RolexPlayerState.h"
 #include "TeamWidget.h"
 #include "Components/Image.h"
@@ -30,6 +31,42 @@ void ARolexGameMode::BeginPlay()
 	UE_LOG(LogTemp, Warning, TEXT("------------ RolexGameMode BeginPlay ------------"));
 	Super::BeginPlay();
 	
+	//FTimerHandle timer;
+	//GetWorldTimerManager().SetTimer(timer, [this]()
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("[GameMode BeginPlay] GS_TrainingRoom is valid"));
+	//	TArray<AActor*> foundActors;
+	//	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), foundActors);
+
+	//	for (AActor* actor : foundActors)
+	//	{
+	//		ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(actor);
+	//		if (baseCharacter)
+	//		{
+	//			baseCharacter->bTabTimer = true;
+	//			if (ARolexPlayerController* rolexPC = Cast<ARolexPlayerController>(baseCharacter->GetController()))
+	//			{
+	//				UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] FindCharacterInWorld client PC : %p"), rolexPC);
+	//			}
+
+	//			if (baseCharacter->Data.Team)
+	//			{
+	//				ATeamChracters.Add(baseCharacter);
+
+	//			}
+	//			else
+	//			{
+	//				BTeamChracters.Add(baseCharacter);
+	//			}
+
+	//		}
+	//	}
+	//}, 5.0f, false);
+	
+
+	
+
+	/*
 	// print player name and team
 	FTimerHandle timerPlayer;
 	GetWorldTimerManager().SetTimer(timerPlayer, [this]()
@@ -46,7 +83,7 @@ void ARolexGameMode::BeginPlay()
 					UE_LOG(LogTemp, Warning, TEXT("[GameMode BeginPlay] Name : %s, Team : %s"), *BaseCharacter->GetName(), BaseCharacter->Data.Team ? TEXT("ATeam") : TEXT("BTeam"));
 				}
 			}
-	}, 3.0f, false);
+	}, 3.0f, false);*/
 }
 
 void ARolexGameMode::Tick(float DeltaTime)

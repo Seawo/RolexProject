@@ -13,78 +13,66 @@ void UUI_InGameTab::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	//if (not bOneTime)
-	//{
-	//	AGS_TrainingRoom* GS_TrainingRoom = Cast<AGS_TrainingRoom>(UGameplayStatics::GetGameState(GetWorld//()));
-	//	if (GS_TrainingRoom)
-	//	{
-	//		//GS_TrainingRoom->FindCharacterInWorld();
-	//
-	//		for (ABaseCharacter* character : GS_TrainingRoom->ATeamChracters)
-	//		{
-	//			ATeam.Add(character);
-	//		}
-	//
-	//		for (ABaseCharacter* character : GS_TrainingRoom->BTeamChracters)
-	//		{
-	//			BTeam.Add(character);
-	//		}
-	//	}
-	//	/*TArray<AActor*> foundActors;
-	//	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), foundActors);
-	//	for (AActor* actor : foundActors)
-	//	{
-	//		ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(actor);
-	//		if (baseCharacter)
-	//		{
-	//			if (baseCharacter->Data.Team)
-	//			{
-	//				ATeam.Add(baseCharacter);
-	//			}
-	//			else
-	//			{
-	//				BTeam.Add(baseCharacter);
-	//			}
-	//		}
-	//	}*/
-	//
-	//	UE_LOG(LogTemp, Warning, TEXT("ATeam : %d, BTeam : %d"), ATeam.Num(), BTeam.Num());
-	//
-	//	
-	//
-	//	for (ABaseCharacter* character : ATeam)
-	//	{
-	//		UUI_PlayerData* PlayerData = CreateWidget<UUI_PlayerData>(GetWorld(), PlayerDataFactory);
-	//
-	//		ARolexPlayerState* playerState = Cast<ARolexPlayerState>(character->GetPlayerState());
-	//
-	//		//PlayerData->SetID(playerState->UniqueID);
-	//		PlayerData->SetID(character->Data.Name.ToString());
-	//		PlayerData->SetIconImage(character->Data.Name);
-	//		PlayerData->SetRoleImage(character->Data.RoleType);
-	//		PlayerData->SetTeamColor(true);
-	//
-	//		VB_ATeam->AddChild(PlayerData);
-	//
-	//	}
-	//
-	//	for (ABaseCharacter* character : BTeam)
-	//	{
-	//		UUI_PlayerData* PlayerData = CreateWidget<UUI_PlayerData>(GetWorld(), PlayerDataFactory);
-	//
-	//		ARolexPlayerState* playerState = Cast<ARolexPlayerState>(character->GetPlayerState()); 
-	//
-	//		//PlayerData->SetID(playerState->UniqueID);
-	//		PlayerData->SetID(character->Data.Name.ToString());
-	//		PlayerData->SetIconImage(character->Data.Name);
-	//		PlayerData->SetRoleImage(character->Data.RoleType);
-	//		PlayerData->SetTeamColor(false);
-	//
-	//		VB_BTeam->AddChild(PlayerData);
-	//	}
-	//
-	//	bOneTime = true;
-	//}
+	
+	if (not bOneTime)
+	{
+		TArray<AActor*> foundActors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), foundActors);
+		UE_LOG(LogTemp, Warning, TEXT("foundActors Num : %d"), foundActors.Num());
+		for (AActor* actor : foundActors)
+		{
+			ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(actor);
+			if (baseCharacter)
+			{
+				if (baseCharacter->Data.Team)
+				{
+					ATeam.Add(baseCharacter);
+				}
+				else
+				{
+					BTeam.Add(baseCharacter);
+				}
+			}
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("ATeam : %d, BTeam : %d"), ATeam.Num(), BTeam.Num());
+
+
+
+		for (ABaseCharacter* character : ATeam)
+		{
+			UUI_PlayerData* PlayerData = CreateWidget<UUI_PlayerData>(GetWorld(), PlayerDataFactory);
+
+			ARolexPlayerState* playerState = Cast<ARolexPlayerState>(character->GetPlayerState());
+
+			//PlayerData->SetID(playerState->UniqueID);
+			PlayerData->SetID(character->Data.Name.ToString());
+			PlayerData->SetIconImage(character->Data.Name);
+			PlayerData->SetRoleImage(character->Data.RoleType);
+			PlayerData->SetTeamColor(true);
+
+			VB_ATeam->AddChild(PlayerData);
+
+		}
+
+		for (ABaseCharacter* character : BTeam)
+		{
+			UUI_PlayerData* PlayerData = CreateWidget<UUI_PlayerData>(GetWorld(), PlayerDataFactory);
+
+			ARolexPlayerState* playerState = Cast<ARolexPlayerState>(character->GetPlayerState());
+
+			//PlayerData->SetID(playerState->UniqueID);
+			PlayerData->SetID(character->Data.Name.ToString());
+			PlayerData->SetIconImage(character->Data.Name);
+			PlayerData->SetRoleImage(character->Data.RoleType);
+			PlayerData->SetTeamColor(false);
+
+			VB_BTeam->AddChild(PlayerData);
+		}
+
+		bOneTime = true;
+	}
+	
 
 
 
@@ -97,17 +85,22 @@ void UUI_InGameTab::NativeConstruct()
 
 void UUI_InGameTab::InitData()
 {
-	AGS_TrainingRoom* GS_TrainingRoom = Cast<AGS_TrainingRoom>(UGameplayStatics::GetGameState(GetWorld()));
-	if (GS_TrainingRoom)
+	TArray<AActor*> foundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), foundActors);
+	UE_LOG(LogTemp, Warning, TEXT("foundActors Num : %d"), foundActors.Num());
+	for (AActor* actor : foundActors)
 	{
-		for (ABaseCharacter* character : GS_TrainingRoom->ATeamChracters)
+		ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(actor);
+		if (baseCharacter)
 		{
-			ATeam.Add(character);
-		}
-
-		for (ABaseCharacter* character : GS_TrainingRoom->BTeamChracters)
-		{
-			BTeam.Add(character);
+			if (baseCharacter->Data.Team)
+			{
+				ATeam.Add(baseCharacter);
+			}
+			else
+			{
+				BTeam.Add(baseCharacter);
+			}
 		}
 	}
 

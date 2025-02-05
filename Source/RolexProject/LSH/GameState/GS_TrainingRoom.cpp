@@ -4,6 +4,7 @@
 #include "GS_TrainingRoom.h"
 
 #include "RolexGameInstance.h"
+#include "RolexGameMode.h"
 #include "PlayerController/PlayerController_TrainingRoom.h"
 #include "RolexPlayerController.h"
 #include "RolexGameInstance.h"
@@ -39,43 +40,35 @@ void AGS_TrainingRoom::BeginPlay()
 	PC = Cast<ARolexPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (PC)
 	{
-		//UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] PC : %s"), *PC->GetName());
 		PC->InitUI();
-		PC->SetCharacterOverlay();
+		/*PC->SetCharacterOverlay(this);*/
 	}
 	else
 	{
-		//UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] PC is nullptr"));
+		UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] PC is nullptr"));
 	}
+
+
+
 
 
 	FTimerHandle TimerHandle;
 
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGS_TrainingRoom::FindCharacterInWorld, 4.0f, false);
-
-
-
-	//if (HasAuthority())
-	//{
-	//	// 맵에 있는 거점 가져오기
-	//	AActor* foundPoint = UGameplayStatics::GetActorOfClass(GetWorld(), AActor_FightPoint::StaticClass());
-	//	if (foundPoint)
-	//	{
-	//		AActor_FightPoint* point = Cast<AActor_FightPoint>(foundPoint);
-	//		point->OnPointOverlapChanged.AddDynamic(this, &AGS_TrainingRoom::ChangeNumberOfTeam);
-	//		Points.Add(point);
-	//	}
-	//
-	//	// PlayTime 1초마다 1씩 올려주기
-	//
-	//}
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+		{
+			//PC->InitInGameTab();
+			PC->SetCharacterOverlay(this);
+		}, 5.0f, false);
 }
 
 void AGS_TrainingRoom::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (not HasAuthority()) return;
+	if (not HasAuthority())
+	{
+		return;
+	}
 
 	PlayTime += DeltaTime;
 	if (PC)
@@ -186,35 +179,24 @@ void AGS_TrainingRoom::ChangeNumberOfTeam(bool bTeam, int32 ChangeValue)
 		UE_LOG(LogTemp, Warning, TEXT("[RolexGameMode ChangeNumberOfTeam] PointBTeamCount: %d"), PointBTeamCount);
 	}
 }
+
+void AGS_TrainingRoom::Multi_SetATeamCharacters_Implementation(ABaseCharacter* ATeam)
+{
+	ATeamChracters.Add(ATeam);
+}
+
+void AGS_TrainingRoom::Multi_SetBTeamCharacters_Implementation(ABaseCharacter* BTeam)
+{
+	BTeamChracters.Add(BTeam);
+}
+
 void AGS_TrainingRoom::FindCharacterInWorld()
 {
-	if (not HasAuthority()) return;
-
-	TArray<AActor*> foundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseCharacter::StaticClass(), foundActors);
-
-	for (AActor* actor : foundActors)
+	if (HasAuthority())
 	{
-		ABaseCharacter* baseCharacter = Cast<ABaseCharacter>(actor);
-		if (baseCharacter)
-		{
-			if (baseCharacter->Data.Team)
-			{
-				ATeamChracters.Add(baseCharacter);
-
-			}
-			else
-			{
-				BTeamChracters.Add(baseCharacter);
-			}
-			baseCharacter->bTabTimer = true;
-		}
+		PC->InitInGameTab();
 	}
-
-	PC->InitInGameTab();
-
-	UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] ATeam Num : %d"), ATeamChracters.Num());
-	UE_LOG(LogTemp, Error, TEXT("[AGM_TrainingRoom] BTeam Num : %d"), BTeamChracters.Num());
+	PC->SetCharacterOverlay(this);
 }
 
 void AGS_TrainingRoom::UpdatePointGauge(float DeltaTime)
@@ -547,8 +529,6 @@ void AGS_TrainingRoom::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(AGS_TrainingRoom, PlayTime);
 	DOREPLIFETIME(AGS_TrainingRoom, Points);
 	DOREPLIFETIME(AGS_TrainingRoom, Doors);
-	DOREPLIFETIME(AGS_TrainingRoom, ATeamChracters);
-	DOREPLIFETIME(AGS_TrainingRoom, BTeamChracters);
 
 	DOREPLIFETIME(AGS_TrainingRoom, Occupation);
 	DOREPLIFETIME(AGS_TrainingRoom, Result);
@@ -571,6 +551,9 @@ void AGS_TrainingRoom::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(AGS_TrainingRoom, IsGetATeamExtraTime);
 	DOREPLIFETIME(AGS_TrainingRoom, IsGetBTeamExtraTime);
+}
+void AGS_TrainingRoom::OnRep_SetPlayerController()
+{
 }
 void AGS_TrainingRoom::OnRep_PlayTime()
 {
@@ -595,20 +578,8 @@ void AGS_TrainingRoom::OnRep_Doors()
 }
 void AGS_TrainingRoom::OnRep_Points()
 {
-	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] Points"));
 	int32 idx = 0;
 	PC->SetPoint(idx);
-
-	//for (AActor_FightPoint* point : Points)
-	//{
-	//	if (point->GetActivePoint() == EActivePoint::Active)
-	//	{
-	//		UE_LOG(LogTemp, Log, TEXT("[GS OnRep_Points] Points : %s"), *point->GetName());
-	//		UE_LOG(LogTemp, Log, TEXT("[GS OnRep_Points] idx : %d"), idx);
-	//		PC->SetPoint(idx);
-	//	}
-	//	idx++;
-	//}
 }
 void AGS_TrainingRoom::OnRep_Occupation()
 {
@@ -677,60 +648,6 @@ void AGS_TrainingRoom::OnRep_IsGetBTeamExtraTime()
 {
 	//UE_LOG(LogTemp, Log, TEXT("[GS_OnRep] IsGetBTeamExtraTime"));
 	PC->SetIsBTeamExtraTime(IsGetBTeamExtraTime);
-}
-void AGS_TrainingRoom::OnRep_ATeamCharacters()
-{
-	for (ABaseCharacter* character : ATeamChracters)
-	{
-		if (not character)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("[AGM_TrainingRoom] BTeamChracters is null on client. Possibly the local player Pawn."));
-
-			if (ARolexPlayerController* rolexPC = Cast<ARolexPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
-			{
-				APawn* localPawn = rolexPC->GetPawn();
-				if (localPawn)
-				{
-					if (ABaseCharacter* localCharacter = Cast<ABaseCharacter>(localPawn))
-					{
-						character = localCharacter;
-						localCharacter->bTabTimer = true;
-					}
-				}
-			}
-		}
-		else
-		{
-			character->bTabTimer = true;
-		}
-	}
-}
-void AGS_TrainingRoom::OnRep_BTeamCharacters()
-{
-	for (ABaseCharacter* character : BTeamChracters)
-	{
-		if (not character)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("[AGM_TrainingRoom] BTeamChracters is null on client. Possibly the local player Pawn."));
-
-			if (ARolexPlayerController* rolexPC = Cast<ARolexPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
-			{
-				APawn* localPawn = rolexPC->GetPawn();
-				if (localPawn)
-				{
-					if(ABaseCharacter* localCharacter = Cast<ABaseCharacter>(localPawn))
-					{
-						character = localCharacter;
-						localCharacter->bTabTimer = true;
-					}
-				}
-			}
-		}
-		else
-		{
-			character->bTabTimer = true;
-		}
-	}
 }
 void AGS_TrainingRoom::AddDynamicMaterialToPostProcessVolume()
 {
