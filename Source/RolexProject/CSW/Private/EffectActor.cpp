@@ -237,11 +237,13 @@ void AEffectActor::CheckOverlapAndApplyDamage()
 			ABaseCharacter* character = Cast<ABaseCharacter>(Actor);
 			ABaseCharacter* onwer = Cast<ABaseCharacter>(GetOwner());
 
-			if (character->Data.Team == onwer->Data.Team)
-				return;
-
-			if (character)
+			if (character && onwer)
 			{
+
+				if (character->Data.Team == onwer->Data.Team)
+					return;
+
+
 				if (NiagaraCollusionEffect)
 				{
 
