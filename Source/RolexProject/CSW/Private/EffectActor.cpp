@@ -19,6 +19,7 @@
 
 #include "Sound/SoundCue.h"
 #include "Kismet/GameplayStatics.h"
+#include "RolexPlayerState.h"
 
 // Sets default values
 AEffectActor::AEffectActor()
@@ -255,7 +256,7 @@ void AEffectActor::CheckOverlapAndApplyDamage()
 						true // 자동 크기 조정
 					);
 				}
-
+				
 				character->ModifyHP(-Damage);
 			}
 

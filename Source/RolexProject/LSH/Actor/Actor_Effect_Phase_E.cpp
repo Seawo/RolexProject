@@ -23,15 +23,30 @@ void AActor_Effect_Phase_E::BeginPlay()
 	Super::BeginPlay();
 
 	ShieldCollision->OnComponentBeginOverlap.AddDynamic(this, &AActor_Effect_Phase_E::OnOverlapBegin);
+	Onwer = Cast<ABaseCharacter>(GetOwner());
 
 	FTimerHandle deathTimer;
 	GetWorld()->GetTimerManager().SetTimer(deathTimer,
-			FTimerDelegate::CreateLambda([this]() {Destroy(); NiagaraComponent->Deactivate(); }), Phase->ESkillDuration, false);
+			FTimerDelegate::CreateLambda([this]() 
+			{
+				if (Onwer)
+				{
+					Onwer->Data.Shield = 0;
+				}
+				Destroy(); 
+				NiagaraComponent->Deactivate();
+			}), Phase->ESkillDuration, false);
 }
 
 void AActor_Effect_Phase_E::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (Onwer and Onwer->Data.Shield <= 0)
+	{
+		Destroy();
+		NiagaraComponent->Deactivate();
+	}
 }
 
 void AActor_Effect_Phase_E::UpdateLocation(float DeltaTime)

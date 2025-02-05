@@ -102,7 +102,7 @@ void AActor_Effect_Phase_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComp
 		if (character->Data.Hp <= 0)
 		{
 			//owner->RolexPS->PlayerData.KillCount++;
-			owner->RolexPS->MultiPlayerKillCount(1);
+			//owner->RolexPS->MultiPlayerKillCount(1);
 		}
 		else if (character->Data.Hp <= Damage)
 		{

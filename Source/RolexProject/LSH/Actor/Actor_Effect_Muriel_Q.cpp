@@ -21,6 +21,8 @@ void AActor_Effect_Muriel_Q::BeginPlay()
 {
 	Super::BeginPlay();
 
+	Damage = 60;
+
 	HitCollision->OnComponentBeginOverlap.AddDynamic(this, &AActor_Effect_Muriel_Q::OnOverlapBegin);
 }
 
@@ -36,6 +38,8 @@ void AActor_Effect_Muriel_Q::UpdateLocation(float DeltaTime)
 
 void AActor_Effect_Muriel_Q::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (not HasAuthority()) return;
+
 	if (OtherActor == this) return;
 
 	if (OtherActor == GetOwner()) return;
@@ -56,24 +60,27 @@ void AActor_Effect_Muriel_Q::OnOverlapBegin(UPrimitiveComponent* OverlappedCompo
 		{
 			if (character->Data.Hp <= 0)
 			{
-				owner->RolexPS->PlayerData.KillCount++;
+				//owner->RolexPS->PlayerData.KillCount++;
 			}
-			else if (character->Data.Hp < 60)
+			else if (character->Data.Hp <= Damage)
 			{
-				owner->RolexPS->PlayerData.Damage += character->Data.Hp;
+				//owner->RolexPS->PlayerData.Damage += character->Data.Hp;
+				owner->RolexPS->MultiPlayerDamage(character->Data.Hp);
+				owner->RolexPS->MultiPlayerDamage(1);
 				character->ModifyHP(-character->Data.Hp);
 			}
 			else
 			{
-				character->ModifyHP(-60);
-				owner->RolexPS->PlayerData.Damage += 60;
+				character->ModifyHP(-Damage);
+				owner->RolexPS->MultiPlayerDamage(Damage);
+				//owner->RolexPS->PlayerData.Damage += 60;
 			}
 		}
 		// 아군인 경우
 		else if (character->Data.Team == owner->Data.Team)
 		{
 			// 실드 추가
-			character->ModifyShield(1);
+			character->ModifyShield(Damage*0.5);
 		}
 	}
 

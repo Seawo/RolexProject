@@ -24,7 +24,7 @@ class ROLEXPROJECT_API AActor_Effect_Phase_E : public AActor_Effect
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 private:
-
+	class ABaseCharacter* Onwer;
 
 	UPROPERTY(EditAnywhere, Category = "Effect")
 	class USphereComponent* ShieldCollision;

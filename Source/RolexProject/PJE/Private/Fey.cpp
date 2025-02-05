@@ -9,6 +9,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "RolexPlayerState.h"
 
 // Sets default values
 AFey::AFey()
@@ -310,7 +311,20 @@ void AFey::Server_LMBAttack_Implementation()
 		if (Opponent && Opponent->Data.Team == Data.Team)
 		{
 			//Opponent->Data.Hp += HealValue;
-			Opponent->ModifyHP(HealValue);
+			//Opponent->ModifyHP(HealValue);
+
+			if (Opponent->Data.Hp + HealValue >= Opponent->Data.MaxHp)
+			{
+				//onwer->RolexPS->PlayerData.Healing += character->Data.MaxHp - character->Data.Hp;
+				RolexPS->MultiPlayerHealing(Opponent->Data.MaxHp - Opponent->Data.Hp);
+				Opponent->ModifyHP(Opponent->Data.MaxHp - Opponent->Data.Hp);
+			}
+			else
+			{
+				Opponent->ModifyHP(HealValue);
+				//onwer->RolexPS->PlayerData.Healing += 10;
+				RolexPS->MultiPlayerHealing(HealValue);
+			}
 		}
 	}
 
@@ -390,7 +404,21 @@ void AFey::Server_RMBAttack_Implementation()
 		if (Opponent && Opponent->Data.Team != Data.Team)
 		{
 			//Opponent->Data.Hp -= AttackValue;
-			Opponent->ModifyHP(-AttackValue);
+			//Opponent->ModifyHP(-AttackValue);
+
+			if (Opponent->Data.Hp <= AttackValue)
+			{
+				//onwer->RolexPS->PlayerData.Damage += character->Data.Hp;
+				RolexPS->MultiPlayerDamage(Opponent->Data.Hp);
+				RolexPS->MultiPlayerKillCount(1);
+				Opponent->ModifyHP(-Opponent->Data.Hp);
+			}
+			else
+			{
+				Opponent->ModifyHP(-AttackValue);
+				RolexPS->MultiPlayerDamage(AttackValue);
+				//onwer->RolexPS->PlayerData.Damage += 10;
+			}
 		}
 	}
 

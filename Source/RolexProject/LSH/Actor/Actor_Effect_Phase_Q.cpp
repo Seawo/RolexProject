@@ -25,6 +25,8 @@ void AActor_Effect_Phase_Q::BeginPlay()
 {
 	Super::BeginPlay();
 
+	Damage = 30;
+
 	onwer = Cast<ABaseCharacter>(GetOwner());
 
 	// 충돌체 BeginOverlap
@@ -123,6 +125,8 @@ void AActor_Effect_Phase_Q::OnOverlapEnd(UPrimitiveComponent* OverlappedComponen
 
 void AActor_Effect_Phase_Q::TakeDamageToCharacter()
 {
+	if (not HasAuthority()) return;
+
 	// 데미지 주기
 	if (bIsOverlap)
 	{
@@ -132,17 +136,20 @@ void AActor_Effect_Phase_Q::TakeDamageToCharacter()
 			{
 				if (character->Data.Hp <= 0)
 				{
-					onwer->RolexPS->PlayerData.KillCount++;
+					//onwer->RolexPS->PlayerData.KillCount++;
 				}
-				else if (character->Data.Hp < 30)
+				else if (character->Data.Hp <= Damage)
 				{
-					onwer->RolexPS->PlayerData.Damage += character->Data.Hp;
+					//onwer->RolexPS->PlayerData.Damage += character->Data.Hp;
+					onwer->RolexPS->MultiPlayerDamage(character->Data.Hp);
+					onwer->RolexPS->MultiPlayerKillCount(1);
 					character->ModifyHP(-character->Data.Hp);
 				}
 				else
 				{
-					character->ModifyHP(-30);
-					onwer->RolexPS->PlayerData.Damage += 30;
+					character->ModifyHP(-Damage);
+					//onwer->RolexPS->PlayerData.Damage += Damage;
+					onwer->RolexPS->MultiPlayerDamage(Damage);
 				}
 				
 			}

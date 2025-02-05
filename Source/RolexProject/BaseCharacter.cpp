@@ -65,15 +65,12 @@ ABaseCharacter::ABaseCharacter()
 	bUseControllerRotationRoll = false;
 
 	bReplicates = true;
-	bOnlyRelevantToOwner = false;
 }
 
 // Called when the game starts or when spawned
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	SetNetDormancy(ENetDormancy::DORM_Awake);
 
 	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
 

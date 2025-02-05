@@ -25,7 +25,7 @@ AActor_Effect_Muriel_Orb::AActor_Effect_Muriel_Orb()
 void AActor_Effect_Muriel_Orb::BeginPlay()
 {
 	Super::BeginPlay();
-
+	Damage = 10;
 	Muriel = Cast<ACharacter_Muriel>(GetOwner());
 
 	OrbCollision->OnComponentBeginOverlap.AddDynamic(this, &AActor_Effect_Muriel_Orb::OnOverlapBegin);
@@ -117,6 +117,8 @@ void AActor_Effect_Muriel_Orb::UpdateRotation()
 
 void AActor_Effect_Muriel_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (not HasAuthority()) return;
+
 	if (OtherActor == this)
 	{
 		//UE_LOG(LogTemp, Log, TEXT("OtherActor Equal This"));
@@ -156,17 +158,20 @@ void AActor_Effect_Muriel_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedCom
 		{
 			if (character->Data.Hp <= 0)
 			{
-				onwer->RolexPS->PlayerData.KillCount++;
+				//onwer->RolexPS->PlayerData.KillCount++;
 			}
-			else if (character->Data.Hp < 10)
+			else if (character->Data.Hp <= Damage)
 			{
-				onwer->RolexPS->PlayerData.Damage += character->Data.Hp;
+				//onwer->RolexPS->PlayerData.Damage += character->Data.Hp;
+				onwer->RolexPS->MultiPlayerDamage(character->Data.Hp);
+				onwer->RolexPS->MultiPlayerKillCount(1);
 				character->ModifyHP(-character->Data.Hp);
 			}
 			else
 			{
-				character->ModifyHP(-10);
-				onwer->RolexPS->PlayerData.Damage += 10;
+				character->ModifyHP(-Damage);
+				onwer->RolexPS->MultiPlayerDamage(Damage);
+				//onwer->RolexPS->PlayerData.Damage += 10;
 			}
 		}
 		// 캐릭터가 있고, 같은 팀이라면 힐 주기
@@ -176,15 +181,17 @@ void AActor_Effect_Muriel_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedCom
 			{
 				return;
 			}
-			else if (character->Data.Hp + 10 >= character->Data.MaxHp)
+			else if (character->Data.Hp + (Damage *2) >= character->Data.MaxHp)
 			{
-				onwer->RolexPS->PlayerData.Healing += character->Data.MaxHp - character->Data.Hp;
+				//onwer->RolexPS->PlayerData.Healing += character->Data.MaxHp - character->Data.Hp;
+				onwer->RolexPS->MultiPlayerHealing(character->Data.MaxHp - character->Data.Hp);
 				character->ModifyHP(character->Data.MaxHp - character->Data.Hp);
 			}
 			else
 			{
-				character->ModifyHP(10);
-				onwer->RolexPS->PlayerData.Healing += 10;
+				character->ModifyHP(Damage * 2);
+				//onwer->RolexPS->PlayerData.Healing += 10;
+				onwer->RolexPS->MultiPlayerHealing(Damage * 2);
 			}
 		}
 	}
@@ -196,17 +203,20 @@ void AActor_Effect_Muriel_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedCom
 		{
 			if (character->Data.Hp <= 0)
 			{
-				onwer->RolexPS->PlayerData.KillCount++;
+				//onwer->RolexPS->PlayerData.KillCount++;
 			}
-			else if (character->Data.Hp < (1 * 25 * GetActorScale3D().X))
+			else if (character->Data.Hp <= (Damage * 2.5f * GetActorScale3D().X))
 			{
-				onwer->RolexPS->PlayerData.Damage += character->Data.Hp;
+				//onwer->RolexPS->PlayerData.Damage += character->Data.Hp;
+				onwer->RolexPS->MultiPlayerDamage(character->Data.Hp);
+				onwer->RolexPS->MultiPlayerKillCount(1);
 				character->ModifyHP(-character->Data.Hp);
 			}
 			else
 			{
-				character->ModifyHP(-(1 * 25 * GetActorScale3D().X));
-				onwer->RolexPS->PlayerData.Damage += (1 * 25 * GetActorScale3D().X);
+				character->ModifyHP(-(Damage * 2.5f * GetActorScale3D().X));
+				//onwer->RolexPS->PlayerData.Damage += (1 * 25 * GetActorScale3D().X);
+				onwer->RolexPS->MultiPlayerDamage(Damage * 2.5f * GetActorScale3D().X);
 			}
 		}
 		else if (character && character->Data.Team == onwer->Data.Team)
@@ -215,15 +225,17 @@ void AActor_Effect_Muriel_Orb::OnOverlapBegin(UPrimitiveComponent* OverlappedCom
 			{
 				return;
 			}
-			else if (character->Data.Hp + (1 * 25 * GetActorScale3D().X) >= character->Data.MaxHp)
+			else if (character->Data.Hp + (Damage * 4 * GetActorScale3D().X) >= character->Data.MaxHp)
 			{
-				onwer->RolexPS->PlayerData.Healing += character->Data.MaxHp - character->Data.Hp;
+				//onwer->RolexPS->PlayerData.Healing += character->Data.MaxHp - character->Data.Hp;
+				onwer->RolexPS->MultiPlayerHealing(character->Data.MaxHp - character->Data.Hp);
 				character->ModifyHP(character->Data.MaxHp - character->Data.Hp);
 			}
 			else
 			{
-				character->ModifyHP(1 * 25 * GetActorScale3D().X);
-				onwer->RolexPS->PlayerData.Healing += 1 * 25 * GetActorScale3D().X;
+				character->ModifyHP(Damage * 4 * GetActorScale3D().X);
+				//onwer->RolexPS->PlayerData.Healing += 1 * 25 * GetActorScale3D().X;
+				onwer->RolexPS->MultiPlayerHealing(Damage * 4 * GetActorScale3D().X);
 			}
 		}
 	}

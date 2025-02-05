@@ -243,7 +243,8 @@ void ACharacter_Phase::EAttack()
 {
 	// Montage
 	PlayMontage("E", 1.0f);
-	GetCharacterMovement()->GravityScale = 0.7f;
+	//GetCharacterMovement()->GravityScale = 0.7f;
+	ModifyShield(100);
 }
 void ACharacter_Phase::QAttack()
 {
