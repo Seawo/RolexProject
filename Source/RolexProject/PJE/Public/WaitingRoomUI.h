@@ -67,7 +67,17 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
 public:
-
 	UFUNCTION()
 	void TravelToMain();
+
+public:
+	UPROPERTY()
+	UAudioComponent* AudioComponent;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USoundBase* WaitingSound;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USoundBase* HeroSelectionSound;
+	
 };

@@ -3,11 +3,13 @@
 
 #include "WaitingRoomUI.h"
 
+#include "AudioManager.h"
 #include "HeroSlotUI.h"
 #include "PlayerSlotUI.h"
 #include "RolexGameInstance.h"
 #include "RolexPlayerController.h"
 #include "WaitingRoomGameStateBase.h"
+#include "Components/AudioComponent.h"
 #include "Components/Button.h"
 #include "Components/UniformGridPanel.h"
 #include "Components/HorizontalBox.h"
@@ -15,6 +17,7 @@
 #include "Components/VerticalBox.h"
 #include "Components/UniformGridPanel.h"
 #include "GameFramework/GameStateBase.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
 void UWaitingRoomUI::NativeConstruct()
@@ -72,6 +75,14 @@ void UWaitingRoomUI::NativeConstruct()
 			RolexPlayerController->ServerRPC_SetText(RolexGameInstance->RoomName.ToString());
 		}
 	}, 0.2f, false);
+
+	// set sound
+	AAudioManager* AudioManager = Cast<AAudioManager>(UGameplayStatics::GetActorOfClass(this, AAudioManager::StaticClass()));
+	if (AudioManager &&WaitingSound)
+	{
+		AudioManager->AudioComponent->SetSound(WaitingSound);
+		AudioManager->AudioComponent->Play();
+	}
 }
 
 void UWaitingRoomUI::GetAllDescendants(UPanelWidget* ParentWidget, TArray<UHeroSlotUI*>& Descendants)
