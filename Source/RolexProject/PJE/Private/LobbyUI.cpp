@@ -1,11 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "LobbyUI.h"
 
 #include "AudioManager.h"
 #include "Blueprint/UserWidget.h"
-#include "NavigationSystemTypes.h"
 #include "RolexGameInstance.h"
 #include "SessionItemUI.h"
 #include "Components/Button.h"
