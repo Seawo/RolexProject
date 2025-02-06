@@ -49,9 +49,9 @@ void AWaitingRoomGameModeBase::HandleStartingNewPlayer_Implementation(APlayerCon
 
 		AWaitingRoomGameStateBase* WaitingRoomGameStateBase = Cast<AWaitingRoomGameStateBase>(GetWorld()->GetGameState());
 
+		// hero selection part: make invisible at the first time 
 		
 		// create widget and initialize for the new player
-		// hero selection part: make invisible at the first time 
 		ARolexPlayerController* RolexPlayerController = Cast<ARolexPlayerController>(NewPlayer);
 		if (RolexPlayerController)
 		{

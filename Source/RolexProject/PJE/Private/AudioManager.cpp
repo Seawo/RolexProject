@@ -8,10 +8,7 @@
 // Sets default values
 AAudioManager::AAudioManager()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
-	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));
+ 	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));
 	AudioComponent->bAutoActivate = false;
 }
 
@@ -20,12 +17,5 @@ void AAudioManager::BeginPlay()
 {
 	Super::BeginPlay();
 	
-}
-
-// Called every frame
-void AAudioManager::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
