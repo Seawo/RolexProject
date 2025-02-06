@@ -112,7 +112,7 @@ void ABaseCharacter::BeginPlay()
 	}
 	
 	// startPos 저장
-	StartPos = GetActorLocation();
+	//StartPos = GetActorLocation();
 
 	// create widget
 	FTimerHandle TimerHandle;

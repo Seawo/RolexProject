@@ -48,6 +48,7 @@ public:
 
 	void LeaveSession();
 	void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
+	void OnSessionFailure(const FUniqueNetId& NetId, ESessionFailure::Type FailureType);
 
 	FAddSession AddSession;
 

@@ -64,6 +64,8 @@ void ARolexGameMode::BeginPlay()
 								if (playerStart->GetName().Contains(TEXT("PlayerStart_4")))
 								{
 									baseCharacter->SetActorLocation(playerStart->GetActorLocation());
+									// startPos 저장
+									baseCharacter->StartPos = baseCharacter->GetActorLocation();
 								}
 							}
 							else
@@ -71,6 +73,8 @@ void ARolexGameMode::BeginPlay()
 								if (playerStart->GetName().Contains(TEXT("PlayerStart_3")))
 								{
 									baseCharacter->SetActorLocation(playerStart->GetActorLocation());
+									// startPos 저장
+									baseCharacter->StartPos = baseCharacter->GetActorLocation();
 								}
 							}
 						}
