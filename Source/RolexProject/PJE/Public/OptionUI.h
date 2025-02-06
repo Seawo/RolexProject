@@ -25,5 +25,10 @@ public:
 
 	UPROPERTY()
 	class AAudioManager* AudioManager;
-	
+
+public:
+	UPROPERTY(meta = (BindWidget))
+	class UButton* CloseButton;
 };
+
+

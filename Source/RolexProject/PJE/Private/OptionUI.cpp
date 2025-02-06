@@ -5,6 +5,7 @@
 
 #include "AudioManager.h"
 #include "Components/AudioComponent.h"
+#include "Components/Button.h"
 #include "Components/Slider.h"
 #include "Kismet/GameplayStatics.h"
 

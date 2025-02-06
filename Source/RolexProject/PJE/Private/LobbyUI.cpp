@@ -17,6 +17,7 @@
 #include "Components/AudioComponent.h"
 #include "Components/Border.h"
 #include "Components/WidgetSwitcher.h"
+#include "OptionUI.h"
 
 class AAudioManager;
 
@@ -27,6 +28,7 @@ void ULobbyUI::NativeConstruct()
 	CreateSessionUI->SetVisibility(ESlateVisibility::Hidden);
 	MapSelectUI->SetVisibility(ESlateVisibility::Hidden);
 	SessionScrollBoxBorder->SetVisibility(ESlateVisibility::Hidden);
+	OptionUI->SetVisibility(ESlateVisibility::Hidden);
 	
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	
@@ -45,6 +47,8 @@ void ULobbyUI::NativeConstruct()
 	UndoButton->OnClicked.AddDynamic(this, &ULobbyUI::UndoSwitchWidget);
 	CreateSessionBtn->OnClicked.AddDynamic(this, &ULobbyUI::CreateSession);
 	FindSessionBtn->OnClicked.AddDynamic(this, &ULobbyUI::FindSession);
+	OptionButton->OnClicked.AddDynamic(this, &ULobbyUI::AddOptionUIToViewport);
+	OptionUI->CloseButton->OnClicked.AddDynamic(this, &ULobbyUI::CloseOptionUI);
 
 	if (RolexGameInstace)
 		RolexGameInstace->AddSession.BindUObject(this, &ULobbyUI::AddSession);
@@ -117,4 +121,16 @@ void ULobbyUI::DisableButtonClick()
 	CreateSessionBtn->SetIsEnabled(false);
 	FindSessionBtn->SetIsEnabled(false);
 	UndoButton->SetIsEnabled(false);
+}
+
+void ULobbyUI::AddOptionUIToViewport()
+{
+	OptionUI->SetVisibility(ESlateVisibility::Visible);
+	GameStartButton->SetIsEnabled(false);
+}
+
+void ULobbyUI::CloseOptionUI()
+{
+	OptionUI->SetVisibility(ESlateVisibility::Hidden);
+	GameStartButton->SetIsEnabled(true);
 }
