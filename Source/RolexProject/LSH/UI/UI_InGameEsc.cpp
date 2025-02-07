@@ -6,6 +6,7 @@
 #include "Components/Button.h"
 #include "RolexPlayerController.h"
 #include "Kismet\KismetSystemLibrary.h"
+#include "RolexGameInstance.h"
 
 
 void UUI_InGameEsc::NativeConstruct()
@@ -44,6 +45,12 @@ void UUI_InGameEsc::OnBtnGameLeaveClicked()
 	UE_LOG(LogTemp, Warning, TEXT("OnBtnGameLeaveClicked"));
 
 	// 세션 나가기
+	URolexGameInstance* rolexGI = Cast<URolexGameInstance>(GetWorld()->GetGameInstance());
+
+	if (rolexGI)
+	{
+		rolexGI->LeaveSession();
+	}
 }
 
 void UUI_InGameEsc::OnBtnGameOverClicked()

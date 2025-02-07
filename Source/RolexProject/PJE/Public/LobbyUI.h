@@ -73,10 +73,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class USessionItemUI> SessionItemUIFactory;
 
+	UPROPERTY(meta = (BindWidget))
+	class UOptionUI* OptionUI;
+
+	UFUNCTION()
+	void AddOptionUIToViewport();
 public:
 	UFUNCTION()
 	void DisableButtonClick();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USoundBase* LobbySound;
+
+	UFUNCTION()
+	void CloseOptionUI();
 };

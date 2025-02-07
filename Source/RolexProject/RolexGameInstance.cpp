@@ -10,7 +10,6 @@
 #include "Engine/Engine.h"
 #include "OnlineSubsystem.h"
 
-
 void URolexGameInstance::Init()
 {
 	Super::Init();
@@ -98,24 +97,27 @@ void URolexGameInstance::FindSession()
 
 void URolexGameInstance::OnFindSession(bool bWasSuccessful)
 {
-	if (bWasSuccessful)
+	if (!IsValid(this))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("FindSession Succeed"));
-		UE_LOG(LogTemp, Warning, TEXT("Number of search results: %d"), SessionSearched->SearchResults.Num());
-
-		// get the created sessions and add to the SessionScrollBox
-		auto results = SessionSearched->SearchResults;
-		for (int32 i = 0; i < results.Num(); i++)
+		if (bWasSuccessful)
 		{
-			FOnlineSessionSearchResult SearchResult = results[i];
-			FString SessionId = SearchResult.GetSessionIdStr();
-			FString OwnerName = SearchResult.Session.OwningUserName;
-			FString SessionName;
-			SearchResult.Session.SessionSettings.Get(TEXT("RoomName"), SessionName);
+			UE_LOG(LogTemp, Warning, TEXT("FindSession Succeed"));
+			UE_LOG(LogTemp, Warning, TEXT("Number of search results: %d"), SessionSearched->SearchResults.Num());
 
-			UE_LOG(LogTemp, Warning, TEXT("Session Found: %s"), *SessionName);
+			// get the created sessions and add to the SessionScrollBox
+			auto results = SessionSearched->SearchResults;
+			for (int32 i = 0; i < results.Num(); i++)
+			{
+				FOnlineSessionSearchResult SearchResult = results[i];
+				FString SessionId = SearchResult.GetSessionIdStr();
+				FString OwnerName = SearchResult.Session.OwningUserName;
+				FString SessionName;
+				SearchResult.Session.SessionSettings.Get(TEXT("RoomName"), SessionName);
+
+				UE_LOG(LogTemp, Warning, TEXT("Session Found: %s"), *SessionName);
 			
-			AddSession.ExecuteIfBound(i, OwnerName, SessionName);
+				AddSession.ExecuteIfBound(i, OwnerName, SessionName);
+			}
 		}
 	}
 }
@@ -148,9 +150,6 @@ void URolexGameInstance::LeaveSession()
 {
 	if (SessionInterface)
 	{
-		// 세션 파괴 완료 델리게이트를 바인딩
-		DestroySessionCompleteDelegateHandle = SessionInterface->AddOnDestroySessionCompleteDelegate_Handle(FOnDestroySessionCompleteDelegate::CreateUObject(this, &URolexGameInstance::OnDestroySessionComplete));
-
 		SessionInterface->DestroySession(FName(RoomName.ToString()));
 		return;
 	}
@@ -158,21 +157,23 @@ void URolexGameInstance::LeaveSession()
 
 void URolexGameInstance::OnDestroySessionComplete(FName SessionName, bool bWasSuccessful)
 {
-	if (SessionInterface)
-	{
-		SessionInterface->ClearOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegateHandle);
-	}
-
 	// 세션 파괴 성공시 메인 메뉴로 이동
 	if (bWasSuccessful)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Destroy Session Success"));
-		GetWorld()->ServerTravel(TEXT("/Game/Rolex/Map/Lobby?listen"));
+		UGameplayStatics::OpenLevel(this, FName("Lobby"), true);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Destroy Session Failed"));
 	}
+}
+
+void URolexGameInstance::OnSessionFailure(const FUniqueNetId& NetId, ESessionFailure::Type FailureType)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Session has been disconnected.Go to the lobby."));
+
+	UGameplayStatics::OpenLevel(this, FName("Lobby"), true);
 }
 
 

@@ -50,6 +50,7 @@ void AWaitingRoomGameStateBase::MulticastRPC_SetText_Implementation(const FStrin
 		WaitingRoomUI->RoomName->SetText(FText::FromString(String));
 }
 
+// update new client on the waiting player list 
 void AWaitingRoomGameStateBase::MulticastRPC_UpdateWaitingPlayerSlotID_Implementation(
 	const FString& NewText)
 {
@@ -62,7 +63,7 @@ void AWaitingRoomGameStateBase::MulticastRPC_UpdateWaitingPlayerSlotID_Implement
 	}
 }
 
-// update new player ID on slot 
+// update new player ID on hero selection player UI slot 
 void AWaitingRoomGameStateBase::MulticastRPC_UpdatePlayerSlotID_Implementation(int32 PlayerNum, const FString& NewText)
 {
 	if (WaitingRoomUI)
