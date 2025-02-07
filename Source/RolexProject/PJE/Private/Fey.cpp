@@ -10,6 +10,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "RolexPlayerState.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/InputSettings.h"
 
 // Sets default values
 AFey::AFey()
@@ -26,7 +28,7 @@ AFey::AFey()
 	Data.Shield = 0;
 	Data.Speed = 400.0f;
 	Data.Power = 10;
-
+	
 	// healing Box
 	HealingBox = CreateDefaultSubobject<UBoxComponent>(TEXT("HealingBox"));
 	HealingBox->SetupAttachment(GetRootComponent());
@@ -49,7 +51,6 @@ void AFey::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SpringArmComp->SetRelativeRotation(FRotator(0, 60, 50));
 	ChangeState(EMoveState::Start, stateMontages[TEXT("Start")]);
 
 	InitHealBarColor();
@@ -59,7 +60,6 @@ void AFey::BeginPlay()
 void AFey::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -73,6 +73,7 @@ void AFey::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		
 		EnhancedInputComponent->BindAction(IA_Q, ETriggerEvent::Started, this, &AFey::InputAttack);
 		EnhancedInputComponent->BindAction(IA_E, ETriggerEvent::Started, this, &AFey::InputAttack);
+		
 		EnhancedInputComponent->BindAction(IA_LBM, ETriggerEvent::Started, this, &AFey::InputAttack);
 		EnhancedInputComponent->BindAction(IA_LBM, ETriggerEvent::Completed, this, &AFey::LMBAttack);
 		EnhancedInputComponent->BindAction(IA_RBM, ETriggerEvent::Started, this, &AFey::InputAttack);
@@ -93,6 +94,7 @@ void AFey::InputAttack(const FInputActionValue& inputValue)
 	int32 InputVector = inputValue.Get<float>();	// each input value are represented as a float val
 	InputVector--;
 
+	// set cooltime 
 	if (bIsSkillOn[InputVector] && MoveState != EMoveState::Die)
 	{
 		CurrentAttackState = static_cast<EAttackState>(InputVector);
@@ -188,6 +190,8 @@ void AFey::Server_SpawnQActor_Implementation()
 
 void AFey::QAttack()
 {
+	if (bSkillOngoing==true) return;
+	
 	 FString AttackName = TEXT("Q");
 	if (AttackMontages[AttackName] == nullptr) return;
 
@@ -201,13 +205,15 @@ void AFey::QAttack()
 		Server_SpawnQActor();
 	}
 	
-	SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
-	//PlayAnimMontage(AttackMontages[AttackName], 1.0f);
-	SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
+	// SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
+	// //PlayAnimMontage(AttackMontages[AttackName], 1.0f);
+	// SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
 }
 
 void AFey::EAttack()
 {
+	if (bSkillOngoing==true) return;
+	
 	FString AttackName = TEXT("E");
 	if (AttackMontages[AttackName] == nullptr) return;
 
@@ -251,17 +257,21 @@ void AFey::EAttack()
 		}
 	}
 	
-	SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
-	//PlayAnimMontage(AttackMontages[AttackName], 1.0f);
-	SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
+	// SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
+	// //PlayAnimMontage(AttackMontages[AttackName], 1.0f);
+	// SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
 }
 
 void AFey::LMBAttackStart()
 {
+	if (bSkillOngoing==true) return;
+
+	bSkillOngoing = true;
+	
 	HealTime = 0;
 	HealValue = 0;
 	
-	GetWorld()->GetTimerManager().SetTimer(StackHealTimer, this, &AFey::StackHeal, 1.0f, true);
+	GetWorld()->GetTimerManager().SetTimer(StackHealTimer, this, &AFey::StackHeal, HealStackRate, true);
 }
 
 void AFey::StackHeal()
@@ -269,16 +279,15 @@ void AFey::StackHeal()
 	// set heal and heal time limit
 	if (HealTime < StackTimeLimit)
 	{
-		HealTime += 1;
-		HealValue += 5;
-
-		UE_LOG(LogTemp, Warning, TEXT("Heal Stacking"));
+		HealTime += HealStackRate;
+		HealValue += 3;
 	}
 }
 
 void AFey::LMBAttack()
 {
 	Server_LMBAttack();
+	bSkillOngoing = false;
 }
 
 void AFey::Server_LMBAttack_Implementation()
@@ -295,10 +304,10 @@ void AFey::Server_LMBAttack_Implementation()
 
 	// collision check
 	FHitResult HitResult;
-	FVector CameraLocation;
-	FRotator CameraRotation;
-	GetActorEyesViewPoint(CameraLocation, CameraRotation);
-
+	FVector CameraLocation = TpsCamComp->GetComponentLocation();
+	FRotator CameraRotation = TpsCamComp->GetComponentRotation();
+	
+	// collision start, end location
 	FVector StartLocation = CameraLocation;
 	FVector EndLocation = StartLocation + CameraRotation.Vector() * 1000.0f;
 
@@ -307,6 +316,7 @@ void AFey::Server_LMBAttack_Implementation()
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
 
+	// sweep single by channel
 	bool bHit = GetWorld()->SweepSingleByChannel(
 		HitResult,
 		StartLocation,
@@ -325,7 +335,7 @@ void AFey::Server_LMBAttack_Implementation()
 	{
 		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, Radius, 10, FColor::Red, false, 2.0f);
 
-
+		
 		ABaseCharacter* Opponent = Cast<ABaseCharacter>(HitResult.GetActor());
 		if (Opponent && Opponent->Data.Team == Data.Team)
 		{
@@ -336,7 +346,7 @@ void AFey::Server_LMBAttack_Implementation()
 			{
 				//onwer->RolexPS->PlayerData.Healing += character->Data.MaxHp - character->Data.Hp;
 				RolexPS->MultiPlayerHealing(Opponent->Data.MaxHp - Opponent->Data.Hp);
-				Opponent->ModifyHP(Opponent->Data.MaxHp - Opponent->Data.Hp);
+				Opponent->ModifyHP(Opponent->Data.MaxHp - Opponent->Data.Hp);		// crash error
 			}
 			else
 			{
@@ -347,40 +357,48 @@ void AFey::Server_LMBAttack_Implementation()
 		}
 	}
 
-	SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
+	//SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
 	//PlayAnimMontage(AttackMontages[AttackName], 1.0f);
+
+	
 	CurrentAttackState = EAttackState::LMB_Completed;
 	if (IsLocallyControlled())
 	{
 		Server_ChangeAttackState(CurrentAttackState);
 	}
-	SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
+	//SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
 }
 
 void AFey::RMBAttackStart()
 {
+	if (bSkillOngoing==true) return;
+	bSkillOngoing = true;
+	
 	AttackTime = 0;
 	AttackValue = 0;
 	
-	GetWorld()->GetTimerManager().SetTimer(StackAttackTimer, this, &AFey::StackAttack, 1.0f, true);
+	GetWorld()->GetTimerManager().SetTimer(StackAttackTimer, this, &AFey::StackAttack, AttackStackRate, true);
 }
 
 void AFey::StackAttack()
 {
-	AttackTime += 1;
-	AttackValue += 5;
-
-	if (AttackTime > StackTimeLimit)
-		RMBAttack();
+	if (AttackTime < StackTimeLimit)
+	{
+		AttackTime += AttackStackRate;
+		AttackValue += 2;
+	}
 }
 
 void AFey::RMBAttack()
 {
 	Server_RMBAttack();
+	bSkillOngoing = false;
 }
 
 void AFey::Server_RMBAttack_Implementation()
 {
+	GetWorld()->GetTimerManager().ClearTimer(StackAttackTimer);
+	
 	FString AttackName = TEXT("RMB");
 	if (AttackMontages[AttackName] == nullptr) return;
 
@@ -389,9 +407,8 @@ void AFey::Server_RMBAttack_Implementation()
 
 	// collision check
 	FHitResult HitResult;
-	FVector CameraLocation;
-	FRotator CameraRotation;
-	GetActorEyesViewPoint(CameraLocation, CameraRotation);
+	FVector CameraLocation = TpsCamComp->GetComponentLocation();
+	FRotator CameraRotation = TpsCamComp->GetComponentRotation();
 
 	FVector StartLocation = CameraLocation;
 	FVector EndLocation = StartLocation + CameraRotation.Vector() * 1000.0f;
@@ -425,7 +442,7 @@ void AFey::Server_RMBAttack_Implementation()
 			//Opponent->Data.Hp -= AttackValue;
 			//Opponent->ModifyHP(-AttackValue);
 
-			if (Opponent->Data.Hp <= AttackValue)
+			if (Opponent->Data.Hp <= AttackValue)	// kill opponent
 			{
 				//onwer->RolexPS->PlayerData.Damage += character->Data.Hp;
 				RolexPS->MultiPlayerDamage(Opponent->Data.Hp);
@@ -441,14 +458,14 @@ void AFey::Server_RMBAttack_Implementation()
 		}
 	}
 
-	SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
+	//SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
 	//PlayAnimMontage(AttackMontages[AttackName], 1.0f);
 	CurrentAttackState = EAttackState::RMB_Completed;
 	if (IsLocallyControlled())
 	{
 		Server_ChangeAttackState(CurrentAttackState);
 	}
-	SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
+	//SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
 }
 
 bool AFey::IsMontagePlaying(UAnimMontage* Montage)

@@ -40,12 +40,16 @@ public:
 public:
 	EAttackState CurrentAttackState;
 
+	bool bSkillOngoing = false;
+	
+	// Q
 	UPROPERTY(EditAnywhere)
 	int32 NumberOfBalls = 15;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AUltimateBall> UltimateBallFactory;
 
+	// ball min max velocity
 	UPROPERTY(EditAnywhere)
 	float MinVelocity =1000.0f;
 	
@@ -54,24 +58,30 @@ public:
 	
 	void QAttack();
 	
+	// E
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UBoxComponent* HealingBox;
 
 	int32 EAttackHealAmount = 10;
 	
 	void EAttack();
-	
+
+	// LMB
 	void LMBAttackStart();
 	void StackHeal();
 	void  LMBAttack();
+	
 	UFUNCTION(Server, Reliable)
 	void Server_LMBAttack();
 
 	UPROPERTY(EditAnywhere)
 	int32 HealValue = 0;
-	int32 HealTime = 0;
+	float HealTime = 0;
+	UPROPERTY(EditAnywhere)
+	float HealStackRate = 0.25f;
 	FTimerHandle StackHealTimer;
-	
+
+	// RMB
 	void RMBAttackStart();
 	void StackAttack();
 	void RMBAttack();
@@ -79,9 +89,12 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_RMBAttack();
 
+	// stack value for LMB RMB
 	UPROPERTY(EditAnywhere)
 	int32 AttackValue = 0;
-	int32 AttackTime = 0;
+	float AttackTime = 0;
+	UPROPERTY(EditAnywhere)
+	float AttackStackRate = 0.25f;
 	FTimerHandle StackAttackTimer;
 
 	int32 StackTimeLimit = 5;
