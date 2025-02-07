@@ -42,8 +42,8 @@ AFey::AFey()
 	HealingBox->SetCollisionResponseToAllChannels(ECR_Ignore);
 	HealingBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	
-	HealingBox->SetHiddenInGame(false);
-	HealingBox->SetVisibility(true);
+	HealingBox->SetHiddenInGame(true);
+	HealingBox->SetVisibility(false);
 }
 
 // Called when the game starts or when spawned
@@ -328,12 +328,12 @@ void AFey::Server_LMBAttack_Implementation()
 	);
 
 	// collision detection region
-	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Green, false, 2.0f);
-	DrawDebugSphere(GetWorld(), StartLocation, Radius, 10, FColor::Blue, false, 2.0f);
+	// DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Green, false, 2.0f);
+	// DrawDebugSphere(GetWorld(), StartLocation, Radius, 10, FColor::Blue, false, 2.0f);
 
 	if (bHit)
 	{
-		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, Radius, 10, FColor::Red, false, 2.0f);
+		// DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, Radius, 10, FColor::Red, false, 2.0f);
 
 		
 		ABaseCharacter* Opponent = Cast<ABaseCharacter>(HitResult.GetActor());
@@ -429,12 +429,12 @@ void AFey::Server_RMBAttack_Implementation()
 	);
 
 	// collision detection region
-	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Green, false, 2.0f);
-	DrawDebugSphere(GetWorld(), StartLocation, Radius, 10, FColor::Blue, false, 2.0f);
+	// DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Green, false, 2.0f);
+	// DrawDebugSphere(GetWorld(), StartLocation, Radius, 10, FColor::Blue, false, 2.0f);
 
 	if (bHit)
 	{
-		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, Radius, 10, FColor::Red, false, 2.0f);
+		// DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, Radius, 10, FColor::Red, false, 2.0f);
 
 		ABaseCharacter* Opponent = Cast<ABaseCharacter>(HitResult.GetActor());
 		if (Opponent && Opponent->Data.Team != Data.Team)
