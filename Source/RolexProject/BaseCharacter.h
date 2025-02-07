@@ -282,4 +282,7 @@ public:
 
 	void InitHeroUI();
 
+	bool ServerController = false;
+
+
 };

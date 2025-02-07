@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/SphereComponent.h"
 
+#include "BaseCharacter.h"
 #include "Character_Rampage.h"
 
 void UEffectSpawnNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
@@ -15,29 +16,43 @@ void UEffectSpawnNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceB
         return;
     }
 
-    FVector spawnLocation = MeshComp->GetComponentLocation() + MeshComp->GetForwardVector()* LocationOffset.X + MeshComp->GetRightVector()*LocationOffset.Y + MeshComp->GetUpVector() * LocationOffset.Z;
+    AActor* OwnerActor = MeshComp->GetOwner(); // MeshComp를 소유한 액터 가져오기
+	if (OwnerActor)
+	{
+		ABaseCharacter* Character = Cast<ABaseCharacter>(OwnerActor); // ABaseCharacter로 캐스팅
 
-    FRotator SpawnRotation = MeshComp->GetComponentRotation() + RotationOffset;
+		if (Character)
+		{
+            if (Character->ServerController)
+            {
+                UE_LOG(LogTemp, Warning, TEXT("SpawnActor"));
 
-    //AEffectActor* spawnActor = MeshComp->GetWorld()->SpawnActor<AEffectActor>(EffectActorClass, spawnLocation, SpawnRotation);
+                FVector spawnLocation = MeshComp->GetComponentLocation() + MeshComp->GetForwardVector() * LocationOffset.X + MeshComp->GetRightVector() * LocationOffset.Y + MeshComp->GetUpVector() * LocationOffset.Z;
 
-    AEffectActor* spawnActor = MeshComp->GetWorld()->SpawnActorDeferred<AEffectActor>(EffectActorClass, FTransform(SpawnRotation, spawnLocation), MeshComp->GetOwner());
+                FRotator SpawnRotation = MeshComp->GetComponentRotation() + RotationOffset;
 
-    if (spawnActor)
-    {
-        USphereComponent* sphereComp = spawnActor->FindComponentByClass<USphereComponent>();
+                //AEffectActor* spawnActor = MeshComp->GetWorld()->SpawnActor<AEffectActor>(EffectActorClass, spawnLocation, SpawnRotation);
 
-        sphereComp->SetSphereRadius(collionRang);
+                AEffectActor* spawnActor = MeshComp->GetWorld()->SpawnActorDeferred<AEffectActor>(EffectActorClass, FTransform(SpawnRotation, spawnLocation), MeshComp->GetOwner());
 
-        spawnActor->FinishSpawning(FTransform(SpawnRotation, spawnLocation));
+                if (spawnActor)
+                {
+                    USphereComponent* sphereComp = spawnActor->FindComponentByClass<USphereComponent>();
 
-        if (NiagaraEffect)
-        {
-            spawnActor->InitializeEffect(NiagaraEffect, EffectScale);
-        }
-        else if (ParticleEffect)
-        {
-            spawnActor->InitializeEffect(ParticleEffect, EffectScale);
-        }
+                    sphereComp->SetSphereRadius(collionRang);
+
+                    spawnActor->FinishSpawning(FTransform(SpawnRotation, spawnLocation));
+
+                    if (NiagaraEffect)
+                    {
+                        spawnActor->InitializeEffect(NiagaraEffect, EffectScale);
+                    }
+                    else if (ParticleEffect)
+                    {
+                        spawnActor->InitializeEffect(ParticleEffect, EffectScale);
+                    }
+                }
+            }
+		}
     }
 }

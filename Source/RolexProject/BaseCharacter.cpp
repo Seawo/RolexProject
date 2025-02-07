@@ -30,6 +30,10 @@
 #include "Point/Actor_FightPoint.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "Components/SphereComponent.h"
+#include "EffectActor.h"
+
+
 // Sets default values
 ABaseCharacter::ABaseCharacter()
 {
@@ -71,6 +75,11 @@ ABaseCharacter::ABaseCharacter()
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (HasAuthority())
+	{
+		ServerController = true;
+	}
 
 	URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
 
