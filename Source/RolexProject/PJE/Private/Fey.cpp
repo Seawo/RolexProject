@@ -334,7 +334,6 @@ void AFey::Server_LMBAttack_Implementation()
 	if (bHit)
 	{
 		// DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, Radius, 10, FColor::Red, false, 2.0f);
-
 		
 		ABaseCharacter* Opponent = Cast<ABaseCharacter>(HitResult.GetActor());
 		if (Opponent && Opponent->Data.Team == Data.Team)
@@ -342,7 +341,7 @@ void AFey::Server_LMBAttack_Implementation()
 			//Opponent->Data.Hp += HealValue;
 			//Opponent->ModifyHP(HealValue);
 
-			if (Opponent->Data.Hp + HealValue >= Opponent->Data.MaxHp)
+			if (Opponent->Data.Hp + HealValue >= Opponent->Data.MaxHp)		// do not exceed the max HP
 			{
 				//onwer->RolexPS->PlayerData.Healing += character->Data.MaxHp - character->Data.Hp;
 				RolexPS->MultiPlayerHealing(Opponent->Data.MaxHp - Opponent->Data.Hp);
@@ -351,7 +350,6 @@ void AFey::Server_LMBAttack_Implementation()
 			else
 			{
 				Opponent->ModifyHP(HealValue);
-				//onwer->RolexPS->PlayerData.Healing += 10;
 				RolexPS->MultiPlayerHealing(HealValue);
 			}
 		}
@@ -359,7 +357,6 @@ void AFey::Server_LMBAttack_Implementation()
 
 	//SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
 	//PlayAnimMontage(AttackMontages[AttackName], 1.0f);
-
 	
 	CurrentAttackState = EAttackState::LMB_Completed;
 	if (IsLocallyControlled())
