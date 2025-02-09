@@ -93,17 +93,21 @@ void AFey::InputAttack(const FInputActionValue& inputValue)
 
 	int32 InputVector = inputValue.Get<float>();	// each input value are represented as a float val
 	InputVector--;
+	UE_LOG(LogTemp, Warning, TEXT("InputVector = %d"), InputVector);
 
 	// set cooltime 
 	if (bIsSkillOn[InputVector] && MoveState != EMoveState::Die)
 	{
-		CurrentAttackState = static_cast<EAttackState>(InputVector);
-		ChangeAttackState(CurrentAttackState);
-		if (IsLocallyControlled())
+		if (InputVector == 0 || InputVector == 1)
 		{
-			Server_ChangeAttackState(CurrentAttackState);
+			CurrentAttackState = static_cast<EAttackState>(InputVector);
+			ChangeAttackState(CurrentAttackState);
+			if (IsLocallyControlled())
+			{
+				Server_ChangeAttackState(CurrentAttackState);
+			}
+			StartSkillCool(InputVector);
 		}
-		StartSkillCool(InputVector);
 	}
 
 }
@@ -148,9 +152,9 @@ void AFey::Multi_ChangeAttackState_Implementation(EAttackState state)
 	case EAttackState::ESkill:
 		PlayAnimMontage(AttackMontages["E"], 1.0f);
 		break;
-	case EAttackState::LMB:
+	case EAttackState::LMB:	// input value 3
 		break;
-	case EAttackState::RMB:
+	case EAttackState::RMB:	// input value 4
 		break;
 	case EAttackState::QSkill_Completed:
 		break;
@@ -234,6 +238,7 @@ void AFey::EAttack()
 			UE_LOG(LogTemp, Warning, TEXT("TargetCharacter Name: %s"), *TargetCharacter->GetName());
 			//TargetCharacter->Data.Hp += EAttackHealAmount;
 
+			// heal
 			if (TargetCharacter->Data.Hp == TargetCharacter->Data.MaxHp)
 			{
 				return;
@@ -247,13 +252,8 @@ void AFey::EAttack()
 			else
 			{
 				TargetCharacter->ModifyHP(EAttackHealAmount);
-				//onwer->RolexPS->PlayerData.Healing += 10;
 				RolexPS->ServerPlayerHealing(EAttackHealAmount);
 			}
-
-
-			// if (TargetCharacter->Data.Hp > TargetCharacter->Data.MaxHp)
-			// 	TargetCharacter->Data.Hp = TargetCharacter->Data.MaxHp;
 		}
 	}
 	
@@ -288,6 +288,21 @@ void AFey::LMBAttack()
 {
 	Server_LMBAttack();
 	bSkillOngoing = false;
+
+	int32 InputVector = 3;	// each input value are represented as a float val
+	InputVector--;
+	
+	// set cooltime 
+	if (bIsSkillOn[InputVector] && MoveState != EMoveState::Die)
+	{
+		CurrentAttackState = EAttackState::LMB_Completed;
+		ChangeAttackState(CurrentAttackState);
+		if (IsLocallyControlled())
+		{
+			Server_ChangeAttackState(CurrentAttackState);
+		}
+		StartSkillCool(InputVector);
+	}
 }
 
 void AFey::Server_LMBAttack_Implementation()
@@ -359,9 +374,9 @@ void AFey::Server_LMBAttack_Implementation()
 	//PlayAnimMontage(AttackMontages[AttackName], 1.0f);
 	
 	CurrentAttackState = EAttackState::LMB_Completed;
-	if (IsLocallyControlled())
+	if (IsLocallyControlled()) // client cannot pass here 
 	{
-		Server_ChangeAttackState(CurrentAttackState);
+		//Server_ChangeAttackState(CurrentAttackState);
 	}
 	//SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
 }
@@ -390,6 +405,21 @@ void AFey::RMBAttack()
 {
 	Server_RMBAttack();
 	bSkillOngoing = false;
+	
+	int32 InputVector = 4;	// each input value are represented as a float val
+	InputVector--;
+	
+	// set cooltime 
+	if (bIsSkillOn[InputVector] && MoveState != EMoveState::Die)
+	{
+		CurrentAttackState = EAttackState::RMB_Completed;
+		ChangeAttackState(CurrentAttackState);
+		if (IsLocallyControlled())
+		{
+			Server_ChangeAttackState(CurrentAttackState);
+		}
+		StartSkillCool(InputVector);
+	}
 }
 
 void AFey::Server_RMBAttack_Implementation()
@@ -458,9 +488,9 @@ void AFey::Server_RMBAttack_Implementation()
 	//SpringArmComp->SetRelativeLocation(FVector(-200, 60, 70));
 	//PlayAnimMontage(AttackMontages[AttackName], 1.0f);
 	CurrentAttackState = EAttackState::RMB_Completed;
-	if (IsLocallyControlled())
+	if (IsLocallyControlled()) // client cannot pass here
 	{
-		Server_ChangeAttackState(CurrentAttackState);
+		//Server_ChangeAttackState(CurrentAttackState);
 	}
 	//SpringArmComp->SetRelativeLocation(FVector(0, 60, 50));
 }
