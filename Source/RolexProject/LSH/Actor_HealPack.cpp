@@ -51,17 +51,17 @@ void AActor_HealPack::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 
 		UE_LOG(LogTemp, Warning, TEXT("HealPack Overlap Begin2"));
 
-		character->ModifyHP(100);
+		character->ModifyHP(HealAmount);
 		NiagaraComponentHealPack->SetVisibility(false);
 		bIsActivated = false;
 	}
 
-	// 5초 후에 다시 활성화
+	// 10초 후에 다시 활성화 (큰 힐팩(200)은 10초, 작은 힐팩은(100)은 5초)
 	FTimerHandle timerHandle;
 	GetWorld()->GetTimerManager().SetTimer(timerHandle, [this]()
 		{
 			NiagaraComponentHealPack->SetVisibility(true);
 			bIsActivated = true;
-		}, 5.0f, false);
+		}, HealCoolTime, false);
 }
 

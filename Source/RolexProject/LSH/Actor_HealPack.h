@@ -36,4 +36,10 @@ public:
 
 
 	bool bIsActivated = true;
+
+	UPROPERTY(EditAnywhere)
+	int32 HealAmount = 100;
+
+	UPROPERTY(EditAnywhere)
+	int32 HealCoolTime = 10;
 };

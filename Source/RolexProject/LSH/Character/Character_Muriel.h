@@ -65,6 +65,13 @@ class ROLEXPROJECT_API ACharacter_Muriel : public ABaseCharacter
 	void UpdateQSkillSearchPlayer();					// Q스킬 플레이어 찾기
 
 
+
+	UFUNCTION(Server, Reliable)
+	void Server_UpdateQSkillMovement(EQkillMovement state);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multi_UpdateQSkillMovement(EQkillMovement state, float time);
+
 public:
 	UFUNCTION(Server, Reliable)
 	void Server_SpawnEffect(FName socketName, FName key);

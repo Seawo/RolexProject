@@ -101,7 +101,7 @@ public:
 	// 스킬 지속시간
 	float LRSkillDuration = 3.0f;						// 좌클릭, 우클릭 스킬 생성시간
 	float QSkillDuration = 3.5f;						// Q스킬 생성시간	
-	float ESkillDuration = 8.0f;						// E스킬 생성시간
+	float ESkillDuration = 6.0f;						// E스킬 생성시간
 
 	// 스킬 쿨타임
 	float RMBSkillCoolTime = 0.0f;						// 쿨타임 5초

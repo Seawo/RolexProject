@@ -12,6 +12,8 @@
 
 #include "AnimInstance_Muriel.h"
 #include "Actor_Effect.h"
+#include "HeroUI.h"
+#include "Components/RadialSlider.h"
 
 
 ACharacter_Muriel::ACharacter_Muriel()
@@ -47,7 +49,7 @@ void ACharacter_Muriel::Tick(float DeltaTime)
 
 	//UpdateFlyCoolTime(DeltaTime);
 	// 캐릭이 땅에 닿아 있을때만 FlyGauge를 채울 수 있도록 설정
-	if (GetCharacterMovement()->IsMovingOnGround())
+	if (IsLocallyControlled() and GetCharacterMovement()->IsMovingOnGround())
 	{
 		FlyGauge += DeltaTime;
 		if (FlyGauge > 5.0f)
@@ -56,12 +58,12 @@ void ACharacter_Muriel::Tick(float DeltaTime)
 		}
 	}
 
-	if (bIsSearchQSkill)
+	if (IsLocallyControlled() and bIsSearchQSkill)
 	{
 		UpdateQSkillSearchPlayer();
 	}
 
-	if (bStartQSkill)
+	if (IsLocallyControlled() and bStartQSkill)
 	{
 		UpdateQSkillMovement(DeltaTime);
 	}
@@ -255,8 +257,6 @@ void ACharacter_Muriel::MurielLShift()
 		SlopeForwardAngle = 0.0f;
 	}
 }
-
-
 void ACharacter_Muriel::MurielFly()
 {
 	SpacebarHoldTime += GetWorld()->GetDeltaSeconds();
@@ -334,8 +334,6 @@ void ACharacter_Muriel::MurielJump()
 		Jump();
 	}
 }
-
-
 void ACharacter_Muriel::MurielRMBEnd()
 {
 	if (not bIsRMBCharging) return;
@@ -354,10 +352,17 @@ void ACharacter_Muriel::MurielQSkillComplete()
 	bIsSearchQSkill = false;
 
 
+	// 궁극시 사용 실패 시 쿨타임 80% 감소 (하면 이상할거같다..)
 	if (QSkillTargetLocation == FVector::ZeroVector)
 	{
 		// 목표 지점이 없다면 재생중인 몽타주 멈추기
 		AnimInstance->Montage_Stop(0.2f, AttackMontages["Q"]);
+		ResetSkillCool(0);
+		if (HeroUI)
+		{
+			//HeroUI->AccumulateTimeMap[0] = 0.0f;
+			HeroUI->RadialBarMap[0]->SetValue(1);
+		}
 		return;
 	}
 
@@ -370,9 +375,8 @@ void ACharacter_Muriel::MurielQSkillComplete()
 	bStartQSkill = true;
 	// QSkill 이동 상태를 시작단계로 변경
 	QSkillMovement = EQkillMovement::Ascending;
-	
+	Server_UpdateQSkillMovement(QSkillMovement);
 }
-
 void ACharacter_Muriel::MurielESkillComplete()
 {
 	// E스킬 차징중이 아니라면 리턴
@@ -408,6 +412,7 @@ void ACharacter_Muriel::MurielESkillRotate()
 		ESkillRotationYaw -= 90.0f;
 	}
 }
+
 
 void ACharacter_Muriel::PlayAttackMontage(FString Key, float InPlayRate, FName StartSectionName)
 {
@@ -502,6 +507,7 @@ void ACharacter_Muriel::Server_SpawnEffect_Implementation(FName socketName, FNam
 		}
 	}
 }
+
 
 void ACharacter_Muriel::SpawnEffect(FName socketName, FName key)
 {
@@ -640,4 +646,90 @@ void ACharacter_Muriel::UpdateQSkillSearchPlayer()
 
 	DrawDebugPoint(GetWorld(), target, 5.0f, FColor::Green, false, 0.1f);
 	//DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 5.0f, 0, 1.0f);
+}
+
+void ACharacter_Muriel::Server_UpdateQSkillMovement_Implementation(EQkillMovement state)
+{
+	float delta = GetWorld()->GetDeltaSeconds();
+
+
+}
+
+void ACharacter_Muriel::Multi_UpdateQSkillMovement_Implementation(EQkillMovement state, float time)
+{
+	FVector currentLocation = GetActorLocation();
+
+	// 수직 상승 중일때
+	if (QSkillMovement == EQkillMovement::Ascending)
+	{
+		//currentLocation.Z += QSkillVerticalSpeed * DeltaTime;
+		currentLocation.Z += QSkillVerticalSpeed * GetWorld()->GetDeltaSeconds();
+
+
+
+		Server_MoveModeChange(EMovementMode::MOVE_None);
+		//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
+		if (currentLocation.Z >= ZHeight)		//	수직 상승 중에 수평이동 시작할 위치에 도착했다면
+		{
+
+
+			currentLocation.Z = ZHeight;
+			QSkillMovement = EQkillMovement::MovingHorizontally;
+
+			PlayAttackMontage("Q", 1.0f, "QSkillDescending");
+
+		}
+	}
+	// 수평 이동 중일때
+	else if (QSkillMovement == EQkillMovement::MovingHorizontally)
+	{
+		FVector horizontalTargetLocation = FVector(QSkillTargetLocation.X + 200.0f, QSkillTargetLocation.Y, ZHeight);
+		FVector horizontalDirection = (horizontalTargetLocation - currentLocation).GetSafeNormal2D();
+
+
+		currentLocation += horizontalDirection * QSkillHorizontalSpeed * time;
+		Server_MoveModeChange(EMovementMode::MOVE_None);
+		//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
+
+		if (FVector::Dist2D(currentLocation, horizontalTargetLocation) <= 300.0f) // 수평 이동중에 수직 하강 위치에 도착했다면
+		{
+			currentLocation = horizontalTargetLocation;
+			QSkillMovement = EQkillMovement::Descending;
+
+		}
+	}
+	// 수직 하강 중일때
+	else if (QSkillMovement == EQkillMovement::Descending)
+	{
+
+		currentLocation.Z -= QSkillVerticalSpeed * 2.0f * time;
+		Server_MoveModeChange(EMovementMode::MOVE_None);
+		//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+		if (currentLocation.Z <= QSkillTargetLocation.Z) // 착지지점에 도착했다면
+		{
+			SpawnEffect("None", "QSkill");
+
+
+			currentLocation.Z = QSkillTargetLocation.Z;
+			currentLocation = FVector(QSkillTargetLocation.X + 200.0f, QSkillTargetLocation.Y, QSkillTargetLocation.Z);
+
+
+			QSkillMovement = EQkillMovement::Idle;
+			PlayAttackMontage("Q", 1.0f, "QSkillLand");
+			//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+		}
+	}
+	// 착지 상태일때
+	else if (QSkillMovement == EQkillMovement::Idle)
+	{
+		bStartQSkill = false;
+		GetCharacterMovement()->GravityScale = DefaultGravityScale;
+		Server_MoveModeChange(EMovementMode::MOVE_Walking);
+		//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	}
+
+	//Server_MoveToLocation(currentLocation);
+	SetActorLocation(currentLocation);
 }
