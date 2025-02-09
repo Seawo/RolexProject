@@ -674,7 +674,6 @@ void ARolexPlayerController::OpenInGameEsc()
 		}
 	}
 }
-
 void ARolexPlayerController::CloseInGameEsc()
 {
 	if (IsLocalController() && UI_InGameEsc)
@@ -696,7 +695,6 @@ void ARolexPlayerController::OpenInGameTab()
 		}, 0.1f, true);
 	}
 }
-
 void ARolexPlayerController::CloseInGameTab()
 {
 	if (IsLocalController() && UI_InGameTab)
@@ -705,7 +703,6 @@ void ARolexPlayerController::CloseInGameTab()
 		GetWorld()->GetTimerManager().ClearTimer(TimerHandleTabUI);
 	}
 }
-
 void ARolexPlayerController::InitInGameTab()
 {
 	if (IsLocalController() && UI_InGameTab)

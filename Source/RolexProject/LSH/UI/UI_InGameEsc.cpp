@@ -43,13 +43,28 @@ void UUI_InGameEsc::OnBtnOptionClicked()
 void UUI_InGameEsc::OnBtnGameLeaveClicked()
 {
 	UE_LOG(LogTemp, Warning, TEXT("OnBtnGameLeaveClicked"));
-
-	// 세션 나가기
-	URolexGameInstance* rolexGI = Cast<URolexGameInstance>(GetWorld()->GetGameInstance());
-
-	if (rolexGI)
+	
+	ARolexPlayerController* rolexPC = Cast<ARolexPlayerController>(GetOwningPlayer());
+	AGS_TrainingRoom* rolexGS = Cast<AGS_TrainingRoom>(GetWorld()->GetGameState());
+	if (rolexPC)
 	{
-		rolexGI->LeaveSession();
+		if (rolexGS)
+		{
+			if (rolexPC->HasAuthority())
+			{
+
+				rolexGS->Multi_DestroySession();
+			}
+			else
+			{
+				// 세션 나가기
+				URolexGameInstance* rolexGI = Cast<URolexGameInstance>(GetWorld()->GetGameInstance());
+				if (rolexGI)
+				{
+					rolexGI->LeaveSession();
+				}
+			}
+		}
 	}
 }
 

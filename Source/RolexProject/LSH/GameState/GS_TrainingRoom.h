@@ -59,6 +59,9 @@ class ROLEXPROJECT_API AGS_TrainingRoom : public AGameStateBase
 	void Multi_SetBTeamCharacters(class ABaseCharacter* BTeam);
 
 public:
+	UFUNCTION(NetMulticast, Reliable)
+	void Multi_DestroySession();
+public:
 	void FindCharacterInWorld();
 	//UFUNCTION(NetMulticast, Reliable)
 	//void MulticastSetTimeDilation(float Dilation);

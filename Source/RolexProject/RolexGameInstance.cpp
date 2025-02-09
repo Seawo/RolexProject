@@ -151,7 +151,6 @@ void URolexGameInstance::LeaveSession()
 	if (SessionInterface)
 	{
 		SessionInterface->DestroySession(FName(RoomName.ToString()));
-		return;
 	}
 }
 
@@ -161,23 +160,10 @@ void URolexGameInstance::OnDestroySessionComplete(FName SessionName, bool bWasSu
 	if (bWasSuccessful)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Destroy Session Success"));
-		UGameplayStatics::OpenLevel(this, FName("Lobby"), true);
+		UGameplayStatics::OpenLevel(this, FName("Lobby"));
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Destroy Session Failed"));
 	}
 }
-
-void URolexGameInstance::OnSessionFailure(const FUniqueNetId& NetId, ESessionFailure::Type FailureType)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Session has been disconnected.Go to the lobby."));
-
-	UGameplayStatics::OpenLevel(this, FName("Lobby"), true);
-}
-
-
-
-
-
-

@@ -126,12 +126,11 @@ void AGS_TrainingRoom::Tick(float DeltaTime)
 					FTimerHandle finishTH;
 					GetWorld()->GetTimerManager().SetTimer(finishTH, [this]()
 					{
-						/*URolexGameInstance* RolexGameInstance = Cast<URolexGameInstance>(GetGameInstance());
-						if (RolexGameInstance)
-						{
-							RolexGameInstance->LeaveSession();
-						}*/
-						UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
+						// 게임 종료
+						//UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
+
+						// 세션 나가기
+						Multi_DestroySession();
 					}, 5.0f, false);
 
 					bIsGameOver = true;
@@ -192,6 +191,18 @@ void AGS_TrainingRoom::Multi_SetATeamCharacters_Implementation(ABaseCharacter* A
 void AGS_TrainingRoom::Multi_SetBTeamCharacters_Implementation(ABaseCharacter* BTeam)
 {
 	BTeamChracters.Add(BTeam);
+}
+
+void AGS_TrainingRoom::Multi_DestroySession_Implementation()
+{
+	UE_LOG(LogTemp, Error, TEXT("[][][][]  Client DestroySession."));
+	if (HasAuthority()) return;
+
+	URolexGameInstance* rolexGI = GetGameInstance<URolexGameInstance>();
+	if (rolexGI)
+	{
+		rolexGI->LeaveSession();
+	}
 }
 
 void AGS_TrainingRoom::FindCharacterInWorld()
@@ -600,7 +611,15 @@ void AGS_TrainingRoom::OnRep_Result()
 		FTimerHandle finishTH;
 		GetWorld()->GetTimerManager().SetTimer(finishTH, [this]()
 			{
-				UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
+				// 게임 종료
+				//UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
+				
+				// 세션 나가기
+				URolexGameInstance* rolexGI = GetGameInstance<URolexGameInstance>();
+				if (rolexGI)
+				{
+					rolexGI->LeaveSession();
+				}
 			}, 5.0f, false);
 	}
 }
