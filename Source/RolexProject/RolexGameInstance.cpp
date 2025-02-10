@@ -66,7 +66,7 @@ void URolexGameInstance::OnCreateSession(FName SessionName, bool bWasSuccessful)
 	if (bWasSuccessful)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Create Session Success"));
-		GetWorld()->ServerTravel(TEXT("/Game/Rolex/Map/WaitingRoom?listen"));
+		GetWorld()->ServerTravel(TEXT("/Game/Rolex/Map/WaitingRoom_MedivalAsia?listen"));
 	}
 	else
 	{
