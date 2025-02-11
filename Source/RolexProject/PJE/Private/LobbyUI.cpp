@@ -57,6 +57,7 @@ void ULobbyUI::NativeConstruct()
 	AAudioManager* AudioManager = Cast<AAudioManager>(UGameplayStatics::GetActorOfClass(this, AAudioManager::StaticClass()));
 	if (AudioManager && LobbySound)
 	{
+		//bAutoActivate
 		AudioManager->AudioComponent->SetSound(LobbySound);
 		AudioManager->AudioComponent->Play();
 	}
