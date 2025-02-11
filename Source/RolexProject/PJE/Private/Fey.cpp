@@ -38,7 +38,7 @@ AFey::AFey()
 
 	// collision settings: ignore all but overlap pawn
 	HealingBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	HealingBox->SetCollisionObjectType(ECC_WorldDynamic);
+	HealingBox->SetCollisionObjectType(ECC_WorldDynamic);		// own type
 	HealingBox->SetCollisionResponseToAllChannels(ECR_Ignore);
 	HealingBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	

@@ -58,7 +58,7 @@ void AWaitingRoomGameModeBase::HandleStartingNewPlayer_Implementation(APlayerCon
 			RolexPlayerController->ClientRPC_CreateWaitingRoomUI();		// create UI for client
 			RolexPlayerController->ClientRPC_InitWaitingRoomUI(PlayerIDArray);	// init UI content
 			// let server and the owner client know information both
-			RolexPlayerController->ClientRPC_SetPlayerSlotUI(CurrentPlayersNum);	// set client's player slot UI
+			RolexPlayerController->ClientRPC_SetPlayerSlotUI(CurrentPlayersNum);	// set client's player slot UI and update number of players
 		}
 
 		// update new player for the every player
@@ -66,8 +66,8 @@ void AWaitingRoomGameModeBase::HandleStartingNewPlayer_Implementation(APlayerCon
 		{
 			if (WaitingRoomGameStateBase)
 			{
-				WaitingRoomGameStateBase->MulticastRPC_UpdateWaitingPlayerSlotID(SteamId);
-				WaitingRoomGameStateBase->MulticastRPC_UpdatePlayerSlotID(CurrentPlayersNum, SteamId);
+				WaitingRoomGameStateBase->MulticastRPC_UpdateWaitingPlayerSlotID(SteamId);		// update new client on the waiting player list 
+				WaitingRoomGameStateBase->MulticastRPC_UpdatePlayerSlotID(CurrentPlayersNum, SteamId);		// update new player ID on hero selection player UI slot 
 				
 				// WaitingRoomGameStateBase->WaitingRoomUI is different by player
 				// WaitingRoomGameStateBase->WaitingRoomUI->PlayerSlots[CurrentPlayersNum]->PlayerIDString = SteamId;

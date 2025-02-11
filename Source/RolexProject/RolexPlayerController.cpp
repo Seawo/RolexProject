@@ -102,6 +102,7 @@ void ARolexPlayerController::ServerRPC_SetSelectedHero_Implementation(const FStr
 // 		// }
 // 	}
 // }
+
 void ARolexPlayerController::ServerRPC_SetPlayerSlotHeroImage_Implementation(UTexture2D* PlayerHeroTexture, const int32 Index)
 {
 	// cannot implement MulticastRPC_SetPlayerHeroImage in RolexPlayerController since clients only have its own controller
@@ -132,6 +133,8 @@ void ARolexPlayerController::ServerRPC_UpdateWholePlayerNumber_Implementation()
 		
 	WaitingRoomGameStateBase->WholePlayerNumber += 1;
 	AWaitingRoomGameModeBase* WaitingRoomGameModeBase = Cast<AWaitingRoomGameModeBase>(GetWorld()->GetAuthGameMode());
+
+	// if the players are all in the room
 	if (WaitingRoomGameStateBase->WholePlayerNumber >= WaitingRoomGameModeBase->MaxPlayersNum)
 	{
 		WaitingRoomGameStateBase->MulticastRPC_UpdateNotice("STARTING SOON ...");

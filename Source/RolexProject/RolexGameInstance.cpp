@@ -98,26 +98,25 @@ void URolexGameInstance::FindSession()
 void URolexGameInstance::OnFindSession(bool bWasSuccessful)
 {
 	if (!IsValid(this))
+		return;
+	if (bWasSuccessful)
 	{
-		if (bWasSuccessful)
+		UE_LOG(LogTemp, Warning, TEXT("FindSession Succeed"));
+		UE_LOG(LogTemp, Warning, TEXT("Number of search results: %d"), SessionSearched->SearchResults.Num());
+
+		// get the created sessions and add to the SessionScrollBox
+		auto results = SessionSearched->SearchResults;
+		for (int32 i = 0; i < results.Num(); i++)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("FindSession Succeed"));
-			UE_LOG(LogTemp, Warning, TEXT("Number of search results: %d"), SessionSearched->SearchResults.Num());
+			FOnlineSessionSearchResult SearchResult = results[i];
+			FString SessionId = SearchResult.GetSessionIdStr();
+			FString OwnerName = SearchResult.Session.OwningUserName;
+			FString SessionName;
+			SearchResult.Session.SessionSettings.Get(TEXT("RoomName"), SessionName);
 
-			// get the created sessions and add to the SessionScrollBox
-			auto results = SessionSearched->SearchResults;
-			for (int32 i = 0; i < results.Num(); i++)
-			{
-				FOnlineSessionSearchResult SearchResult = results[i];
-				FString SessionId = SearchResult.GetSessionIdStr();
-				FString OwnerName = SearchResult.Session.OwningUserName;
-				FString SessionName;
-				SearchResult.Session.SessionSettings.Get(TEXT("RoomName"), SessionName);
-
-				UE_LOG(LogTemp, Warning, TEXT("Session Found: %s"), *SessionName);
-			
-				AddSession.ExecuteIfBound(i, OwnerName, SessionName);
-			}
+			UE_LOG(LogTemp, Warning, TEXT("Session Found: %s"), *SessionName);
+		
+			AddSession.ExecuteIfBound(i, OwnerName, SessionName);
 		}
 	}
 }
