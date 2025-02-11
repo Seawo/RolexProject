@@ -651,17 +651,17 @@ void ABaseCharacter::InputEsc()
 	{
 		if (bIsClickEsc)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ESC Open"));
-			RolexPC->OpenInGameEsc();
-			RolexPC->SetInputMode(FInputModeGameAndUI());
-			RolexPC->bShowMouseCursor = true;
+			//UE_LOG(LogTemp, Warning, TEXT("ESC Open"));
+			//RolexPC->OpenInGameEsc();
+			//RolexPC->SetInputMode(FInputModeGameAndUI());
+			//RolexPC->bShowMouseCursor = true;
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ESC Close"));
-			RolexPC->CloseInGameEsc();
-			RolexPC->SetInputMode(FInputModeGameOnly());
-			RolexPC->bShowMouseCursor = false;
+			//UE_LOG(LogTemp, Warning, TEXT("ESC Close"));
+			//RolexPC->CloseInGameEsc();
+			//RolexPC->SetInputMode(FInputModeGameOnly());
+			//RolexPC->bShowMouseCursor = false;
 		}
 	}
 }
