@@ -50,6 +50,8 @@ class ROLEXPROJECT_API AGS_TrainingRoom : public AGameStateBase
 
 	void UpdatePointGauge(float DeltaTime);
 
+
+
 	UFUNCTION()
 	void ChangeNumberOfTeam(bool bTeam, int32 ChangeValue);
 
@@ -59,6 +61,8 @@ class ROLEXPROJECT_API AGS_TrainingRoom : public AGameStateBase
 	void Multi_SetBTeamCharacters(class ABaseCharacter* BTeam);
 
 public:
+	void GameSoundPlay(FString name);
+
 	UFUNCTION(NetMulticast, Reliable)
 	void Multi_DestroySession();
 public:
@@ -187,4 +191,12 @@ public:
 	bool IsGetBTeamExtraTime = false;
 
 	bool bIsGameOver = false;
+
+	bool bIsSoundCount = false;
+	UPROPERTY(EditAnywhere)
+	class USoundBase* SoundCount;
+	UPROPERTY(EditAnywhere)
+	class USoundBase* SoundVictory;
+	UPROPERTY(EditAnywhere)
+	class USoundBase* SoundDefeat;
 };

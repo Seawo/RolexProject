@@ -10,6 +10,8 @@
 #include "Engine/Engine.h"
 #include "OnlineSubsystem.h"
 
+#include "RolexPlayerController.h"
+
 void URolexGameInstance::Init()
 {
 	Super::Init();
@@ -147,9 +149,48 @@ void URolexGameInstance::OnJoinSession(FName SessionName, EOnJoinSessionComplete
 
 void URolexGameInstance::LeaveSession()
 {
-	if (SessionInterface)
+	FName name = FName(RoomName.ToString());
+	if (SessionInterface and SessionInterface->GetNamedSession(name))
+	{ // NAME_GameSession
+		ARolexPlayerController* pc = Cast<ARolexPlayerController>(GetWorld()->GetFirstPlayerController());
+
+		if (pc and pc->HasAuthority())
+		{
+			// 서버일 경우
+			SessionInterface->DestroySession(name, FOnDestroySessionCompleteDelegate::CreateLambda(
+				[this](FName SessionName, bool bWasSuccessful)
+				{
+					UE_LOG(LogTemp, Log, TEXT("Listen Server: Session %s destroyed: %s"), *SessionName.ToString(), bWasSuccessful ? TEXT("Success") : TEXT("Failure"));
+					GetWorld()->ServerTravel("/Game/Rolex/Map/Lobby_MedivalAsia?listen");
+				}));
+		}
+		else
+		{
+			// 클라인 경우
+			pc->ClientTravel("/Game/Rolex/Map/Lobby_MedivalAsia", ETravelType::TRAVEL_Absolute);
+		}
+
+		// 모든 클라이언트 내보내기
+		//for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		//{
+		//	APlayerController* PC = Iterator->Get();
+		//	if (PC && !PC->IsLocalController()) // 로컬 플레이어(서버) 제외
+		//	{
+		//		PC->ClientTravel("/Game/Rolex/Map/Lobby_MedivalAsia", ETravelType::TRAVEL_Absolute);
+		//	}
+		//}
+
+		// 세션 삭제 후 서버 이동
+		/*SessionInterface->DestroySession(name, FOnDestroySessionCompleteDelegate::CreateLambda(
+			[this](FName SessionName, bool bWasSuccessful)
+			{
+				UE_LOG(LogTemp, Log, TEXT("Listen Server: Session %s destroyed: %s"), *SessionName.ToString(), bWasSuccessful ? TEXT("Success") : TEXT("Failure"));
+				GetWorld()->ServerTravel("/Game/Rolex/Map/Lobby_MedivalAsia?listen");
+			}));*/
+	}
+	else
 	{
-		SessionInterface->DestroySession(FName(RoomName.ToString()));
+		UE_LOG(LogTemp, Error, TEXT("SessionInterface is not valid"));
 	}
 }
 

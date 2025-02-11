@@ -567,6 +567,9 @@ void ARolexPlayerController::SetResult(const EResult result)
 		//UI_GameEnd->UIInit();
 
 		ABaseCharacter* character = Cast<ABaseCharacter>(GetPawn());
+		AGS_TrainingRoom* GS = Cast<AGS_TrainingRoom>(GetWorld()->GetGameState());
+
+
 		if (character)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Character is %s"), *character->GetName());
@@ -577,10 +580,19 @@ void ARolexPlayerController::SetResult(const EResult result)
 			if (character and character->Data.Team)
 			{
 				UI_GameEnd->SetResultWin();
+				if (GS)
+				{
+					GS->GameSoundPlay("Victory");
+				}
 			}
 			else if (character and not character->Data.Team)
 			{
 				UI_GameEnd->SetResultLose();
+
+				if (GS)
+				{
+					GS->GameSoundPlay("Defeat");
+				}
 			}
 		}
 		else if (result == EResult::BWin)
@@ -588,10 +600,20 @@ void ARolexPlayerController::SetResult(const EResult result)
 			if (character and character->Data.Team)
 			{
 				UI_GameEnd->SetResultLose();
+
+				if (GS)
+				{
+					GS->GameSoundPlay("Defeat");
+				}
 			}
 			else if (character and not character->Data.Team)
 			{
 				UI_GameEnd->SetResultWin();
+
+				if (GS)
+				{
+					GS->GameSoundPlay("Victory");
+				}
 			}
 		}
 	}

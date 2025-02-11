@@ -14,6 +14,8 @@
 #include "BaseCharacter.h"
 #include "UI_Zone.h"
 #include "Point/Actor_StartDoor.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundBase.h"
 
 #include "Net/UnrealNetwork.h"
 
@@ -68,6 +70,17 @@ void AGS_TrainingRoom::BeginPlay()
 void AGS_TrainingRoom::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// 서버와 클라 모두 사용되는 사운드 재생
+	if (PlayTime > 10.0f)
+	{
+		if (not bIsSoundCount and SoundCount)
+		{
+			//SoundCount11->Play();
+			GameSoundPlay("Count");
+			bIsSoundCount = true;
+		}
+	}
 
 	if (not HasAuthority())
 	{
@@ -130,7 +143,12 @@ void AGS_TrainingRoom::Tick(float DeltaTime)
 						//UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
 
 						// 세션 나가기
-						Multi_DestroySession();
+						//Multi_DestroySession();
+						URolexGameInstance* rolexGI = GetGameInstance<URolexGameInstance>();
+						if (rolexGI)
+						{
+							rolexGI->LeaveSession();
+						}
 					}, 5.0f, false);
 
 					bIsGameOver = true;
@@ -195,13 +213,29 @@ void AGS_TrainingRoom::Multi_SetBTeamCharacters_Implementation(ABaseCharacter* B
 
 void AGS_TrainingRoom::Multi_DestroySession_Implementation()
 {
-	UE_LOG(LogTemp, Error, TEXT("[][][][]  Client DestroySession."));
-	if (HasAuthority()) return;
+	UE_LOG(LogTemp, Error, TEXT("[][][][] DestroySession."));
+	//if (HasAuthority()) return;
 
 	URolexGameInstance* rolexGI = GetGameInstance<URolexGameInstance>();
 	if (rolexGI)
 	{
 		rolexGI->LeaveSession();
+	}
+}
+
+void AGS_TrainingRoom::GameSoundPlay(FString name)
+{
+	if (name == "Count")
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), SoundCount);
+	}
+	else if (name == "Victory")
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), SoundVictory);
+	}
+	else if (name == "Defeat")
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), SoundDefeat);
 	}
 }
 
@@ -572,16 +606,6 @@ void AGS_TrainingRoom::OnRep_SetPlayerController()
 }
 void AGS_TrainingRoom::OnRep_PlayTime()
 {
-	//if (HasAuthority())
-	//{
-	//	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep_Server] PlayTime"));
-	//	PC->SetPlayTime(PlayTime);
-	//}
-	//else
-	//{
-	//	UE_LOG(LogTemp, Log, TEXT("[GS_OnRep_Client] PlayTime"));
-	//	PC->UI_Zone->SetPlayTime(PlayTime);
-	//}
 	PC->SetPlayTime(PlayTime);
 }
 void AGS_TrainingRoom::OnRep_Doors()
@@ -606,21 +630,32 @@ void AGS_TrainingRoom::OnRep_Result()
 	PC->SetOffofTxtraTime();
 	PC->SetResult(Result);
 
+	//if (Result == EResult::AWin)
+	//{
+	//	// 게임 승리 사운드
+	//	GameSoundPlay("Victory");
+	//}
+	//else if (Result == EResult::BWin)
+	//{
+	//	// 게임 패배 사운드
+	//	GameSoundPlay("Defeat");
+	//}
+
 	if (Result != EResult::None)
 	{
-		FTimerHandle finishTH;
-		GetWorld()->GetTimerManager().SetTimer(finishTH, [this]()
-			{
-				// 게임 종료
-				//UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
-				
-				// 세션 나가기
-				URolexGameInstance* rolexGI = GetGameInstance<URolexGameInstance>();
-				if (rolexGI)
-				{
-					rolexGI->LeaveSession();
-				}
-			}, 5.0f, false);
+		//FTimerHandle finishTH;
+		//GetWorld()->GetTimerManager().SetTimer(finishTH, [this]()
+		//	{
+		//		// 게임 종료
+		//		//UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
+		//		
+		//		// 세션 나가기
+		//		URolexGameInstance* rolexGI = GetGameInstance<URolexGameInstance>();
+		//		if (rolexGI)
+		//		{
+		//			rolexGI->LeaveSession();
+		//		}
+		//	}, 5.0f, false);
 	}
 }
 void AGS_TrainingRoom::OnRep_Clash()
