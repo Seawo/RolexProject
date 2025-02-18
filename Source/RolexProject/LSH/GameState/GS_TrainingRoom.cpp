@@ -142,6 +142,7 @@ void AGS_TrainingRoom::Tick(float DeltaTime)
 						// 게임 종료
 						//UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
 
+						bGameOver = true;
 						// 세션 나가기
 						//Multi_DestroySession();
 						URolexGameInstance* rolexGI = GetGameInstance<URolexGameInstance>();
@@ -656,6 +657,17 @@ void AGS_TrainingRoom::OnRep_Result()
 		//			rolexGI->LeaveSession();
 		//		}
 		//	}, 5.0f, false);
+	}
+}
+void AGS_TrainingRoom::OnRep_GameOver()
+{
+	if (bGameOver)
+	{
+		URolexGameInstance* rolexGI = GetGameInstance<URolexGameInstance>();
+		if (rolexGI)
+		{
+			rolexGI->LeaveSession();
+		}
 	}
 }
 void AGS_TrainingRoom::OnRep_Clash()

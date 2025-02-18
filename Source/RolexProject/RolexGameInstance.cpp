@@ -164,29 +164,11 @@ void URolexGameInstance::LeaveSession()
 					GetWorld()->ServerTravel("/Game/Rolex/Map/Lobby_MedivalAsia?listen");
 				}));
 		}
-		else
+		else if (pc and not pc->HasAuthority())
 		{
 			// 클라인 경우
 			pc->ClientTravel("/Game/Rolex/Map/Lobby_MedivalAsia", ETravelType::TRAVEL_Absolute);
 		}
-
-		// 모든 클라이언트 내보내기
-		//for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-		//{
-		//	APlayerController* PC = Iterator->Get();
-		//	if (PC && !PC->IsLocalController()) // 로컬 플레이어(서버) 제외
-		//	{
-		//		PC->ClientTravel("/Game/Rolex/Map/Lobby_MedivalAsia", ETravelType::TRAVEL_Absolute);
-		//	}
-		//}
-
-		// 세션 삭제 후 서버 이동
-		/*SessionInterface->DestroySession(name, FOnDestroySessionCompleteDelegate::CreateLambda(
-			[this](FName SessionName, bool bWasSuccessful)
-			{
-				UE_LOG(LogTemp, Log, TEXT("Listen Server: Session %s destroyed: %s"), *SessionName.ToString(), bWasSuccessful ? TEXT("Success") : TEXT("Failure"));
-				GetWorld()->ServerTravel("/Game/Rolex/Map/Lobby_MedivalAsia?listen");
-			}));*/
 	}
 	else
 	{

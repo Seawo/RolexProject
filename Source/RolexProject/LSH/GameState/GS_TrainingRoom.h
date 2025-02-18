@@ -85,6 +85,8 @@ protected:
 	UFUNCTION()
 	void OnRep_Result();
 	UFUNCTION()
+	void OnRep_GameOver();
+	UFUNCTION()
 	void OnRep_Clash();
 	UFUNCTION()
 	void OnRep_PointATeamCount();
@@ -109,6 +111,7 @@ protected:
 	UFUNCTION()
 	void OnRep_IsGetBTeamExtraTime();
 
+
 private:
 	void AddDynamicMaterialToPostProcessVolume();
 
@@ -130,6 +133,8 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Info")
 	bool IsGameStart = false;
 
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Doors, Category = "Info")
+	bool bGameOver = false;
 
 	UPROPERTY(VisibleAnywhere, Category = "Info")
 	TArray<class ABaseCharacter*> ATeamChracters;		// Team == true (A팀)
